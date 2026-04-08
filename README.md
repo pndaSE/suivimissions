@@ -1,5 +1,10 @@
 # Suivi des missions
 
+[![Version](https://img.shields.io/badge/version-1.0.0-1d4c34)](https://github.com/KISUNGU/suivi-missions/releases/tag/v1.0.0)
+[![Windows](https://img.shields.io/badge/platform-Windows-0f6cbd)](https://github.com/KISUNGU/suivi-missions/releases)
+[![Electron](https://img.shields.io/badge/Electron-37.2.0-47848f)](https://www.electronjs.org/)
+[![Release](https://img.shields.io/badge/download-releases-d3a52c)](https://github.com/KISUNGU/suivi-missions/releases)
+
 Application desktop Electron pour le suivi des missions du PNDA-SE.
 
 ## Apercu
@@ -10,6 +15,13 @@ Le projet fournit une application Windows autonome avec :
 - un tableau de bord administrateur ;
 - l'export de donnees et de rapports Excel ;
 - une generation d'executable portable via Electron Builder.
+
+## Telechargement
+
+- Page des releases : https://github.com/KISUNGU/suivi-missions/releases
+- Version `v1.0.0` : https://github.com/KISUNGU/suivi-missions/releases/tag/v1.0.0
+
+Quand un executable est publie dans une release, il peut etre telecharge directement depuis cette page.
 
 ## Prerequis
 
@@ -27,6 +39,18 @@ npm install
 ```powershell
 npm start
 ```
+
+## Utilisation
+
+Au lancement, l'application ouvre le formulaire principal de saisie.
+
+Le menu de l'application permet ensuite de :
+
+- revenir au formulaire de saisie ;
+- ouvrir le tableau de bord administrateur ;
+- recharger la fenetre ;
+- ouvrir les outils developpeur ;
+- exporter les donnees vers Excel.
 
 ## Scripts disponibles
 
@@ -50,11 +74,11 @@ Le build genere un executable Windows portable dans le dossier `dist/` avec un n
 - `admin.html` : tableau de bord administrateur.
 - `pnda_reference.json` : referentiel de donnees.
 
-## Publication Git
+## Depot GitHub
 
-Le depot distant GitHub associe est :
+Le depot distant associe est :
 
-`https://github.com/KISUNGU/suivi-missions.git`
+https://github.com/KISUNGU/suivi-missions.git
 
 ## Licence
 
