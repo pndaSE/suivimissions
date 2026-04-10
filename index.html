@@ -53,6 +53,28 @@
   .nav-user { text-align: right; font-size: 0.82rem; }
   .nav-user strong { color: var(--pnda-green); display: block; }
   .nav-user span { color: #6c757d; font-size: 0.72rem; }
+  .brand-heading {
+    font-family: 'Playfair Display', serif;
+  }
+  .notif-badge {
+    display: none;
+    font-size: 0.6rem;
+  }
+  .main-container {
+    max-width: 960px;
+  }
+  .trimester-badge {
+    letter-spacing: 1px;
+  }
+  .summary-title-sm {
+    font-size: 1.05rem;
+  }
+  .section-hidden {
+    display: none;
+  }
+  .step-icon {
+    font-size: 0.85rem;
+  }
 
   @media (max-width: 767.98px) {
     .navbar-pnda .container {
@@ -89,6 +111,9 @@
     padding: 12px 0;
   }
   .logos-bar img { height: 72px; object-fit: contain; }
+  .logo-ministere { height: 70px; }
+  .logo-programme,
+  .logo-pnda-main { height: 78px; }
 
   /* ── TITLES ──────────────────────────────────────────────── */
   .page-title { font-family: 'Playfair Display', serif; color: var(--pnda-green); }
@@ -239,6 +264,47 @@
     border-radius: 6px; padding: 10px 12px; margin-bottom: 12px;
     font-size: 0.85rem;
   }
+
+  @media (max-width: 767.98px) {
+    main .container {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+    .page-title { font-size: 1.3rem; }
+    .card-header-pnda {
+      padding: 0.9rem 1rem !important;
+      align-items: flex-start !important;
+    }
+    .card-header-pnda h5 { font-size: 0.94rem; }
+    .mission-row,
+    .completion-mission-card { padding: 14px; }
+    .summary-table { min-width: 860px; }
+    .table-responsive .table { font-size: 0.84rem; }
+    .summary-table th { font-size: 0.67rem; }
+    #main-form-section .d-flex.gap-2.mt-2,
+    #selected-missions-section .d-flex.gap-2.flex-wrap,
+    #comptable-completion-section .d-flex.gap-2.mt-3.flex-wrap {
+      flex-direction: column;
+    }
+    #main-form-section .d-flex.gap-2.mt-2 .btn,
+    #selected-missions-section .d-flex.gap-2.flex-wrap .btn,
+    #comptable-completion-section .d-flex.gap-2.mt-3.flex-wrap .btn {
+      width: 100%;
+    }
+    .footer-pnda {
+      padding-left: 12px;
+      padding-right: 12px;
+      line-height: 1.5;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .step-num {
+      width: 28px;
+      height: 28px;
+    }
+    .mission-meta { padding: 8px 10px; }
+  }
   .completion-mission-card .readonly-section strong { color: var(--pnda-green); display: block; font-size: 0.92rem; }
   .completion-financial-section {
     background: rgba(211,165,44,0.08);
@@ -263,7 +329,7 @@
         <div class="d-flex align-items-center gap-3 mb-2">
           <div class="logo-sm"><img src="logo_pnda.png" alt="PNDA"></div>
           <div>
-            <h5 class="mb-0 fw-bold" style="font-family:'Playfair Display',serif">PNDA-SE</h5>
+            <h5 class="mb-0 fw-bold brand-heading">PNDA-SE</h5>
             <small class="opacity-50">Programme National de Développement Agricole</small>
           </div>
         </div>
@@ -272,7 +338,7 @@
       <div class="modal-body p-4">
         <div class="mb-3">
           <label class="form-label form-label-sm">Province</label>
-          <select class="form-select form-select-sm" id="auth-province">
+          <select class="form-select form-select-sm" id="auth-province" title="Sélectionner une province">
             <option value="">— Chargement des provinces —</option>
           </select>
         </div>
@@ -284,7 +350,7 @@
           <label class="form-label form-label-sm">Mot de passe</label>
           <input type="password" class="form-control form-control-sm" id="auth-pass" placeholder="••••••••" autocomplete="current-password">
         </div>
-        <div class="alert alert-danger py-2 small" id="auth-error" style="display:none">
+        <div class="alert alert-danger py-2 small section-hidden" id="auth-error">
           Identifiants incorrects. Veuillez réessayer.
         </div>
         <button class="btn btn-pnda w-100 text-uppercase fw-semibold" onclick="doLogin()">
@@ -298,9 +364,9 @@
 <!-- ══════════════ LOGOS BAR ══════════════ -->
 <div class="logos-bar">
   <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <img src="logo_ministere.png" alt="Ministère" style="height:70px">
-    <img src="logo_programme.png" alt="Programme" style="height:78px">
-    <img src="logo_pnda.png" alt="PNDA" style="height:78px">
+    <img src="logo_ministere.png" alt="Ministère" class="logo-ministere">
+    <img src="logo_programme.png" alt="Programme" class="logo-programme">
+    <img src="logo_pnda.png" alt="PNDA" class="logo-pnda-main">
   </div>
 </div>
 
@@ -315,7 +381,7 @@
       <span class="badge bg-warning text-dark" id="header-province-label">—</span>
       <button class="btn btn-sm position-relative p-1" id="btn-notif" onclick="scrollToWorkflowPanel()" title="Notifications de workflow">
         <i class="bi bi-bell-fill text-white fs-5"></i>
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notif-badge" style="display:none;font-size:.6rem">0</span>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notif-badge" id="notif-badge">0</span>
       </button>
       <div class="nav-user d-none d-sm-block">
         <strong id="display-user">—</strong>
@@ -334,11 +400,11 @@
 
 <!-- ══════════════ MAIN CONTENT ══════════════ -->
 <main class="flex-grow-1">
-  <div class="container" style="max-width:960px">
+  <div class="container main-container">
     <div class="py-4">
       <div class="d-flex align-items-baseline gap-3 mb-2 flex-wrap">
         <h2 class="page-title mb-0">Saisie du Budget des Missions</h2>
-        <span class="badge bg-warning text-dark fw-bold" style="letter-spacing:1px">T4 2025</span>
+        <span class="badge bg-warning text-dark fw-bold trimester-badge">T4 2025</span>
       </div>
       <p class="text-muted small border-bottom pb-3 mb-4">
         Remplissez les informations ci-dessous. Le formulaire génère un fichier JSON standardisé pour la saisie, le suivi et la consolidation du budget des missions.
@@ -363,14 +429,14 @@
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label form-label-sm">Province <span class="req">*</span></label>
-              <select class="form-select form-select-sm" id="f-province" onchange="updateProvinceLabel()">
+              <select class="form-select form-select-sm" id="f-province" onchange="updateProvinceLabel()" title="Sélectionner la province">
                 <option value="">— Chargement des provinces —</option>
               </select>
               <small class="text-muted">Les missions proposées dépendent de la province sélectionnée.</small>
             </div>
             <div class="col-md-6">
               <label class="form-label form-label-sm">Trimestre <span class="req">*</span></label>
-              <select class="form-select form-select-sm" id="f-trimestre">
+              <select class="form-select form-select-sm" id="f-trimestre" title="Sélectionner le trimestre">
                 <option value="T1">T1 — Janvier à Mars</option>
                 <option value="T2">T2 — Avril à Juin</option>
                 <option value="T3">T3 — Juillet à Septembre</option>
@@ -379,7 +445,7 @@
             </div>
             <div class="col-md-6">
               <label class="form-label form-label-sm">Année <span class="req">*</span></label>
-              <input type="number" class="form-control form-control-sm" id="f-annee" value="2025" min="2020" max="2030">
+              <input type="number" class="form-control form-control-sm" id="f-annee" value="2025" min="2020" max="2030" title="Saisir l'année budgétaire" placeholder="2025">
             </div>
             <div class="col-md-6">
               <label class="form-label form-label-sm">Rapporteur <span class="req">*</span></label>
@@ -391,7 +457,7 @@
             </div>
             <div class="col-md-6">
               <label class="form-label form-label-sm">Date de génération</label>
-              <input type="date" class="form-control form-control-sm" id="f-date">
+              <input type="date" class="form-control form-control-sm" id="f-date" title="Sélectionner la date de génération" placeholder="Date de génération">
             </div>
           </div>
         </div>
@@ -425,7 +491,7 @@
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-start gap-3 mb-3 flex-wrap">
             <div>
-              <h6 class="page-title mb-1" style="font-size:1.05rem">Récapitulatif prêt à imprimer et à exporter</h6>
+              <h6 class="page-title mb-1 summary-title-sm">Récapitulatif prêt à imprimer et à exporter</h6>
               <p class="text-muted small mb-0">Le tableau se met à jour automatiquement.</p>
             </div>
             <div class="d-flex gap-2 flex-wrap">
@@ -462,10 +528,10 @@
 
       <!-- ════ VUE COMPTABLE ════ -->
       <!-- ── Missions en attente (liste) ── -->
-      <div id="comptable-pending-section" style="display:none" class="mb-4">
+      <div id="comptable-pending-section" class="mb-4 section-hidden">
         <div class="card">
           <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
-            <span class="step-num step-num-gold"><i class="bi bi-hourglass-split" style="font-size:.85rem"></i></span>
+            <span class="step-num step-num-gold"><i class="bi bi-hourglass-split step-icon"></i></span>
             <div>
               <h5 class="mb-0">Missions en attente — Complétion financière</h5>
               <small class="text-muted ms-1" id="comptable-province-label"></small>
@@ -490,10 +556,10 @@
         </div>
       </div>
 
-      <div id="comptable-active-section" style="display:none" class="mb-4">
+      <div id="comptable-active-section" class="mb-4 section-hidden">
         <div class="card">
           <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
-            <span class="step-num step-num-gold"><i class="bi bi-lightning-charge-fill" style="font-size:.85rem"></i></span>
+            <span class="step-num step-num-gold"><i class="bi bi-lightning-charge-fill step-icon"></i></span>
             <div>
               <h5 class="mb-0">Missions activées en cours</h5>
               <small class="text-muted ms-1">Suivi des missions exécutées et clôture après justification.</small>
@@ -519,10 +585,10 @@
       </div>
 
       <!-- ── Complétion financière (formulaire) ── -->
-      <div id="comptable-completion-section" style="display:none" class="mb-4">
+      <div id="comptable-completion-section" class="mb-4 section-hidden">
         <div class="card">
           <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
-            <span class="step-num step-num-gold"><i class="bi bi-cash-coin" style="font-size:.85rem"></i></span>
+            <span class="step-num step-num-gold"><i class="bi bi-cash-coin step-icon"></i></span>
             <div>
               <h5 class="mb-0">Complétion financière</h5>
               <small class="text-muted" id="completion-report-info">—</small>
@@ -559,9 +625,9 @@
       </div>
 
       <!-- ── ARCHIVE ── -->
-      <div class="card mb-4" id="archive-section" style="display:none">
+      <div class="card mb-4 section-hidden" id="archive-section">
         <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
-          <span class="step-num step-num-gold"><i class="bi bi-archive-fill" style="font-size:.85rem"></i></span>
+          <span class="step-num step-num-gold"><i class="bi bi-archive-fill step-icon"></i></span>
           <h5>Mes rapports précédents</h5>
         </div>
         <div class="card-body">

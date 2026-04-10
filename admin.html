@@ -199,6 +199,54 @@
     #content { padding: 16px 12px 40px; }
   }
 
+  @media (max-width: 767.98px) {
+    .page-title { font-size: 1.25rem; }
+    #summary-grid { --bs-gutter-x: 0.75rem; }
+    #summary-grid > [class*="col-"] { width: 50%; }
+    .stat-value { font-size: 1.2rem; }
+    .stat-icon { font-size: 1.25rem; }
+    .card-header { padding: 0.85rem 1rem; }
+    .card-body { padding: 1rem; }
+    .content-narrow { max-width: none; }
+    #tabs {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 1rem;
+    }
+    .pnda-tab-btn {
+      flex: 0 0 auto;
+      white-space: nowrap;
+      padding: 7px 12px;
+      font-size: 0.8rem;
+    }
+    .pnda-panel > .d-flex.justify-content-between.align-items-baseline {
+      align-items: flex-start !important;
+      gap: 8px;
+    }
+    .panel-grid { gap: 14px; }
+    .table { font-size: 0.84rem; }
+    .table th { font-size: 0.68rem; }
+    .report-actions-cell { min-width: 140px; }
+    .report-actions-cell .btn {
+      width: 100%;
+      margin-bottom: 6px;
+    }
+    .report-actions-cell .btn:last-child { margin-bottom: 0; }
+    #view-dashboard > .d-flex.gap-2.flex-wrap,
+    #view-export .card-body .row.g-3.content-narrow .col-md-6:last-child,
+    #view-filters .card-body .row.g-3.content-narrow .col-md-3:last-child {
+      width: 100%;
+    }
+    #view-dashboard > .d-flex.gap-2.flex-wrap .btn {
+      flex: 1 1 100%;
+    }
+    #view-filters .btn-pnda,
+    #view-export .btn-gold {
+      width: 100%;
+    }
+  }
+
   /* ── IMPORT SECTION ──────────────────────────────────────── */
   .import-badge {
     display: inline-flex; align-items: center; gap: 8px;
