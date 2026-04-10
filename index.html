@@ -1444,6 +1444,8 @@ async function persistReport(data) {
       },
       seq_number: seq,
       statut: WORKFLOW_STATUS.EN_ATTENTE,
+      returned_by: null,
+      returned_at: null,
       activated_by: null,
       activated_at: null,
       completed_by: null,
@@ -1460,6 +1462,8 @@ async function persistReport(data) {
         if (error.code === 'PGRST204' || (error.message && error.message.includes('statut'))) {
           const fallbackPayload = { id: rid, ...payload };
           delete fallbackPayload.statut;
+          delete fallbackPayload.returned_by;
+          delete fallbackPayload.returned_at;
           delete fallbackPayload.activated_by;
           delete fallbackPayload.activated_at;
           delete fallbackPayload.completed_by;
@@ -1905,13 +1909,16 @@ async function returnMissionToMissionnaire() {
   const report = PENDING_REPORTS_CACHE.find((entry) => entry.id === CURRENT_COMPLETION_REPORT_ID);
   if (!report) { showToast('Rapport introuvable.'); return; }
   try {
+    const returnedAt = new Date().toISOString();
     const { error } = await db.from('reports').update({
       statut: WORKFLOW_STATUS.RETOURNEE,
+      returned_by: session?.user || null,
+      returned_at: returnedAt,
       meta: {
         ...(report.meta || {}),
         workflow_comment: comment,
         returned_by: session?.user || null,
-        returned_at: new Date().toISOString()
+        returned_at: returnedAt
       }
     }).eq('id', CURRENT_COMPLETION_REPORT_ID);
     if (error) throw error;
@@ -1966,6 +1973,8 @@ async function saveFinancialCompletion() {
     const { error } = await db.from('reports').update({
       missions: updatedMissions, meta: updatedMeta,
       statut: WORKFLOW_STATUS.ACTIVEE,
+      returned_by: null,
+      returned_at: null,
       activated_by: session?.user || null,
       activated_at: new Date().toISOString()
     }).eq('id', CURRENT_COMPLETION_REPORT_ID);

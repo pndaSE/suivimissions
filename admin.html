@@ -872,6 +872,8 @@ async function getStoredReports() {
       missions: row.missions || [], savedAt: row.saved_at, source: row.source || 'supabase',
       is_read: !!row.is_read, read_at: row.read_at || null, read_by: row.read_by || null,
       statut: row.statut || 'activee',
+      returned_by: row.returned_by || null,
+      returned_at: row.returned_at || null,
       activated_by: row.activated_by || null, activated_at: row.activated_at || null
     }));
   } catch (error) { console.error('Erreur lecture rapports Supabase:', error); return []; }
@@ -1168,7 +1170,7 @@ function buildProvincePanel(province, reportsSource = getFilteredReports()) {
                         <table class="table table-sm table-bordered mb-0 report-detail-table">
                           <thead><tr>
                             <th>N°</th><th>Nature</th><th>Objectif</th><th>Prov. dest.</th><th>Territoire</th><th>Secteur</th>
-                            <th>Début</th><th>Fin</th><th>Nuitées</th><th>Taux</th>
+                            <th>Début</th><th>Fin</th><th>Participants</th><th>Nuitées</th><th>Taux</th>
                             <th>Montant</th><th>Autres</th><th>Total</th><th>Avance</th><th>Solde</th><th>Section</th><th>Observation</th>
                           </tr></thead>
                           <tbody>${rm.map((m) => `<tr>
@@ -1177,6 +1179,7 @@ function buildProvincePanel(province, reportsSource = getFilteredReports()) {
                             <td>${escapeHtml(m.destination_province_label||'—')}</td>
                             <td>${escapeHtml(m.territoire_label||'—')}</td><td>${escapeHtml(m.secteur_label||'—')}</td>
                             <td>${escapeHtml(m.date_debut||'—')}</td><td>${escapeHtml(m.date_fin||'—')}</td>
+                            <td class="text-end">${Number(m.participants||0)}</td>
                             <td class="text-end">${m.nuitees||0}</td><td class="text-end">${formatCurrency(Number(m.taux_per_diem||0))}</td>
                             <td class="text-end">${formatCurrency(Number(m.montant_usd||0))}</td>
                             <td class="text-end">${formatCurrency(Number(m.autres_frais_usd||0))}</td>
@@ -1417,8 +1420,8 @@ function buildProvinceSheetRows(province, signatory = {}, reportsSource = getFil
   const reports = reportsSource.filter((r) => getReportProvinceName(r) === province.name);
   const missions = reports.flatMap((r) => (r.missions || []).map((m) => ({ ...m, __report: r })));
   return [
-    ...buildWorkbookHeaderRows(`Province - ${province.label}`, 16),
-    [{ value: `Province - ${province.label}`, style: 'title', mergeAcross: 15 }],
+    ...buildWorkbookHeaderRows(`Province - ${province.label}`, 17),
+    [{ value: `Province - ${province.label}`, style: 'title', mergeAcross: 16 }],
     [{ value: 'Rapports', style: 'subtitle' }, { value: reports.length, type: 'Number', style: 'integer' }],
     [{ value: 'Missions', style: 'subtitle' }, { value: missions.length, type: 'Number', style: 'integer' }],
     [],
@@ -1431,10 +1434,10 @@ function buildProvinceSheetRows(province, signatory = {}, reportsSource = getFil
       { value: Number(r.meta?.total_solde_usd || 0), type: 'Number', style: 'currency' }
     ]),
     [],
-    [{ value: 'Détail des missions', style: 'title', mergeAcross: 16 }],
+    [{ value: 'Détail des missions', style: 'title', mergeAcross: 17 }],
     [{ value:'Début',style:'header' },{ value:'Fin prévue',style:'header' },{ value:'Numero',style:'header' },{ value:'Nature',style:'header' },{ value:'Objectif',style:'header' },
      { value:'Prov. dest.',style:'header' },{ value:'Territoire',style:'header' },{ value:'Secteur',style:'header' },
-     { value:'Rapporteur',style:'header' },{ value:'Nuitées',style:'header' },{ value:'Taux/nuit',style:'header' },
+     { value:'Rapporteur',style:'header' },{ value:'Participants',style:'header' },{ value:'Nuitées',style:'header' },{ value:'Taux/nuit',style:'header' },
      { value:'Montant USD',style:'header' },{ value:'Autres frais',style:'header' },{ value:'Total USD',style:'header' },
      { value:'Avance USD',style:'header' },{ value:'Solde USD',style:'header' },{ value:'Observation',style:'header' }],
     ...missions.map((m) => [
@@ -1444,6 +1447,7 @@ function buildProvinceSheetRows(province, signatory = {}, reportsSource = getFil
       { value: m.objectif || '—', style: 'text' },
       { value: m.destination_province_label || '—', style: 'text' }, { value: m.territoire_label || '—', style: 'text' }, { value: m.secteur_label || '—', style: 'text' },
       { value: m.__report.meta?.rapporteur || '—', style: 'text' },
+      { value: Number(m.participants || 0), type: 'Number', style: 'integer' },
       { value: Number(m.nuitees || 0), type: 'Number', style: 'integer' },
       { value: Number(m.taux_per_diem || 0), type: 'Number', style: 'currency' },
       { value: Number(m.montant_usd || 0), type: 'Number', style: 'currency' },
@@ -1453,18 +1457,18 @@ function buildProvinceSheetRows(province, signatory = {}, reportsSource = getFil
       { value: Number(m.solde_usd || 0), type: 'Number', style: 'currency' },
       { value: m.observation || '', style: 'text' }
     ]),
-    [], ...buildSignatureRows(signatory, 17)
+    [], ...buildSignatureRows(signatory, 18)
   ];
 }
 
 function buildAllMissionsSheetRows(signatory = {}, reports = getFilteredReports()) {
   const missions = reports.flatMap((r) => (r.missions || []).map((m) => ({ ...m, __report: r })));
   return [
-    ...buildWorkbookHeaderRows('Toutes les missions', 21),
-    [{ value: 'Toutes les missions', style: 'title', mergeAcross: 20 }],
+    ...buildWorkbookHeaderRows('Toutes les missions', 22),
+    [{ value: 'Toutes les missions', style: 'title', mergeAcross: 21 }],
     [{ value:'Province',style:'header' },{ value:'Rapporteur',style:'header' },{ value:'Trimestre',style:'header' },{ value:'Année',style:'header' },{ value:'Numero',style:'header' },{ value:'Mission ref',style:'header' },{ value:'Nature',style:'header' },{ value:'Objectif',style:'header' },
      { value:'Prov. dest.',style:'header' },{ value:'Territoire',style:'header' },{ value:'Secteur',style:'header' },
-     { value:'Début',style:'header' },{ value:'Fin prévue',style:'header' },
+     { value:'Début',style:'header' },{ value:'Fin prévue',style:'header' },{ value:'Participants',style:'header' },
      { value:'Nuitées',style:'header' },{ value:'Taux/nuit',style:'header' },
      { value:'Montant USD',style:'header' },{ value:'Autres frais',style:'header' },{ value:'Total USD',style:'header' },
      { value:'Avance USD',style:'header' },{ value:'Solde USD',style:'header' },{ value:'Observation',style:'header' }],
@@ -1477,6 +1481,7 @@ function buildAllMissionsSheetRows(signatory = {}, reports = getFilteredReports(
       { value: m.nature || '—', style: 'text' }, { value: m.objectif || '—', style: 'text' },
       { value: m.destination_province_label || '—', style: 'text' }, { value: m.territoire_label || '—', style: 'text' }, { value: m.secteur_label || '—', style: 'text' },
       { value: m.date_debut || m.date || '—', style: 'text' }, { value: m.date_fin || '—', style: 'text' },
+      { value: Number(m.participants || 0), type: 'Number', style: 'integer' },
       { value: Number(m.nuitees || 0), type: 'Number', style: 'integer' },
       { value: Number(m.taux_per_diem || 0), type: 'Number', style: 'currency' },
       { value: Number(m.montant_usd || 0), type: 'Number', style: 'currency' },
@@ -1486,7 +1491,7 @@ function buildAllMissionsSheetRows(signatory = {}, reports = getFilteredReports(
       { value: Number(m.solde_usd || 0), type: 'Number', style: 'currency' },
       { value: m.observation || '', style: 'text' }
     ]),
-    [], ...buildSignatureRows(signatory, 21)
+    [], ...buildSignatureRows(signatory, 22)
   ];
 }
 
