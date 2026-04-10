@@ -69,9 +69,6 @@
   .summary-title-sm {
     font-size: 1.05rem;
   }
-  .section-hidden {
-    display: none;
-  }
   .step-icon {
     font-size: 0.85rem;
   }
@@ -350,7 +347,7 @@
           <label class="form-label form-label-sm">Mot de passe</label>
           <input type="password" class="form-control form-control-sm" id="auth-pass" placeholder="••••••••" autocomplete="current-password">
         </div>
-        <div class="alert alert-danger py-2 small section-hidden" id="auth-error">
+        <div class="alert alert-danger py-2 small" id="auth-error" style="display:none">
           Identifiants incorrects. Veuillez réessayer.
         </div>
         <button class="btn btn-pnda w-100 text-uppercase fw-semibold" onclick="doLogin()">
@@ -528,7 +525,7 @@
 
       <!-- ════ VUE COMPTABLE ════ -->
       <!-- ── Missions en attente (liste) ── -->
-      <div id="comptable-pending-section" class="mb-4 section-hidden">
+      <div id="comptable-pending-section" class="mb-4" style="display:none">
         <div class="card">
           <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
             <span class="step-num step-num-gold"><i class="bi bi-hourglass-split step-icon"></i></span>
@@ -556,7 +553,7 @@
         </div>
       </div>
 
-      <div id="comptable-active-section" class="mb-4 section-hidden">
+      <div id="comptable-active-section" class="mb-4" style="display:none">
         <div class="card">
           <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
             <span class="step-num step-num-gold"><i class="bi bi-lightning-charge-fill step-icon"></i></span>
@@ -585,7 +582,7 @@
       </div>
 
       <!-- ── Complétion financière (formulaire) ── -->
-      <div id="comptable-completion-section" class="mb-4 section-hidden">
+      <div id="comptable-completion-section" class="mb-4" style="display:none">
         <div class="card">
           <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
             <span class="step-num step-num-gold"><i class="bi bi-cash-coin step-icon"></i></span>
@@ -625,7 +622,7 @@
       </div>
 
       <!-- ── ARCHIVE ── -->
-      <div class="card mb-4 section-hidden" id="archive-section">
+      <div class="card mb-4" id="archive-section" style="display:none">
         <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
           <span class="step-num step-num-gold"><i class="bi bi-archive-fill step-icon"></i></span>
           <h5>Mes rapports précédents</h5>
@@ -2104,6 +2101,9 @@ async function loadUserArchive(rapporteur, province) {
       if (fallback.error) throw fallback.error;
       data = fallback.data;
     }
+    if (CURRENT_USER_ROLE === 'comptable') {
+      data = (data || []).filter((report) => normalizeReportStatus(report.statut) !== WORKFLOW_STATUS.EN_ATTENTE);
+    }
     if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Aucune mission enregistrée.</td></tr>'; return; }
 
     const STATUT_BADGE = {
@@ -2115,12 +2115,13 @@ async function loadUserArchive(rapporteur, province) {
 
     tbody.innerHTML = data.map((r) => {
       const nb = r.missions?.length || r.meta?.total_missions || 0;
-      const tot = r.meta?.total_montant_usd || '0.00';
+      const tot = r.meta?.total_general_usd || r.meta?.total_montant_usd || '0.00';
       const st = normalizeReportStatus(r.statut);
       const badge = STATUT_BADGE[st] || STATUT_BADGE.activee;
       const rid = escapeHtml(r.id);
       const workflowComment = escapeHtml(getWorkflowComment(r));
       const litige = calculateReportLitige(r);
+      const periode = `${r.trimestre || r.meta?.trimestre || ''} ${r.annee || r.meta?.annee || ''}`.trim();
       let actions = '';
       if (CURRENT_USER_ROLE !== 'comptable') {
         if (st === WORKFLOW_STATUS.RETOURNEE) {
@@ -2138,15 +2139,20 @@ async function loadUserArchive(rapporteur, province) {
         } else if (st === WORKFLOW_STATUS.RETOURNEE) {
           actions = '<span class="text-warning small">En attente de correction missionnaire</span>';
         } else if (st === WORKFLOW_STATUS.ACTIVEE) {
-          actions = `<button class="btn btn-outline-secondary btn-sm" onclick="signalerMissionRealisee('${rid}')"><i class="bi bi-check2-circle me-1"></i>Clôturer</button><div class="small text-muted mt-1">Litige ${escapeHtml(formatCurrencyDisplay(litige))} USD</div>`;
+          actions = `
+            <button class="btn btn-outline-primary btn-sm me-1" onclick="printLiquidationBordereau('${rid}')"><i class="bi bi-printer me-1"></i>Bordereau</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="signalerMissionRealisee('${rid}')"><i class="bi bi-check2-circle me-1"></i>Clôturer</button>
+            <div class="small text-muted mt-1">Litige ${escapeHtml(formatCurrencyDisplay(litige))} USD</div>`;
         } else {
-          actions = '<span class="text-muted small">Clôturée</span>';
+          actions = `
+            <button class="btn btn-outline-primary btn-sm me-1" onclick="printLiquidationBordereau('${rid}')"><i class="bi bi-printer me-1"></i>Bordereau</button>
+            <span class="text-muted small">Clôturée</span>`;
         }
       }
       return `<tr>
         <td>${escapeHtml(r.seq_number ? '#'+r.seq_number : '—')}</td>
         <td>${escapeHtml(new Date(r.saved_at).toLocaleDateString('fr-FR'))}</td>
-        <td>${escapeHtml(`${r.trimestre||''} ${r.annee||''}`.trim())}</td>
+        <td>${escapeHtml(periode || '—')}</td>
         <td><span class="badge bg-secondary">${nb}</span></td>
         <td class="text-end">${escapeHtml(formatCurrencyDisplay(Number(tot)))} USD</td>
         <td>${badge}</td>
