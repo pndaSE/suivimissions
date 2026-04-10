@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PNDA-SE — Super Administrateur</title>
+<title>PNDA-SE — RNSE</title>
 
 <!-- Bootstrap 5 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
@@ -144,7 +144,7 @@
 <div class="top-navbar">
   <img src="logo_pnda.png" alt="PNDA">
   <div class="brand-text">
-    <h1>PNDA-SE · Super Administration</h1>
+    <h1>PNDA-SE · RNSE</h1>
     <p>Plateforme nationale de gestion des missions</p>
   </div>
   <div class="ms-auto text-end">
@@ -158,7 +158,7 @@
 
   <!-- ────── SIDEBAR ────── -->
   <nav id="sidebar">
-    <div class="sidebar-badge"><i class="bi bi-shield-lock-fill me-1"></i>Super Admin</div>
+    <div class="sidebar-badge"><i class="bi bi-shield-lock-fill me-1"></i>RNSE</div>
 
     <div class="sidebar-label">Navigation</div>
     <ul class="nav flex-column">
@@ -316,8 +316,8 @@
     <div id="view-users" class="view">
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
-          <h2 class="page-title">Gestion des utilisateurs</h2>
-          <p class="text-muted mb-0 small">Créer, modifier et désactiver les comptes.</p>
+          <h2 class="page-title">Gestion des utilisateurs et rôles</h2>
+          <p class="text-muted mb-0 small">Le RNSE crée les comptes, attribue les rôles et définit les accès par province.</p>
         </div>
         <button class="btn btn-gold btn-sm" onclick="openUserModal()">
           <i class="bi bi-person-plus-fill me-1"></i>Nouvel utilisateur
@@ -329,10 +329,13 @@
           <h5><i class="bi bi-people me-2"></i>Comptes enregistrés</h5>
           <button class="btn btn-pnda btn-sm" onclick="loadUsers()"><i class="bi bi-arrow-clockwise"></i></button>
         </div>
+        <div class="card-body border-bottom bg-light">
+          <div class="small text-muted"><i class="bi bi-shield-lock me-1"></i>Gestion réservée au RNSE : création des comptes, attribution des rôles et définition des accès par province.</div>
+        </div>
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="table table-hover table-sm mb-0">
-              <thead><tr><th>Email</th><th>Nom affiché</th><th>Rôle</th><th>Provinces</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Email</th><th>Nom affiché</th><th>Rôle</th><th>Accès</th><th>Actions</th></tr></thead>
               <tbody id="tbl-users">
                 <tr><td colspan="5" class="text-center text-muted py-4">Chargement…</td></tr>
               </tbody>
@@ -364,13 +367,14 @@
               <input type="password" class="form-control form-control-sm" id="u-password" placeholder="Nouveau mot de passe">
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Rôle *</label>
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Rôle attribué *</label>
               <select class="form-select form-select-sm" id="u-role" onchange="onRoleChange()">
                 <option value="province">Missionnaire (Province)</option>
                 <option value="comptable">Comptable (Entité)</option>
                 <option value="admin">Admin / RAF</option>
                 <option value="super_admin">Super Admin / RNSE</option>
               </select>
+              <div class="form-text small">Le rôle détermine l'écran d'accès après connexion et les droits métier accordés au compte.</div>
             </div>
             <div class="col-12" id="u-provinces-wrap">
               <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Provinces accessibles</label>
@@ -693,7 +697,24 @@
   <div id="toast" class="toast align-items-center text-bg-dark border-0" role="alert">
     <div class="d-flex">
       <div class="toast-body fw-semibold" id="toast-body">—</div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" title="Fermer la notification" aria-label="Fermer la notification"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ░░ MODALE DE CONFIRMATION ░░ -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header border-0 pb-1">
+        <h6 class="modal-title fw-bold text-danger" id="confirmModalTitle">Confirmer</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body small pt-1" id="confirmModalBody">Cette action est irréversible.</div>
+      <div class="modal-footer border-0 pt-0 gap-2">
+        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+        <button class="btn btn-danger btn-sm" id="confirmModalOk">Confirmer</button>
+      </div>
     </div>
   </div>
 </div>
@@ -718,6 +739,27 @@ const _bsToast = new bootstrap.Toast(_toastEl, { delay: 3500 });
 function showToast(msg) {
   document.getElementById('toast-body').textContent = msg;
   _bsToast.show();
+}
+
+const _confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+let _confirmOkCallback = null;
+document.getElementById('confirmModalOk').addEventListener('click', () => {
+  document.activeElement?.blur();
+  _confirmModal.hide();
+  if (_confirmOkCallback) {
+    const cb = _confirmOkCallback;
+    _confirmOkCallback = null;
+    cb();
+  }
+});
+function askConfirm(message, onOk, title = 'Confirmer', okLabel = 'Confirmer', okClass = 'btn-danger') {
+  document.getElementById('confirmModalTitle').textContent = title;
+  document.getElementById('confirmModalBody').textContent = message;
+  const okBtn = document.getElementById('confirmModalOk');
+  okBtn.textContent = okLabel;
+  okBtn.className = `btn btn-sm ${okClass}`;
+  _confirmOkCallback = onOk;
+  _confirmModal.show();
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
@@ -822,7 +864,7 @@ async function loadUsers() {
       <td>${esc(u.email)}</td>
       <td>${esc(u.display_name || '—')}</td>
       <td><span class="badge bg-${ROLE_BG[u.role]||'secondary'}">${esc(ROLE_LABELS[u.role]||u.role)}</span></td>
-      <td class="small text-muted">${u.provinces ? esc(u.provinces.join(', ')) : '<em>Toutes</em>'}</td>
+      <td class="small text-muted">${formatUserAccess(u)}</td>
       <td class="text-nowrap">
         <button class="btn btn-pnda btn-sm me-1" onclick="editUser('${esc(u.id)}')"><i class="bi bi-pencil-fill"></i></button>
         <button class="btn btn-outline-danger btn-sm" onclick="deleteUser('${esc(u.id)}','${esc(u.email)}')"><i class="bi bi-trash3-fill"></i></button>
@@ -855,6 +897,17 @@ function buildProvinceCheckboxes(selected) {
       <label class="form-check-label small" for="ck-${esc(p.name)}">${esc(p.label)}</label>
     </div>
   `).join('');
+}
+
+function formatUserAccess(user) {
+  if (!user?.provinces || user.provinces === '*') {
+    return '<span class="badge bg-light text-dark border">Toutes provinces</span>';
+  }
+  const labels = user.provinces.map((provinceName) => {
+    const province = PROVINCES_CACHE.find((entry) => entry.name === provinceName);
+    return province?.label || provinceName;
+  });
+  return labels.map((label) => `<span class="badge bg-light text-dark border me-1 mb-1">${esc(label)}</span>`).join('');
 }
 
 function onRoleChange() {
@@ -908,16 +961,23 @@ async function saveUser() {
 }
 
 async function deleteUser(id, email) {
-  if (!confirm('Supprimer le compte "'+email+'" ? Action irréversible.')) return;
-  try {
-    const { error } = await db.from('users').delete().eq('id', id);
-    if (error) throw error;
-    showToast('✓ Utilisateur supprimé.');
-    await loadUsers();
-  } catch (e) {
-    console.error('deleteUser error:', e);
-    showToast('Erreur de suppression : ' + (e?.message || 'Vérifiez les politiques RLS dans Supabase.'));
-  }
+  askConfirm(
+    `Supprimer le compte "${email}" ? Cette action est irréversible.`,
+    async () => {
+      try {
+        const { error } = await db.from('users').delete().eq('id', id);
+        if (error) throw error;
+        showToast('✓ Utilisateur supprimé.');
+        await loadUsers();
+      } catch (e) {
+        console.error('deleteUser error:', e);
+        showToast('Erreur de suppression : ' + (e?.message || 'Vérifiez les politiques RLS dans Supabase.'));
+      }
+    },
+    'Supprimer le compte',
+    'Supprimer',
+    'btn-danger'
+  );
 }
 
 // ─── PROVINCES ───────────────────────────────────────────────────────────────

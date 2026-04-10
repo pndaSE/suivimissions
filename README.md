@@ -13,6 +13,7 @@ Le projet fournit une application Windows autonome avec :
 
 - un formulaire de saisie des missions ;
 - un tableau de bord administrateur ;
+- un espace RNSE pour créer les utilisateurs, attribuer les rôles et gérer les accès ;
 - l'export de donnees et de rapports Excel ;
 - une generation d'executable portable via Electron Builder.
 
@@ -72,6 +73,7 @@ Le build genere un executable Windows portable dans le dossier `dist/` avec un n
 - `preload.js` : pont securise entre Electron et l'interface.
 - `index.html` : interface de saisie.
 - `admin.html` : tableau de bord administrateur.
+- `superadmin.html` : espace RNSE pour la gestion des utilisateurs, rôles et référentiels.
 - `pnda_reference.json` : referentiel de donnees.
 
 ## Depot GitHub
