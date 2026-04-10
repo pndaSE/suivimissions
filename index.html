@@ -622,6 +622,7 @@ let CURRENT_COMPLETION_REPORT_ID = null;
 let PENDING_REPORTS_CACHE = [];
 let CURRENT_EDIT_REPORT_ID = null;
 let ACTIVE_REPORTS_CACHE = [];
+let IS_SAVING_COMPLETION = false;
 
 const WORKFLOW_STATUS = {
   EN_ATTENTE: 'en_attente',
@@ -717,6 +718,21 @@ function scrollToWorkflowPanel() {
     ? ((PENDING_REPORTS_CACHE?.length || 0) > 0 ? 'comptable-pending-section' : 'comptable-active-section')
     : (missionnaireHasReturned ? 'workflow-alerts' : 'archive-section');
   document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updatePendingSectionVisibility() {
+  const pendingSection = document.getElementById('comptable-pending-section');
+  if (!pendingSection) return;
+  pendingSection.style.display = (PENDING_REPORTS_CACHE?.length || 0) > 0 ? '' : 'none';
+}
+
+function setCompletionActionsDisabled(disabled) {
+  const container = document.getElementById('comptable-completion-section');
+  if (!container) return;
+  container.querySelectorAll('button').forEach((button) => {
+    if (button.classList.contains('btn-close')) return;
+    button.disabled = disabled;
+  });
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
@@ -1284,6 +1300,74 @@ function formatDateDisplay(value) {
   return date.toLocaleDateString('fr-FR');
 }
 
+function numberToFrenchWords(value) {
+  const units = ['zero', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize'];
+  const tens = ['', '', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante'];
+
+  function underHundred(number) {
+    if (number < 17) return units[number];
+    if (number < 20) return `dix-${units[number - 10]}`;
+    if (number < 70) {
+      const ten = Math.floor(number / 10);
+      const unit = number % 10;
+      if (unit === 0) return tens[ten];
+      if (unit === 1) return `${tens[ten]} et un`;
+      return `${tens[ten]}-${units[unit]}`;
+    }
+    if (number < 80) {
+      if (number === 71) return 'soixante et onze';
+      return `soixante-${underHundred(number - 60)}`;
+    }
+    if (number === 80) return 'quatre-vingts';
+    return `quatre-vingt-${underHundred(number - 80)}`;
+  }
+
+  function underThousand(number) {
+    if (number < 100) return underHundred(number);
+    const hundred = Math.floor(number / 100);
+    const remainder = number % 100;
+    const hundredLabel = hundred === 1 ? 'cent' : `${units[hundred]} cent`;
+    if (!remainder) return hundred > 1 ? `${hundredLabel}s` : hundredLabel;
+    return `${hundredLabel} ${underHundred(remainder)}`;
+  }
+
+  if (!Number.isFinite(value)) return '';
+  if (value === 0) return 'zero';
+
+  const scales = [
+    { value: 1000000000, singular: 'milliard', plural: 'milliards' },
+    { value: 1000000, singular: 'million', plural: 'millions' },
+    { value: 1000, singular: 'mille', plural: 'mille' }
+  ];
+
+  let remainder = Math.floor(Math.abs(value));
+  const parts = [];
+
+  scales.forEach((scale) => {
+    if (remainder >= scale.value) {
+      const count = Math.floor(remainder / scale.value);
+      remainder %= scale.value;
+      if (scale.value === 1000 && count === 1) {
+        parts.push('mille');
+      } else {
+        parts.push(`${underThousand(count)} ${count > 1 ? scale.plural : scale.singular}`);
+      }
+    }
+  });
+
+  if (remainder > 0) parts.push(underThousand(remainder));
+  return parts.join(' ').replace(/\s+/g, ' ').trim();
+}
+
+function formatAmountInWords(value) {
+  const amount = Number(value || 0);
+  const whole = Math.floor(amount);
+  const cents = Math.round((amount - whole) * 100);
+  const wholeWords = numberToFrenchWords(whole);
+  if (!cents) return `${wholeWords} dollars americains`;
+  return `${wholeWords} dollars americains et ${numberToFrenchWords(cents)} cents`;
+}
+
 function getMissionTravelDays(mission) {
   const start = mission?.date_debut ? new Date(mission.date_debut) : null;
   const end = mission?.date_fin ? new Date(mission.date_fin) : null;
@@ -1295,10 +1379,62 @@ function getMissionTravelDays(mission) {
 
 function getLiquidationNumber(report) {
   const meta = report?.meta || {};
+  if (report?.liquidation_number || meta.liquidation_number) {
+    return report?.liquidation_number || meta.liquidation_number;
+  }
   const provinceCode = String(meta.province_code || report?.province_code || report?.meta?.province || report?.province || 'PNDA').replace(/\s+/g, '').toUpperCase();
   const year = String(report?.annee || meta.annee || new Date().getFullYear());
-  const sequence = String(report?.seq_number || meta.seq_number || 0).padStart(3, '0');
+  const sequence = String(report?.liquidation_seq_number || meta.liquidation_seq_number || report?.seq_number || meta.seq_number || 0).padStart(3, '0');
   return `BLM-${provinceCode}-${year}-${sequence}`;
+}
+
+async function ensureLiquidationIdentity(report) {
+  if (!report) return null;
+  if (report.liquidation_number || report?.meta?.liquidation_number) return report;
+
+  const meta = report.meta || {};
+  const year = Number(report.annee || meta.annee || new Date().getFullYear());
+  const province = report.province || meta.province;
+  const provinceCode = String(meta.province_code || report.province_code || province || 'PNDA').replace(/\s+/g, '').toUpperCase();
+  const session = getSession();
+
+  try {
+    const { data, error } = await db.rpc('next_liquidation_seq', {
+      p_province: province,
+      p_year: year
+    });
+    if (error) throw error;
+
+    const seq = Number(data || 1);
+    const liquidationNumber = `BLM-${provinceCode}-${year}-${String(seq).padStart(3, '0')}`;
+    const printedAt = new Date().toISOString();
+    const payload = {
+      liquidation_seq_number: seq,
+      liquidation_number: liquidationNumber,
+      liquidation_printed_at: printedAt,
+      liquidation_printed_by: session?.user || null,
+      meta: {
+        ...meta,
+        liquidation_seq_number: seq,
+        liquidation_number: liquidationNumber,
+        liquidation_printed_at: printedAt,
+        liquidation_printed_by: session?.user || null
+      }
+    };
+
+    const { error: updateError } = await db.from('reports').update(payload).eq('id', report.id);
+    if (updateError) throw updateError;
+
+    report.liquidation_seq_number = seq;
+    report.liquidation_number = liquidationNumber;
+    report.liquidation_printed_at = printedAt;
+    report.liquidation_printed_by = session?.user || null;
+    report.meta = payload.meta;
+    return report;
+  } catch (error) {
+    console.warn('Numérotation dédiée indisponible, fallback sur le numéro de rapport:', error?.message || error);
+    return report;
+  }
 }
 
 function collectCompletionMissions(report) {
@@ -1385,16 +1521,21 @@ function buildLiquidationPrintHtml(snapshot) {
     * { box-sizing: border-box; }
     body { font-family: Arial, sans-serif; color: #14251b; margin: 0; font-size: 11px; line-height: 1.25; }
     .sheet { width: 100%; min-height: 271mm; display: flex; flex-direction: column; }
-    .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #123524; padding-bottom: 8px; margin-bottom: 10px; }
+    .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #123524; padding-bottom: 6px; margin-bottom: 8px; }
     .brand { display: flex; align-items: center; gap: 10px; }
-    .brand img { width: 48px; height: 48px; object-fit: contain; }
-    .brand h1 { margin: 0; font-size: 17px; text-transform: uppercase; letter-spacing: 0.4px; }
-    .brand p { margin: 2px 0 0; font-size: 10px; color: #43584b; }
-    .doc-meta { text-align: right; font-size: 10px; }
-    .doc-meta strong { display: block; font-size: 13px; color: #123524; }
-    .title { text-align: center; border: 1px solid #123524; background: #eef4ef; padding: 8px 10px; font-weight: 700; font-size: 13px; text-transform: uppercase; margin-bottom: 10px; }
-    .section { border: 1px solid #bbc8bf; margin-bottom: 8px; }
-    .section-title { background: #f4f7f4; color: #123524; padding: 5px 8px; font-weight: 700; text-transform: uppercase; font-size: 10px; border-bottom: 1px solid #ccd8d0; }
+    .brand img { width: 42px; height: 42px; object-fit: contain; }
+    .brand h1 { margin: 0; font-size: 15px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .brand p { margin: 1px 0 0; font-size: 9px; color: #43584b; }
+    .doc-meta { text-align: right; font-size: 9.5px; min-width: 180px; }
+    .doc-meta strong { display: block; font-size: 12px; color: #123524; }
+    .cartouche { border: 1.5px solid #123524; padding: 7px 9px; background: linear-gradient(180deg, #f8faf8 0%, #edf3ee 100%); }
+    .cartouche-label { display: block; text-transform: uppercase; font-size: 8px; letter-spacing: 0.8px; color: #5a6f62; margin-bottom: 2px; }
+    .cartouche-value { display: block; font-size: 13px; font-weight: 700; color: #123524; margin-bottom: 4px; }
+    .title { text-align: center; border: 1.5px solid #123524; background: #eef4ef; padding: 8px 10px; font-weight: 700; font-size: 13px; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.4px; }
+    .copy-strip { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .copy-badge { flex: 1; border: 1px dashed #aebbb3; padding: 4px 8px; text-transform: uppercase; font-size: 8.3px; letter-spacing: 0.7px; color: #4c6054; background: #fafcfb; }
+    .section { border: 1px solid #b5c3ba; margin-bottom: 8px; }
+    .section-title { background: #eef3ef; color: #123524; padding: 5px 8px; font-weight: 700; text-transform: uppercase; font-size: 10px; border-bottom: 1px solid #c8d4cc; letter-spacing: 0.3px; }
     .section-body { padding: 8px 9px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
     .grid-3 { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 8px 12px; }
@@ -1402,18 +1543,24 @@ function buildLiquidationPrintHtml(snapshot) {
     .field span { display: block; font-weight: 600; }
     table { width: 100%; border-collapse: collapse; }
     th, td { border: 1px solid #cad4cd; padding: 5px 6px; vertical-align: top; font-size: 9.5px; }
-    th { background: #f6f7f6; text-transform: uppercase; font-size: 8.8px; }
+    th { background: #f1f4f1; text-transform: uppercase; font-size: 8.8px; letter-spacing: 0.2px; }
     td.num, th.num { text-align: right; white-space: nowrap; }
     .totals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 9px; }
     .totals table td { font-size: 10px; }
     .totals .highlight td { font-weight: 700; background: #f7f0d8; }
     .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .pay-card { border: 1px solid #123524; padding: 10px; min-height: 80px; }
+    .pay-card { border: 1.2px solid #123524; padding: 10px; min-height: 80px; background: #fcfdfc; }
     .pay-card h3 { margin: 0 0 6px; font-size: 10px; text-transform: uppercase; color: #123524; }
     .pay-card .amount { font-size: 18px; font-weight: 700; color: #123524; }
     .pay-card small { display: block; color: #566b5f; margin-top: 4px; }
-    .sign-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; margin-top: auto; padding-top: 8px; }
-    .signature-box { border: 1px solid #bbc8bf; min-height: 126px; padding: 10px; display: flex; flex-direction: column; }
+    .amount-in-words { margin-top: 8px; border: 1px dashed #bcc8c0; padding: 7px 8px; background: #fbfcfb; font-size: 9.5px; }
+    .amount-in-words strong { display: block; text-transform: uppercase; font-size: 8.8px; color: #5a6f62; margin-bottom: 3px; }
+    .stamp-placeholder { margin-top: 8px; width: 78px; height: 78px; border: 1px dashed #8ea293; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 8px; color: #627568; align-self: flex-end; }
+    .sign-grid { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 10px; margin-top: auto; padding-top: 8px; }
+    .signature-box { border: 1px solid #b8c5bd; min-height: 126px; padding: 10px; display: flex; flex-direction: column; background: #fcfdfc; }
+    .signature-box.engagement-box { min-height: 146px; }
+    .signature-box.approval-box { min-height: 126px; }
+    .signature-box.visa-box { min-height: 126px; }
     .signature-box h4 { margin: 0 0 6px; font-size: 10px; text-transform: uppercase; color: #123524; }
     .signature-line { margin-top: auto; border-top: 1px solid #8ea293; padding-top: 6px; font-size: 9.5px; color: #5b6e61; }
     .note { font-size: 9px; color: #495b50; }
@@ -1430,13 +1577,20 @@ function buildLiquidationPrintHtml(snapshot) {
         </div>
       </div>
       <div class="doc-meta">
-        <strong>${escapeHtml(liquidationNumber)}</strong>
-        <div>Émis le ${escapeHtml(printedAt.toLocaleDateString('fr-FR'))}</div>
-        <div>Par ${escapeHtml(session?.user || '—')}</div>
+        <div class="cartouche">
+          <span class="cartouche-label">Numero officiel du bordereau</span>
+          <span class="cartouche-value">${escapeHtml(liquidationNumber)}</span>
+          <div>Émis le ${escapeHtml(printedAt.toLocaleDateString('fr-FR'))}</div>
+          <div>Par ${escapeHtml(session?.user || '—')}</div>
+        </div>
       </div>
     </div>
 
     <div class="title">Bordereau de liquidation de mission</div>
+    <div class="copy-strip">
+      <div class="copy-badge">Exemplaire original</div>
+      <div class="copy-badge" style="text-align:right;">Copie comptabilite</div>
+    </div>
 
     <div class="section">
       <div class="section-title">1. Identité</div>
@@ -1520,18 +1674,28 @@ function buildLiquidationPrintHtml(snapshot) {
           <small>20 % du per diem après dépôt du rapport et des pièces</small>
         </div>
       </div>
+      <div class="amount-in-words">
+        <strong>Montant en lettres</strong>
+        ${escapeHtml(formatAmountInWords(snapshot.aPayer))}
+      </div>
     </div>
 
     <div class="sign-grid">
-      <div class="signature-box">
+      <div class="signature-box engagement-box">
         <h4>6. Engagement du missionnaire</h4>
         <div class="note">Je m'engage à soumettre le rapport de mission et les pièces justificatives endéans 7 jours après le retour.</div>
         <div class="signature-line">Nom et signature du missionnaire</div>
       </div>
-      <div class="signature-box">
+      <div class="signature-box approval-box">
         <h4>7. Approbation</h4>
         <div class="note">Visa et approbation du comptable / autorité habilitée.</div>
         <div class="signature-line">Nom, qualité et signature</div>
+      </div>
+      <div class="signature-box visa-box">
+        <h4>8. Visa RAF / Coordination</h4>
+        <div class="note">Espace réservé au visa administratif final, selon le circuit interne de validation.</div>
+        <div class="stamp-placeholder">Cachet officiel</div>
+        <div class="signature-line">Nom, fonction et cachet</div>
       </div>
     </div>
   </div>
@@ -1553,19 +1717,21 @@ function openLiquidationPrintWindow(snapshot) {
   printWindow.document.close();
 }
 
-function printCurrentLiquidationBordereau() {
+async function printCurrentLiquidationBordereau() {
   if (!CURRENT_COMPLETION_REPORT_ID) { showToast('Ouvrez d\'abord une mission à compléter.'); return; }
-  const report = PENDING_REPORTS_CACHE.find((entry) => entry.id === CURRENT_COMPLETION_REPORT_ID);
+  let report = PENDING_REPORTS_CACHE.find((entry) => entry.id === CURRENT_COMPLETION_REPORT_ID);
   if (!report) { showToast('Rapport introuvable.'); return; }
+  report = await ensureLiquidationIdentity(report);
   const updatedMissions = collectCompletionMissions(report);
   openLiquidationPrintWindow(buildLiquidationSnapshot(report, updatedMissions));
 }
 
-function printLiquidationBordereau(reportId) {
-  const report = ACTIVE_REPORTS_CACHE.find((entry) => entry.id === reportId)
+async function printLiquidationBordereau(reportId) {
+  let report = ACTIVE_REPORTS_CACHE.find((entry) => entry.id === reportId)
     || PENDING_REPORTS_CACHE.find((entry) => entry.id === reportId)
     || USER_MISSIONS_CACHE.find((entry) => entry.id === reportId);
   if (!report) { showToast('Bordereau introuvable pour ce rapport.'); return; }
+  report = await ensureLiquidationIdentity(report);
   openLiquidationPrintWindow(buildLiquidationSnapshot(report));
 }
 
@@ -1827,7 +1993,7 @@ async function loadUserArchive(rapporteur, province) {
   section.style.display = '';
   try {
     let query = db.from('reports')
-      .select('id, saved_at, trimestre, annee, seq_number, meta, missions, statut, rapporteur')
+      .select('id, saved_at, trimestre, annee, seq_number, liquidation_seq_number, liquidation_number, liquidation_printed_at, liquidation_printed_by, meta, missions, statut, rapporteur')
       .eq('province', prov)
       .order('saved_at', { ascending: false }).limit(50);
     // For missionnaire: show their own reports. For comptable: show activee/realisee they handled.
@@ -1981,12 +2147,14 @@ async function signalerMissionRealisee(reportId) {
 // ─── COMPTABLE — MISSIONS EN ATTENTE ─────────────────────────────────────────
 async function loadPendingMissions(province) {
   const tbody = document.getElementById('pending-tbody');
+  const pendingSection = document.getElementById('comptable-pending-section');
   if (!tbody) return;
   const prov = province || getSession()?.province;
+  if (pendingSection) pendingSection.style.display = '';
   tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Chargement…</td></tr>';
   try {
     const { data, error } = await db.from('reports')
-      .select('id, saved_at, trimestre, annee, seq_number, meta, missions, rapporteur, statut')
+      .select('id, saved_at, trimestre, annee, seq_number, liquidation_seq_number, liquidation_number, liquidation_printed_at, liquidation_printed_by, meta, missions, rapporteur, statut')
       .eq('province', prov)
       .eq('statut', 'en_attente')
       .order('saved_at', { ascending: true })
@@ -1995,13 +2163,18 @@ async function loadPendingMissions(province) {
       // Migration not yet applied — statut column missing
       console.warn('statut column not found (migration pending):', error.message);
       tbody.innerHTML = '<tr><td colspan="5" class="text-center text-warning py-4"><i class="bi bi-exclamation-triangle me-1"></i>Migration V5 non appliquée. Exécutez migration_v5_statut_roles.sql dans Supabase.</td></tr>';
+      updatePendingSectionVisibility();
       return;
     }
     PENDING_REPORTS_CACHE = data || [];
     if (!PENDING_REPORTS_CACHE.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4"><i class="bi bi-check2-circle me-1 text-success"></i>Aucune mission en attente.</td></tr>';
+      tbody.innerHTML = '';
+      updatePendingSectionVisibility();
+      renderWorkflowAlerts();
+      updateNotifBadge();
       return;
     }
+    updatePendingSectionVisibility();
     tbody.innerHTML = PENDING_REPORTS_CACHE.map((r) => {
       const nb = r.missions?.length || 0;
       const rid = escapeHtml(r.id);
@@ -2029,7 +2202,7 @@ async function loadActiveMissions(province) {
   tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Chargement…</td></tr>';
   try {
     const { data, error } = await db.from('reports')
-      .select('id, saved_at, trimestre, annee, seq_number, meta, missions, rapporteur, statut')
+      .select('id, saved_at, trimestre, annee, seq_number, liquidation_seq_number, liquidation_number, liquidation_printed_at, liquidation_printed_by, meta, missions, rapporteur, statut')
       .eq('province', prov)
       .eq('statut', WORKFLOW_STATUS.ACTIVEE)
       .order('saved_at', { ascending: false })
@@ -2194,10 +2367,12 @@ function openFinancialCompletion(reportId) {
 
 function closeFinancialCompletion() {
   CURRENT_COMPLETION_REPORT_ID = null;
+  IS_SAVING_COMPLETION = false;
   const sect = document.getElementById('comptable-completion-section');
   if (sect) sect.style.display = 'none';
   const commentEl = document.getElementById('completion-comment');
   if (commentEl) commentEl.value = '';
+  setCompletionActionsDisabled(false);
 }
 
 async function returnMissionToMissionnaire() {
@@ -2233,8 +2408,11 @@ async function returnMissionToMissionnaire() {
 
 async function saveFinancialCompletion() {
   if (!CURRENT_COMPLETION_REPORT_ID) { showToast('Aucun rapport sélectionné.'); return; }
+  if (IS_SAVING_COMPLETION) { showToast('Activation déjà en cours.'); return; }
   const report = PENDING_REPORTS_CACHE.find((r) => r.id === CURRENT_COMPLETION_REPORT_ID);
   if (!report) { showToast('Rapport introuvable.'); return; }
+  IS_SAVING_COMPLETION = true;
+  setCompletionActionsDisabled(true);
 
   const updatedMissions = collectCompletionMissions(report);
 
@@ -2252,21 +2430,33 @@ async function saveFinancialCompletion() {
   };
 
   try {
-    const { error } = await db.from('reports').update({
+    const { data, error } = await db.from('reports').update({
       missions: updatedMissions, meta: updatedMeta,
       statut: WORKFLOW_STATUS.ACTIVEE,
       returned_by: null,
       returned_at: null,
       activated_by: session?.user || null,
       activated_at: new Date().toISOString()
-    }).eq('id', CURRENT_COMPLETION_REPORT_ID);
+    }).eq('id', CURRENT_COMPLETION_REPORT_ID).eq('statut', WORKFLOW_STATUS.EN_ATTENTE).select('id');
     if (error) throw error;
+    if (!data?.length) {
+      throw new Error('already-processed');
+    }
+    PENDING_REPORTS_CACHE = PENDING_REPORTS_CACHE.filter((entry) => entry.id !== CURRENT_COMPLETION_REPORT_ID);
+    updatePendingSectionVisibility();
     showToast('✓ Mission activée ! Le budget a été validé.');
     closeFinancialCompletion();
     await loadPendingMissions(session?.province);
     await loadActiveMissions(session?.province);
     await loadUserArchive(session?.user, session?.province);
-  } catch (e) { console.error(e); showToast('Erreur lors de l\'activation.'); }
+  } catch (e) {
+    console.error(e);
+    showToast(e?.message === 'already-processed'
+      ? 'Cette mission a déjà été activée.'
+      : 'Erreur lors de l\'activation.');
+    IS_SAVING_COMPLETION = false;
+    setCompletionActionsDisabled(false);
+  }
 }
 
 // ─── AUTO-SAVE ────────────────────────────────────────────────────────────────
