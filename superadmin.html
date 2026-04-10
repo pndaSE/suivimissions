@@ -174,7 +174,7 @@
     <ul class="nav flex-column">
       <li class="nav-item">
         <a href="#" class="nav-link" onclick="showView('users'); return false;">
-          <i class="bi bi-people-fill"></i> Utilisateurs
+          <i class="bi bi-people-fill"></i> Utilisateurs et rôles
         </a>
       </li>
       <li class="nav-item">
@@ -239,9 +239,19 @@
           <h2 class="page-title">Tableau de bord</h2>
           <p class="text-muted mb-0 small">Vue d'ensemble de la plateforme PNDA-SE</p>
         </div>
-        <button class="btn btn-pnda btn-sm" onclick="loadDashboard()">
-          <i class="bi bi-arrow-clockwise me-1"></i>Actualiser
-        </button>
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-outline-secondary btn-sm" onclick="showView('users')">
+            <i class="bi bi-people-fill me-1"></i>Utilisateurs et rôles
+          </button>
+          <button class="btn btn-pnda btn-sm" onclick="loadDashboard()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Actualiser
+          </button>
+        </div>
+      </div>
+
+      <div class="alert alert-light border d-flex align-items-center gap-2 small mb-4">
+        <i class="bi bi-info-circle text-primary"></i>
+        <span>Pour créer un utilisateur, attribuer un rôle ou modifier ses accès, cliquez sur <strong>Utilisateurs et rôles</strong> dans le menu de gauche.</span>
       </div>
 
       <!-- Stats -->
@@ -1079,13 +1089,20 @@ function openMissionRefModal(m) {
 function editMissionRef(id) { const m = MR_CACHE.find((m)=>m.id===id); if (m) openMissionRefModal(m); }
 
 async function deleteMissionRef(id) {
-  if (!confirm('Supprimer cette mission de référence ?')) return;
-  try {
-    const { error } = await db.from('missions_ref').delete().eq('id', id);
-    if (error) throw error;
-    showToast('✓ Mission supprimée.');
-    await loadMissionsRef();
-  } catch (e) { console.error(e); showToast('Erreur suppression : ' + (e?.message || '')); }
+  askConfirm(
+    'Supprimer cette mission de référence ?',
+    async () => {
+      try {
+        const { error } = await db.from('missions_ref').delete().eq('id', id);
+        if (error) throw error;
+        showToast('✓ Mission supprimée.');
+        await loadMissionsRef();
+      } catch (e) { console.error(e); showToast('Erreur suppression : ' + (e?.message || '')); }
+    },
+    'Supprimer la mission',
+    'Supprimer',
+    'btn-danger'
+  );
 }
 
 async function saveMissionRef() {
@@ -1163,13 +1180,20 @@ async function saveTerritoire() {
 }
 
 async function deleteTerritoire(id, label) {
-  if (!confirm('Supprimer le territoire "'+label+'" ? Les secteurs liés seront aussi supprimés.')) return;
-  try {
-    const { error } = await db.from('territoires').delete().eq('id', id);
-    if (error) throw error;
-    showToast('✓ Territoire supprimé.');
-    await loadTerritoires();
-  } catch (e) { console.error(e); showToast('Erreur suppression : ' + (e?.message || '')); }
+  askConfirm(
+    'Supprimer le territoire "'+label+'" ? Les secteurs liés seront aussi supprimés.',
+    async () => {
+      try {
+        const { error } = await db.from('territoires').delete().eq('id', id);
+        if (error) throw error;
+        showToast('✓ Territoire supprimé.');
+        await loadTerritoires();
+      } catch (e) { console.error(e); showToast('Erreur suppression : ' + (e?.message || '')); }
+    },
+    'Supprimer le territoire',
+    'Supprimer',
+    'btn-danger'
+  );
 }
 
 // ─── SECTEURS ────────────────────────────────────────────────────────────────
@@ -1264,13 +1288,20 @@ async function saveSecteur() {
 }
 
 async function deleteSecteur(id, label) {
-  if (!confirm('Supprimer le secteur "'+label+'" ?')) return;
-  try {
-    const { error } = await db.from('secteurs').delete().eq('id', id);
-    if (error) throw error;
-    showToast('✓ Secteur supprimé.');
-    await loadSecteurs();
-  } catch (e) { console.error(e); showToast('Erreur suppression : ' + (e?.message || '')); }
+  askConfirm(
+    'Supprimer le secteur "'+label+'" ?',
+    async () => {
+      try {
+        const { error } = await db.from('secteurs').delete().eq('id', id);
+        if (error) throw error;
+        showToast('✓ Secteur supprimé.');
+        await loadSecteurs();
+      } catch (e) { console.error(e); showToast('Erreur suppression : ' + (e?.message || '')); }
+    },
+    'Supprimer le secteur',
+    'Supprimer',
+    'btn-danger'
+  );
 }
 
 // ─── RAPPORTS ────────────────────────────────────────────────────────────────
@@ -1299,11 +1330,18 @@ async function loadAllReports() {
 }
 
 async function deleteReport(id) {
-  if (!confirm('Supprimer définitivement ce rapport ?')) return;
-  const { error } = await db.from('reports').delete().eq('id', id);
-  if (error) { showToast('Erreur de suppression.'); return; }
-  showToast('✓ Rapport supprimé.');
-  await loadAllReports();
+  askConfirm(
+    'Supprimer définitivement ce rapport ?',
+    async () => {
+      const { error } = await db.from('reports').delete().eq('id', id);
+      if (error) { showToast('Erreur de suppression.'); return; }
+      showToast('✓ Rapport supprimé.');
+      await loadAllReports();
+    },
+    'Supprimer le rapport',
+    'Supprimer',
+    'btn-danger'
+  );
 }
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
