@@ -175,7 +175,7 @@ INSERT INTO users (email, password_b64, provinces, role) VALUES
   ('compte_kwilu@pnda.cd',  'S3dpbHUjMjAyNg==', ARRAY['Kwilu'],          'province'),
   ('compte_kasaic@pnda.cd', 'S2FzYWlDIzIwMjY=', ARRAY['Kasaï Central'], 'province'),
   ('compte_kasai@pnda.cd',  'S2FzYWkjMjAyNg==', ARRAY['Kasaï'],         'province'),
-  ('compte_uncp@pnda.cd',   'VU5DUCMyMDI2',     ARRAY['UN'],             'province'),
+  ('compte_uncp@pnda.cd',   'VU5DUCMyMDI2',     ARRAY['UN'],             'comptable'),
   ('rnse@pnda.cd',          'Uk5TRSMyMDI2',     NULL,                    'super_admin'),
   ('raf@pnda.cd',           'UkFGIzIwMjY=',     NULL,                    'admin')
 ON CONFLICT (email) DO NOTHING;
