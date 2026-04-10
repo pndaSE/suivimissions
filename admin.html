@@ -4,574 +4,517 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PNDA-SE — Tableau de Bord Admin</title>
+
+<!-- Bootstrap 5 CSS -->
+<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
+<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
   :root {
-    --forest: #123524;
-    --forest-md: #1d4c34;
-    --forest-lt: #2f6a48;
-    --gold: #d3a52c;
-    --gold-lt: #f1c85b;
-    --cream: #f6f1df;
-    --paper: #fffdf7;
-    --mist: #eef5ef;
-    --text: #1b2019;
-    --muted: #5e695f;
-    --border: #d8c88a;
-    --danger: #ad3434;
-    --info: #2563a8;
-    --shadow: 0 14px 36px rgba(18,53,36,0.14);
+    --pnda-green:    #123524;
+    --pnda-green-md: #1d4c34;
+    --pnda-green-lt: #2f6a48;
+    --pnda-gold:     #d3a52c;
+    --pnda-gold-lt:  #f1c85b;
+    --pnda-cream:    #f6f1df;
+    --pnda-paper:    #fffdf7;
   }
+  body { background: #f0f2f5; font-family: 'Source Sans 3', sans-serif; }
 
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: 'Source Sans 3', sans-serif;
-    color: var(--text);
-    background:
-      radial-gradient(circle at top left, rgba(211,165,44,0.18), transparent 24%),
-      radial-gradient(circle at right, rgba(47,106,72,0.13), transparent 30%),
-      linear-gradient(180deg, #f9f6eb 0%, var(--cream) 48%, #eee3bf 100%);
+  /* ── TOP NAVBAR ─────────────────────────────────────────── */
+  .top-navbar {
+    background: var(--pnda-green);
+    border-bottom: 3px solid var(--pnda-gold);
+    height: 66px;
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1040;
+    display: flex; align-items: center;
+    padding: 0 20px; gap: 14px;
   }
-
-  header {
-    background: #ffffff;
-    color: var(--forest);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.14);
-    border-bottom: 1px solid rgba(18,53,36,0.12);
-  }
-  .header-top {
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: 12px 24px 16px;
-    display: grid;
-    justify-items: center;
-    gap: 10px;
-    border-bottom: 3px solid rgba(18,53,36,0.12);
-  }
-  .header-logos-row {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 18px;
-  }
-  .header-logo-side,
-  .header-logo-center {
-    display: flex;
-    align-items: center;
-  }
-  .header-logo-side.left { justify-content: flex-start; }
-  .header-logo-side.right { justify-content: flex-end; }
-  .header-logo-center { justify-content: center; }
-  .header-logo-shell {
-    background: #ffffff;
-    padding: 4px 8px;
-  }
-  .header-logo-shell img {
-    display: block;
-    object-fit: contain;
-  }
-  .logo-ministere img { width: 200px; height: 84px; }
-  .logo-programme img { width: 200px; height: 92px; }
-  .logo-pnda img { width: 200px; height: 92px; }
-  .header-copy {
-    text-align: center;
-    max-width: 860px;
-  }
-  .header-copy h1 {
-    margin: 0;
+  .top-navbar img { height: 46px; }
+  .top-navbar .brand-text h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.7rem;
-    line-height: 1.15;
-    color: var(--forest);
+    font-size: 1.05rem; color: #fff; margin: 0; line-height: 1.2;
   }
-  .header-copy p {
-    margin: 6px 0 0;
-    color: var(--forest-lt);
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    font-size: 0.8rem;
+  .top-navbar .brand-text p {
+    font-size: 0.68rem; color: rgba(255,255,255,0.55);
+    margin: 0; text-transform: uppercase; letter-spacing: 0.8px;
   }
-  .header-meta-row {
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: 12px 24px;
-    display: flex;
-    justify-content: flex-end;
-    background: #ffffff;
-  }
-  .header-meta {
-    text-align: right;
-    font-size: 0.84rem;
-    color: var(--muted);
-  }
-  .header-meta strong {
-    display: block;
-    color: var(--forest);
-    font-size: 0.98rem;
+  .top-navbar .session-user { font-weight: 700; color: var(--pnda-gold-lt); font-size: 0.9rem; display: block; }
+  .top-navbar .session-date { font-size: 0.72rem; color: rgba(255,255,255,0.5); }
+
+  /* ── LAYOUT WRAPPER ─────────────────────────────────────── */
+  #layout-wrapper {
+    display: flex; min-height: 100vh; padding-top: 66px;
   }
 
-  main {
-    max-width: 1240px;
-    margin: 28px auto 0;
-    padding: 0 24px 48px;
+  /* ── SIDEBAR ────────────────────────────────────────────── */
+  #sidebar {
+    width: 250px; flex-shrink: 0;
+    background: var(--pnda-green);
+    min-height: calc(100vh - 66px);
+    position: sticky; top: 66px; height: calc(100vh - 66px);
+    overflow-y: auto; padding: 16px 0 24px;
+  }
+  .sidebar-badge {
+    margin: 0 16px 16px; text-align: center;
+    background: var(--pnda-gold); color: var(--pnda-green);
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; border-radius: 4px; padding: 5px 10px;
+  }
+  .sidebar-label {
+    padding: 10px 18px 4px; font-size: 0.62rem;
+    text-transform: uppercase; letter-spacing: 1.8px;
+    color: rgba(255,255,255,0.35);
+  }
+  #sidebar .nav-link {
+    color: rgba(255,255,255,0.75); padding: 9px 18px;
+    border-radius: 0; font-size: 0.875rem;
+    display: flex; align-items: center; gap: 10px;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, color 0.15s;
+  }
+  #sidebar .nav-link:hover,
+  #sidebar .nav-link.active {
+    background: rgba(255,255,255,0.1); color: #fff;
+    border-left-color: var(--pnda-gold);
+  }
+  #sidebar .nav-link.danger { color: rgba(255,130,130,0.85); }
+  #sidebar .nav-link.danger:hover { color: #ffaaaa; }
+  .sidebar-sep { border-top: 1px solid rgba(255,255,255,0.07); margin: 6px 16px; }
+
+  /* ── CONTENT ─────────────────────────────────────────────── */
+  #content { flex: 1; padding: 28px 28px 60px; min-width: 0; }
+
+  /* ── VIEWS ───────────────────────────────────────────────── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── PAGE TITLE ──────────────────────────────────────────── */
+  .page-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--pnda-green); margin: 0; }
+
+  /* ── STAT CARDS ──────────────────────────────────────────── */
+  .stat-value {
+    font-family: 'Playfair Display', serif; font-size: 1.5rem;
+    font-weight: 700; color: var(--pnda-green); display: block;
+  }
+  .stat-icon { font-size: 1.6rem; opacity: 0.15; }
+
+  /* ── CARDS ───────────────────────────────────────────────── */
+  .card { border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .card-header {
+    background: linear-gradient(180deg, #f5f0e0 0%, #ede7cc 100%);
+    border-bottom: 1px solid rgba(0,0,0,0.08); font-weight: 600;
+    color: var(--pnda-green); display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  .card-header h5, .card-header h6 { margin: 0; font-family: 'Playfair Display', serif; }
+
+  /* ── BUTTONS ──────────────────────────────────────────────── */
+  .btn-pnda { background: var(--pnda-green); color: #fff; border: none; }
+  .btn-pnda:hover { background: var(--pnda-green-lt); color: #fff; }
+  .btn-gold { background: var(--pnda-gold); color: var(--pnda-green); border: none; font-weight: 600; }
+  .btn-gold:hover { background: var(--pnda-gold-lt); color: var(--pnda-green); }
+
+  /* ── TABLES ──────────────────────────────────────────────── */
+  .table th {
+    font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 0.7px; color: #6c757d;
+    background: rgba(237,231,204,0.35); white-space: nowrap;
   }
 
-  .toolbar,
-  .panel,
-  .table-card,
-  .summary-card {
-    background: var(--paper);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow: var(--shadow);
+  /* ── TABS (province tabs) ─────────────────────────────────── */
+  .pnda-tab-btn {
+    border: 1px solid rgba(18,53,36,0.16); background: rgba(255,255,255,0.82);
+    color: var(--pnda-green); border-radius: 999px; padding: 8px 14px;
+    font-weight: 600; cursor: pointer; font-size: 0.85rem;
   }
+  .pnda-tab-btn.active { background: var(--pnda-green); color: #fff; border-color: var(--pnda-green); }
 
-  .toolbar {
-    padding: 18px 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-  .toolbar-left {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-  }
-  .toolbar-field {
-    display: grid;
-    gap: 4px;
-  }
-  .toolbar-field label {
-    font-size: 0.72rem;
-    letter-spacing: 0.7px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .toolbar-field input {
-    min-width: 180px;
-    padding: 10px 12px;
-    border: 1px solid rgba(18,53,36,0.18);
-    border-radius: 4px;
-    background: #fffefb;
-    font: inherit;
-    color: var(--text);
-  }
-  .toolbar-field select {
-    min-width: 180px;
-    padding: 10px 12px;
-    border: 1px solid rgba(18,53,36,0.18);
-    border-radius: 4px;
-    background: #fffefb;
-    font: inherit;
-    color: var(--text);
-  }
-  .toolbar h2 {
-    margin: 0;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.24rem;
-    color: var(--forest);
-  }
-  .toolbar-note {
-    font-size: 0.88rem;
-    color: var(--muted);
-  }
-  .btn,
-  .file-label {
-    appearance: none;
-    border: none;
-    border-radius: 4px;
-    padding: 11px 16px;
-    font: inherit;
-    cursor: pointer;
-    transition: transform 0.12s, background 0.2s, border-color 0.2s;
-  }
-  .btn:active,
-  .file-label:active {
-    transform: scale(0.98);
-  }
-  .btn-primary,
-  .file-label {
-    background: var(--forest);
-    color: white;
-  }
-  .btn-block {
-    width: 100%;
-    margin-top: 16px;
-  }
-  .btn-primary:hover,
-  .file-label:hover {
-    background: var(--forest-lt);
-  }
-  .btn-secondary {
-    background: var(--gold);
-    color: var(--forest);
-  }
-  .btn-secondary:hover {
-    background: var(--gold-lt);
-  }
-  .btn-ghost {
-    background: transparent;
-    color: var(--danger);
-    border: 1px solid rgba(173,52,52,0.35);
-  }
-  .btn-ghost:hover {
-    background: rgba(173,52,52,0.08);
-  }
-  #json-files {
-    display: none;
-  }
+  /* ── PANELS ──────────────────────────────────────────────── */
+  .pnda-panel { display: none; }
+  .pnda-panel.active { display: block; }
 
-  .summary-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-  .import-card {
-    padding: 18px 20px;
-    margin-bottom: 20px;
-  }
-  .import-card-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-  .import-card-head h3 {
-    margin: 0;
-    font-family: 'Playfair Display', serif;
-    color: var(--forest);
-    font-size: 1.12rem;
-  }
-  .import-card-head p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-  .import-list {
-    display: grid;
-    gap: 10px;
-  }
-  .import-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
+  .panel-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; }
+  @media (max-width: 960px) { .panel-grid { grid-template-columns: 1fr; } }
+
+  /* ── IMPORT SECTION ──────────────────────────────────────── */
   .import-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 999px;
-    background: rgba(18,53,36,0.08);
-    border: 1px solid rgba(18,53,36,0.12);
-    color: var(--forest);
-    font-size: 0.84rem;
-    font-weight: 600;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border-radius: 999px;
+    background: rgba(18,53,36,0.08); border: 1px solid rgba(18,53,36,0.12);
+    color: var(--pnda-green); font-size: 0.84rem; font-weight: 600;
   }
-  .import-badge strong {
-    color: var(--forest-lt);
-    font-size: 0.88rem;
-  }
+  .import-badge strong { color: var(--pnda-green-lt); font-size: 0.88rem; }
   .import-item {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 12px;
-    align-items: center;
-    padding: 12px 14px;
-    border: 1px solid rgba(18,53,36,0.1);
-    border-radius: 6px;
+    display: flex; flex-wrap: wrap; justify-content: space-between;
+    gap: 12px; align-items: center; padding: 12px 14px;
+    border: 1px solid rgba(18,53,36,0.1); border-radius: 6px;
     background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,245,239,0.95));
   }
-  .import-item strong {
-    display: block;
-    color: var(--forest);
-    margin-bottom: 2px;
-  }
-  .import-meta {
-    font-size: 0.86rem;
-    color: var(--muted);
-  }
-  .btn-inline-danger {
-    background: transparent;
-    color: var(--danger);
-    border: 1px solid rgba(173,52,52,0.24);
-    border-radius: 4px;
-    padding: 8px 12px;
-    font: inherit;
-    cursor: pointer;
-  }
-  .btn-inline-danger:hover {
-    background: rgba(173,52,52,0.08);
-  }
-  .summary-card {
-    padding: 18px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(246,241,223,0.96));
-  }
-  .summary-card span {
-    display: block;
-    font-size: 0.75rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-  .summary-card strong {
-    font-size: 1.55rem;
-    color: var(--forest);
-  }
-
-  .tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 18px;
-  }
-  .tab-btn {
-    border: 1px solid rgba(18,53,36,0.16);
-    background: rgba(255,255,255,0.82);
-    color: var(--forest);
-    border-radius: 999px;
-    padding: 10px 14px;
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .tab-btn.active {
-    background: var(--forest);
-    color: white;
-    border-color: var(--forest);
-  }
-
-  .panel {
-    display: none;
-    padding: 20px;
-    margin-bottom: 18px;
-  }
-  .panel.active {
-    display: block;
-  }
-  .panel-head {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 8px;
-    align-items: baseline;
-    margin-bottom: 16px;
-  }
-  .panel-head h3 {
-    margin: 0;
-    font-family: 'Playfair Display', serif;
-    color: var(--forest);
-    font-size: 1.18rem;
-  }
-  .panel-head p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: var(--muted);
-  }
-
-  .panel-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 18px;
-  }
-  .table-card {
-    overflow: hidden;
-  }
-  .table-card h4 {
-    margin: 0;
-    padding: 14px 16px;
-    background: linear-gradient(180deg, #f3e8be 0%, #efe4bc 100%);
-    color: var(--forest);
-    font-size: 1rem;
-    border-bottom: 1px solid var(--border);
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.92rem;
-  }
-  th, td {
-    padding: 12px 14px;
-    border-bottom: 1px solid rgba(216,200,138,0.55);
-    text-align: left;
-    vertical-align: top;
-  }
-  th {
-    color: var(--muted);
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    background: rgba(239,228,188,0.45);
-  }
-  tbody tr:nth-child(even) {
-    background: rgba(246,241,223,0.42);
-  }
-  .empty-state {
-    padding: 18px;
-    font-size: 0.92rem;
-    color: var(--muted);
-  }
+  .import-item strong { display: block; color: var(--pnda-green); margin-bottom: 2px; }
+  .import-meta { font-size: 0.86rem; color: #6c757d; }
   .pill {
-    display: inline-block;
-    padding: 3px 9px;
-    border-radius: 999px;
-    background: rgba(37,99,168,0.1);
-    color: var(--info);
-    font-size: 0.76rem;
-    font-weight: 700;
+    display: inline-block; padding: 3px 9px; border-radius: 999px;
+    background: rgba(37,99,168,0.1); color: #2563a8;
+    font-size: 0.76rem; font-weight: 700;
   }
 
-  #toast {
-    position: fixed;
-    right: 24px;
-    bottom: 24px;
-    padding: 12px 18px;
-    background: var(--forest);
-    color: white;
-    border-left: 4px solid var(--gold);
-    border-radius: 4px;
-    display: none;
-    z-index: 10000;
-    box-shadow: 0 6px 22px rgba(0,0,0,0.25);
-  }
+  /* ── TOAST ───────────────────────────────────────────────── */
+  .toast-container { z-index: 9999; }
 
-  @media (max-width: 960px) {
-    .summary-grid,
-    .panel-grid {
-      grid-template-columns: 1fr;
-    }
-    .header-logos-row {
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-    .header-logo-side.left,
-    .header-logo-side.right,
-    .header-logo-center {
-      justify-content: center;
-    }
-    .header-meta-row {
-      justify-content: center;
-    }
-    .header-meta {
-      text-align: center;
-    }
+  /* ── REPORT ROWS ─────────────────────────────────────────── */
+  .report-row:hover td { background: rgba(18,53,36,0.04); }
+  .report-row.unread td { font-weight: 600; }
+  .badge-nouveau { font-size: .65rem; vertical-align: middle; }
+  .btn-mark-read { font-size: .72rem; padding: 1px 7px; }
+
+  /* ── PRINT ───────────────────────────────────────────────── */
+  @media print {
+    body { background: #fff !important; }
+    .top-navbar, #sidebar, .toast-container { display: none !important; }
+    #layout-wrapper { padding-top: 0; }
+    #content { padding: 0; }
   }
 </style>
 </head>
 <body>
-<header>
-  <div class="header-top">
-    <div class="header-logos-row">
-      <div class="header-logo-side left">
-        <div class="header-logo-shell logo-ministere"><img src="logo_ministere.png" alt="Logo Ministère"></div>
-      </div>
-      <div class="header-logo-center">
-        <div class="header-logo-shell logo-programme"><img src="logo_programme.png" alt="Logo Programme"></div>
-      </div>
-      <div class="header-logo-side right">
-        <div class="header-logo-shell logo-pnda"><img src="logo_pnda.png" alt="Logo PNDA"></div>
-      </div>
-    </div>
-    <div class="header-copy">
-      <h1>PNDA-SE — Tableau de Bord Administratif</h1>
-      <p>RNSE · RAF · Consolidation trimestrielle des missions</p>
+
+<!-- ░░ TOP NAVBAR ░░ -->
+<div class="top-navbar">
+  <img src="logo_pnda.png" alt="PNDA">
+  <div class="brand-text">
+    <h1>PNDA-SE · Administration</h1>
+    <p>RNSE · RAF · Consolidation trimestrielle des missions</p>
+  </div>
+  <div class="ms-auto d-flex align-items-center gap-3">
+    <button class="btn btn-sm position-relative p-1" id="btn-admin-notif" onclick="refreshDashboard()" title="Nouveaux rapports">
+      <i class="bi bi-bell-fill text-white fs-5"></i>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="admin-notif-badge" style="display:none;font-size:.6rem">0</span>
+    </button>
+    <div class="text-end">
+      <span class="session-user" id="session-user">—</span>
+      <span class="session-date" id="session-date">—</span>
     </div>
   </div>
-  <div class="header-meta-row">
-    <div class="header-meta">
-      <strong id="session-user">—</strong>
-      <span id="session-date">—</span>
+</div>
+
+<!-- ░░ LAYOUT ░░ -->
+<div id="layout-wrapper">
+
+  <!-- ────── SIDEBAR ────── -->
+  <nav id="sidebar">
+    <div class="sidebar-badge"><i class="bi bi-person-badge-fill me-1"></i>Admin</div>
+
+    <div class="sidebar-label">Navigation</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="#" class="nav-link active" onclick="showAdminView('dashboard'); return false;">
+          <i class="bi bi-speedometer2"></i> Tableau de bord
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-sep"></div>
+    <div class="sidebar-label">Export</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showAdminView('export'); return false;">
+          <i class="bi bi-file-earmark-excel"></i> Export Excel
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-sep"></div>
+    <div class="sidebar-label">Paramètres</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showAdminView('signatory'); return false;">
+          <i class="bi bi-pen-fill"></i> Signataire
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showAdminView('filters'); return false;">
+          <i class="bi bi-funnel-fill"></i> Filtres
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-sep"></div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="index.html?manual-login=1" class="nav-link">
+          <i class="bi bi-file-earmark-text"></i> Formulaire
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link danger" onclick="logoutAdmin(); return false;">
+          <i class="bi bi-box-arrow-right"></i> Déconnexion
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ────── CONTENU ────── -->
+  <main id="content">
+
+    <!-- ░░ VUE : TABLEAU DE BORD ░░ -->
+    <div id="view-dashboard" class="view active">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h2 class="page-title">Suivi consolidé</h2>
+          <p class="text-muted mb-0 small">Rapports enregistrés par les utilisateurs province.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-gold btn-sm" onclick="exportExcelWorkbook()">
+            <i class="bi bi-download me-1"></i>Exporter Excel
+          </button>
+          <button class="btn btn-pnda btn-sm" onclick="refreshDashboard()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Actualiser
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="row g-3 mb-4" id="summary-grid">
+        <div class="col-6 col-md-2">
+          <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:.65rem;letter-spacing:.8px">Rapports</div>
+                <span class="stat-value" id="stat-reports">—</span>
+              </div>
+              <i class="bi bi-folder2 stat-icon" style="color:var(--pnda-green)"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-2">
+          <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:.65rem;letter-spacing:.8px">En attente</div>
+                <span class="stat-value text-warning" id="stat-en-attente">—</span>
+              </div>
+              <i class="bi bi-hourglass-split stat-icon" style="color:#d3a52c"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-2">
+          <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:.65rem;letter-spacing:.8px">Activées</div>
+                <span class="stat-value text-success" id="stat-activee">—</span>
+              </div>
+              <i class="bi bi-lightning-charge stat-icon" style="color:#198754"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-2">
+          <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:.65rem;letter-spacing:.8px">Réalisées</div>
+                <span class="stat-value text-secondary" id="stat-realisee">—</span>
+              </div>
+              <i class="bi bi-check2-all stat-icon" style="color:#6c757d"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-2">
+          <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:.65rem;letter-spacing:.8px">Total USD</div>
+                <span class="stat-value" id="stat-total">—</span>
+              </div>
+              <i class="bi bi-cash-coin stat-icon" style="color:var(--pnda-green-lt)"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-2">
+          <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:.65rem;letter-spacing:.8px">Missions</div>
+                <span class="stat-value" id="stat-missions">—</span>
+              </div>
+              <i class="bi bi-list-check stat-icon" style="color:#2563a8"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Province tabs -->
+      <div class="d-flex gap-2 flex-wrap mb-3" id="tabs"></div>
+
+      <!-- Panels -->
+      <div id="panels"></div>
+    </div>
+
+    <!-- ░░ VUE : EXPORT EXCEL ░░ -->
+    <div id="view-export" class="view">
+      <div class="mb-4">
+        <h2 class="page-title">Export Excel</h2>
+        <p class="text-muted mb-0 small">Génère un classeur consolidé avec tous les rapports filtrés.</p>
+      </div>
+      <div class="card">
+        <div class="card-body text-center py-5">
+          <i class="bi bi-file-earmark-excel text-success" style="font-size:3rem"></i>
+          <p class="text-muted mt-3 mb-3">Cliquez ci-dessous pour télécharger le classeur Excel consolidé.</p>
+          <button class="btn btn-gold btn-lg" onclick="exportExcelWorkbook()">
+            <i class="bi bi-download me-1"></i>Télécharger le classeur Excel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░ VUE : SIGNATAIRE ░░ -->
+    <div id="view-signatory" class="view">
+      <div class="mb-4">
+        <h2 class="page-title">Paramètres du signataire</h2>
+        <p class="text-muted mb-0 small">Ces informations apparaissent sur le classeur Excel exporté.</p>
+      </div>
+      <div class="card">
+        <div class="card-header py-3">
+          <h5><i class="bi bi-pen me-2"></i>Signataire</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3" style="max-width:600px">
+            <div class="col-12">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Nom du signataire</label>
+              <input class="form-control form-control-sm" id="signatory-name" placeholder="Ex. Jean-Pierre Mukeba">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Poste</label>
+              <input class="form-control form-control-sm" id="signatory-position" placeholder="Ex. Coordonnateur National">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Lieu de signature</label>
+              <input class="form-control form-control-sm" id="signatory-location" placeholder="Ex. Kinshasa">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░ VUE : FILTRES ░░ -->
+    <div id="view-filters" class="view">
+      <div class="mb-4">
+        <h2 class="page-title">Filtres de consultation</h2>
+        <p class="text-muted mb-0 small">Restreignez les données affichées dans le tableau de bord.</p>
+      </div>
+      <div class="card">
+        <div class="card-header py-3">
+          <h5><i class="bi bi-funnel me-2"></i>Critères de filtre</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3" style="max-width:600px">
+            <div class="col-12">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Province</label>
+              <select class="form-select form-select-sm" id="filter-province"><option value="">Toutes les provinces</option></select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Statut de la mission</label>
+              <select class="form-select form-select-sm" id="filter-statut">
+                <option value="">Tous les statuts</option>
+                <option value="en_attente">⏳ En attente</option>
+                <option value="activee">⚡ Activée</option>
+                <option value="realisee">✓ Réalisée</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Rapporteur</label>
+              <input class="form-control form-control-sm" id="filter-rapporteur" placeholder="Nom du rapporteur">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Période du</label>
+              <input class="form-control form-control-sm" id="filter-start-date" type="date">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Période au</label>
+              <input class="form-control form-control-sm" id="filter-end-date" type="date">
+            </div>
+            <div class="col-12">
+              <button class="btn btn-pnda" onclick="refreshDashboard()">
+                <i class="bi bi-check-lg me-1"></i>Appliquer les filtres
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ░░ TOAST ░░ -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="toast" class="toast align-items-center text-bg-dark border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body fw-semibold" id="toast-body">—</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
     </div>
   </div>
-</header>
+</div>
 
-<main>
-  <section class="toolbar">
-    <div class="toolbar-left">
-      <div>
-        <h2>Suivi consolidé</h2>
-        <div class="toolbar-note">Vue générale, puis détails par province. Les rapports saisis dans le formulaire HTML sont détectés automatiquement.</div>
+<!-- ░░ MODALE DE CONFIRMATION ░░ -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header border-0 pb-1">
+        <h6 class="modal-title fw-bold text-danger" id="confirmModalTitle">Confirmer la suppression</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body small pt-1" id="confirmModalBody">Cette action est irréversible.</div>
+      <div class="modal-footer border-0 pt-0 gap-2">
+        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+        <button class="btn btn-danger btn-sm" id="confirmModalOk">Supprimer</button>
       </div>
     </div>
-    <div class="toolbar-left">
-      <label class="file-label" for="json-files">Importer des fichiers JSON</label>
-      <input id="json-files" type="file" accept="application/json,.json" multiple>
-      <div class="toolbar-field">
-        <label for="signatory-name">Nom signataire</label>
-        <input id="signatory-name" type="text" placeholder="Nom du signataire">
-      </div>
-      <div class="toolbar-field">
-        <label for="signatory-position">Poste du signataire</label>
-        <input id="signatory-position" type="text" placeholder="Poste du signataire">
-      </div>
-      <div class="toolbar-field">
-        <label for="signatory-location">Lieu de signature</label>
-        <input id="signatory-location" type="text" placeholder="Ex. Kinshasa">
-      </div>
-      <div class="toolbar-field">
-        <label for="filter-province">Filtre province</label>
-        <select id="filter-province">
-          <option value="">Toutes les provinces</option>
-        </select>
-      </div>
-      <div class="toolbar-field">
-        <label for="filter-rapporteur">Filtre rapporteur</label>
-        <input id="filter-rapporteur" type="text" placeholder="Nom du rapporteur">
-      </div>
-      <div class="toolbar-field">
-        <label for="filter-start-date">Période du</label>
-        <input id="filter-start-date" type="date">
-      </div>
-      <div class="toolbar-field">
-        <label for="filter-end-date">Période au</label>
-        <input id="filter-end-date" type="date">
-      </div>
-      <button class="btn btn-secondary" onclick="returnToFormLogin()">Retour au formulaire</button>
-      <button class="btn btn-secondary" onclick="exportExcelWorkbook()">Exporter Excel</button>
-      <button class="btn btn-secondary" onclick="refreshDashboard()">Actualiser</button>
-      <button class="btn btn-ghost" onclick="clearImportedReports()">Vider imports JSON</button>
-      <button class="btn btn-ghost" onclick="clearDashboardData()">Vider toutes les données</button>
-      <button class="btn btn-ghost" onclick="logoutAdmin()">Déconnexion</button>
-    </div>
-  </section>
+  </div>
+</div>
 
-  <section class="import-card toolbar">
-    <div class="import-card-head">
-      <h3>Fichiers JSON importés</h3>
-      <p id="import-summary">Aucun import supplémentaire chargé.</p>
-    </div>
-    <div id="import-badges" class="import-badges"></div>
-    <div id="import-list" class="import-list"></div>
-  </section>
-
-  <section class="summary-grid" id="summary-grid"></section>
-
-  <div class="tabs" id="tabs"></div>
-  <div id="panels"></div>
-</main>
-
-<div id="toast"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- ░░ SCRIPTS ░░ -->
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="node_modules/@supabase/supabase-js/dist/umd/supabase.js"></script>
 <script src="supabase_config.js"></script>
+
 <script>
 // ─── CLIENT SUPABASE ──────────────────────────────────────────────────────────
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ─── BOOTSTRAP TOAST ──────────────────────────────────────────────────────────
+const _toastEl = document.getElementById('toast');
+const _bsToast = new bootstrap.Toast(_toastEl, { delay: 3500 });
+function showToast(msg) {
+  document.getElementById('toast-body').textContent = msg;
+  _bsToast.show();
+}
+
+// ─── CONFIRMATION MODAL (remplace window.confirm) ─────────────────────────────
+const _confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+let _confirmOkCallback = null;
+document.getElementById('confirmModalOk').addEventListener('click', () => {
+  document.activeElement?.blur();
+  _confirmModal.hide();
+  if (_confirmOkCallback) { const cb = _confirmOkCallback; _confirmOkCallback = null; cb(); }
+});
+function askConfirm(message, onOk, title = 'Confirmer', okLabel = 'Confirmer', okClass = 'btn-danger') {
+  document.getElementById('confirmModalTitle').textContent = title;
+  document.getElementById('confirmModalBody').textContent = message;
+  const okBtn = document.getElementById('confirmModalOk');
+  okBtn.textContent = okLabel;
+  okBtn.className = `btn btn-sm ${okClass}`;
+  _confirmOkCallback = onOk;
+  _confirmModal.show();
+}
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
 let USERS = {};
 let REFERENCE = { provinces: [] };
 let TAB_ORDER = ['general'];
@@ -586,12 +529,11 @@ initialize();
 async function initialize() {
   await loadReferenceAndUsers();
   TAB_ORDER = ['general', ...REFERENCE.provinces.map((province) => province.name)];
-  if (!hydrateSession()) {
-    return;
-  }
+  if (!hydrateSession()) return;
   bindEvents();
   buildTabs();
   await refreshDashboard();
+  startPolling();
 }
 
 async function loadReferenceAndUsers() {
@@ -609,22 +551,14 @@ async function loadReferenceAndUsers() {
 
     REFERENCE = {
       provinces: (provinces || []).map((prov) => ({
-        name:     prov.name,
-        label:    prov.label,
-        code:     prov.code,
-        missions: (missions || [])
-          .filter((m) => m.province_name === prov.name)
+        name: prov.name, label: prov.label, code: prov.code,
+        missions: (missions || []).filter((m) => m.province_name === prov.name)
           .map((m) => ({ id: m.ref_id, nature: m.nature, objectif: m.objectif || '' }))
       }))
     };
-
     USERS = {};
     (users || []).forEach((u) => {
-      USERS[u.email] = {
-        password:  u.password_b64,
-        provinces: u.provinces === null ? '*' : u.provinces,
-        role:      u.role
-      };
+      USERS[u.email] = { password: u.password_b64, provinces: u.provinces === null ? '*' : u.provinces, role: u.role };
     });
   } catch (error) {
     console.error('Erreur chargement Supabase:', error);
@@ -633,17 +567,27 @@ async function loadReferenceAndUsers() {
 
 function hydrateSession() {
   const session = getSession();
-  if (session?.role !== 'admin' || !session.user || !USERS[session.user]) {
-    redirectToLogin();
-    return false;
+  if (!session?.user || !USERS[session.user] || !['admin', 'super_admin'].includes(session.role)) {
+    redirectToLogin(); return false;
   }
-
   openDashboard(session.user);
   return true;
 }
 
+function showAdminView(name) {
+  const views = ['dashboard','export','signatory','filters'];
+  views.forEach((v) => {
+    const el = document.getElementById(`view-${v}`);
+    if (el) el.classList.toggle('active', v === name);
+  });
+  document.querySelectorAll('#sidebar .nav-link').forEach((btn) => btn.classList.remove('active'));
+  const map = { dashboard:'tableau', imports:'import', export:'export', signatory:'signa', filters:'filtr' };
+  document.querySelectorAll('#sidebar .nav-link').forEach((btn) => {
+    if (btn.textContent.toLowerCase().includes(map[name] || name)) btn.classList.add('active');
+  });
+}
+
 function bindEvents() {
-  document.getElementById('json-files').addEventListener('change', handleFileImport);
   document.getElementById('signatory-name').addEventListener('input', persistSignatory);
   document.getElementById('signatory-position').addEventListener('input', persistSignatory);
   document.getElementById('signatory-location').addEventListener('input', persistSignatory);
@@ -651,16 +595,13 @@ function bindEvents() {
   document.getElementById('filter-rapporteur').addEventListener('input', refreshDashboard);
   document.getElementById('filter-start-date').addEventListener('change', refreshDashboard);
   document.getElementById('filter-end-date').addEventListener('change', refreshDashboard);
+  document.getElementById('filter-statut').addEventListener('change', refreshDashboard);
   window.addEventListener('storage', handleStorageSync);
   window.addEventListener('PNDA_DATA_UPDATED', refreshDashboard);
 }
 
 function getSession() {
-  try {
-    return JSON.parse(localStorage.getItem('PNDA_SESSION') || 'null');
-  } catch {
-    return null;
-  }
+  try { return JSON.parse(localStorage.getItem('PNDA_SESSION') || 'null'); } catch { return null; }
 }
 
 function redirectToLogin() {
@@ -671,10 +612,7 @@ function redirectToLogin() {
 function openDashboard(user) {
   document.getElementById('session-user').textContent = user.toUpperCase();
   document.getElementById('session-date').textContent = new Date().toLocaleDateString('fr-FR', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
   importedReports = getPersistedImportedReports();
   hydrateSignatory();
@@ -685,39 +623,44 @@ function logoutAdmin() {
   window.location.href = 'index.html?manual-login=1';
 }
 
-function returnToFormLogin() {
-  window.location.href = 'index.html?manual-login=1';
+function returnToFormLogin() { window.location.href = 'index.html?manual-login=1'; }
+
+function getAdminProvinces(session) {
+  if (session?.role === 'super_admin') return REFERENCE.provinces;
+  if (session?.province) return REFERENCE.provinces.filter((p) => p.name === session.province);
+  const userProvs = USERS[session?.user]?.provinces;
+  if (userProvs === '*') return REFERENCE.provinces;
+  if (Array.isArray(userProvs)) return REFERENCE.provinces.filter((p) => userProvs.includes(p.name));
+  return REFERENCE.provinces;
 }
 
 function buildTabs() {
   const tabs = document.getElementById('tabs');
   tabs.innerHTML = '';
-
-  const generalButton = createTabButton('general', 'Général');
-  tabs.appendChild(generalButton);
-
-  REFERENCE.provinces.forEach((province) => {
-    tabs.appendChild(createTabButton(province.name, province.label));
-  });
+  const session = getSession();
+  const isSuperAdmin = session?.role === 'super_admin';
+  if (isSuperAdmin) {
+    tabs.appendChild(createTabButton('general', 'Général'));
+  }
+  const provinces = getAdminProvinces(session);
+  provinces.forEach((province) => tabs.appendChild(createTabButton(province.name, province.label)));
+  if (!isSuperAdmin && provinces.length) { activeTab = provinces[0].name; updateActiveTab(); }
 }
 
 function createTabButton(key, label) {
   const button = document.createElement('button');
-  button.className = `tab-btn${key === activeTab ? ' active' : ''}`;
+  button.className = `pnda-tab-btn${key === activeTab ? ' active' : ''}`;
   button.textContent = label;
-  button.addEventListener('click', () => {
-    activeTab = key;
-    updateActiveTab();
-  });
+  button.addEventListener('click', () => { activeTab = key; updateActiveTab(); });
   return button;
 }
 
 function updateActiveTab() {
-  document.querySelectorAll('.tab-btn').forEach((button) => {
+  document.querySelectorAll('.pnda-tab-btn').forEach((button) => {
     const target = button.textContent === 'Général' ? 'general' : getProvinceNameByLabel(button.textContent);
     button.classList.toggle('active', target === activeTab);
   });
-  document.querySelectorAll('.panel').forEach((panel) => {
+  document.querySelectorAll('.pnda-panel').forEach((panel) => {
     panel.classList.toggle('active', panel.dataset.tab === activeTab);
   });
 }
@@ -729,44 +672,60 @@ function getProvinceNameByLabel(label) {
 async function refreshDashboard() {
   await refreshReportsCache();
   populateFilterProvinceOptions();
-  renderImportedReportsList();
   renderSummaryCards();
   renderPanels();
   updateActiveTab();
+  updateAdminNotifBadge();
 }
+
+function updateAdminNotifBadge() {
+  const unreadCount = REPORTS_CACHE.filter(r => !r.is_read).length;
+  const badge = document.getElementById('admin-notif-badge');
+  if (!badge) return;
+  if (unreadCount > 0) {
+    badge.style.display = ''; badge.textContent = unreadCount;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// Auto-poll every 30s for new reports
+let _pollInterval = null;
+function startPolling() {
+  if (_pollInterval) clearInterval(_pollInterval);
+  _pollInterval = setInterval(async () => {
+    const prevUnread = REPORTS_CACHE.filter(r => !r.is_read).length;
+    const prevTotal = REPORTS_CACHE.length;
+    await refreshReportsCache();
+    const curUnread = REPORTS_CACHE.filter(r => !r.is_read).length;
+    if (REPORTS_CACHE.length !== prevTotal || curUnread !== prevUnread) {
+      renderSummaryCards(); renderPanels(); updateActiveTab(); updateAdminNotifBadge();
+      if (curUnread > prevUnread) {
+        showToast(`${curUnread - prevUnread} nouveau(x) rapport(s) non lu(s) !`);
+      }
+    }
+  }, 30000);
+}
+function stopPolling() { if (_pollInterval) { clearInterval(_pollInterval); _pollInterval = null; } }
 
 function handleStorageSync(event) {
   if ([IMPORT_STORAGE_KEY, 'PNDA_SESSION'].includes(event.key)) {
-    if (event.key === 'PNDA_SESSION' && !getSession()) {
-      redirectToLogin();
-      return;
-    }
+    if (event.key === 'PNDA_SESSION' && !getSession()) { redirectToLogin(); return; }
     importedReports = getPersistedImportedReports();
     refreshDashboard();
   }
 }
 
 function stableStringify(value) {
-  if (Array.isArray(value)) {
-    return `[${value.map((item) => stableStringify(item)).join(',')}]`;
-  }
-
-  if (value && typeof value === 'object') {
-    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(',')}}`;
-  }
-
+  if (Array.isArray(value)) return `[${value.map((item) => stableStringify(item)).join(',')}]`;
+  if (value && typeof value === 'object') return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(',')}}`;
   return JSON.stringify(value);
 }
 
-async function refreshReportsCache() {
-  REPORTS_CACHE = await getAllReports();
-}
+async function refreshReportsCache() { REPORTS_CACHE = await getAllReports(); }
 
 function getReportProvinceName(report) {
-  if (report?.meta?.province) {
-    return report.meta.province;
-  }
-
+  if (report?.meta?.province) return report.meta.province;
   const provinceLabel = report?.meta?.province_label;
   return REFERENCE.provinces.find((province) => province.label === provinceLabel)?.name || provinceLabel || '';
 }
@@ -776,12 +735,10 @@ function getReportProvinceLabel(report) {
   return REFERENCE.provinces.find((province) => province.name === provinceName)?.label || report?.meta?.province_label || provinceName || '—';
 }
 
-function getReportDateValue(report) {
-  return report?.savedAt || report?.meta?.date_generation || '';
-}
+function getReportDateValue(report) { return report?.savedAt || report?.meta?.date_generation || ''; }
 
 function getReportFingerprint(report) {
-  return stableStringify({ meta: report.meta, missions: report.missions });
+  return JSON.stringify({ meta: report.meta, missions: report.missions });
 }
 
 function getFilteredReports() {
@@ -789,25 +746,16 @@ function getFilteredReports() {
   const rapporteurFilter = document.getElementById('filter-rapporteur').value.trim().toLowerCase();
   const startDate = document.getElementById('filter-start-date').value;
   const endDate = document.getElementById('filter-end-date').value;
-
+  const statutFilter = document.getElementById('filter-statut')?.value || '';
   return REPORTS_CACHE.filter((report) => {
     const provinceName = getReportProvinceName(report);
     const reporteur = String(report?.meta?.rapporteur || '').toLowerCase();
     const reportDate = getReportDateValue(report);
-
-    if (selectedProvince && provinceName !== selectedProvince) {
-      return false;
-    }
-    if (rapporteurFilter && !reporteur.includes(rapporteurFilter)) {
-      return false;
-    }
-    if (startDate && reportDate && reportDate < startDate) {
-      return false;
-    }
-    if (endDate && reportDate && reportDate > endDate) {
-      return false;
-    }
-
+    if (selectedProvince && provinceName !== selectedProvince) return false;
+    if (rapporteurFilter && !reporteur.includes(rapporteurFilter)) return false;
+    if (startDate && reportDate && reportDate < startDate) return false;
+    if (endDate && reportDate && reportDate > endDate) return false;
+    if (statutFilter && (report.statut || 'activee') !== statutFilter) return false;
     return true;
   });
 }
@@ -815,28 +763,23 @@ function getFilteredReports() {
 function populateFilterProvinceOptions() {
   const select = document.getElementById('filter-province');
   const currentValue = select.value;
-  select.innerHTML = '<option value="">Toutes les provinces</option>';
-
-  REFERENCE.provinces.forEach((province) => {
+  const session = getSession();
+  const isSuperAdmin = session?.role === 'super_admin';
+  select.innerHTML = isSuperAdmin ? '<option value="">Toutes les provinces</option>' : '';
+  const provinces = getAdminProvinces(session);
+  provinces.forEach((province) => {
     const option = new Option(province.label, province.name);
-    if (province.name === currentValue) {
-      option.selected = true;
-    }
+    if (province.name === currentValue) option.selected = true;
     select.appendChild(option);
   });
-}
-
-function getReportFingerprint(report) {
-  return JSON.stringify({ meta: report.meta, missions: report.missions });
+  if (!isSuperAdmin && provinces.length) select.value = provinces[0].name;
 }
 
 function getPersistedImportedReports() {
   try {
     const raw = JSON.parse(localStorage.getItem(IMPORT_STORAGE_KEY) || '[]');
     return raw.map((entry) => normalizeImportedReport(entry)).filter(Boolean);
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 function getSignatory() {
@@ -860,20 +803,12 @@ function hydrateSignatory() {
   }
 }
 
-function persistSignatory() {
-  localStorage.setItem(SIGNATORY_STORAGE_KEY, JSON.stringify(getSignatory()));
-}
-
-function persistImportedReports() {
-  localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(importedReports));
-}
+function persistSignatory() { localStorage.setItem(SIGNATORY_STORAGE_KEY, JSON.stringify(getSignatory())); }
+function persistImportedReports() { localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(importedReports)); }
 
 function normalizeImportedReport(entry) {
   const normalized = normalizeReport(entry, entry.importLabel || entry.source || 'import manuel');
-  if (!normalized) {
-    return null;
-  }
-
+  if (!normalized) return null;
   return {
     ...normalized,
     importId: entry.importId || `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
@@ -884,69 +819,82 @@ function normalizeImportedReport(entry) {
 
 async function getStoredReports() {
   try {
-    const { data, error } = await db
-      .from('reports')
-      .select('*')
-      .order('saved_at', { ascending: false })
-      .limit(500);
+    const session = getSession();
+    let query = db.from('reports').select('*').order('saved_at', { ascending: false }).limit(500);
+    // Province isolation: non-super_admin only sees allowed provinces
+    if (session?.role !== 'super_admin') {
+      if (session?.province) {
+        query = query.eq('province', session.province);
+      } else {
+        const userProvs = USERS[session?.user]?.provinces;
+        if (userProvs !== '*' && Array.isArray(userProvs) && userProvs.length) {
+          query = query.in('province', userProvs);
+        }
+      }
+    }
+    const { data, error } = await query;
     if (error) throw error;
     return (data || []).map((row) => ({
-      meta: {
-        ...(row.meta || {}),
-        province:        row.province,
-        province_label:  row.province_label,
-        province_code:   row.province_code,
-        trimestre:       row.trimestre,
-        annee:           row.annee,
-        rapporteur:      row.rapporteur,
-        role:            row.rapporteur_role
-      },
-      missions: row.missions || [],
-      savedAt:  row.saved_at,
-      source:   row.source || 'supabase'
+      id: row.id,
+      meta: { ...(row.meta || {}), province: row.province, province_label: row.province_label,
+              province_code: row.province_code, trimestre: row.trimestre, annee: row.annee,
+              rapporteur: row.rapporteur, role: row.rapporteur_role },
+      missions: row.missions || [], savedAt: row.saved_at, source: row.source || 'supabase',
+      is_read: !!row.is_read, read_at: row.read_at || null, read_by: row.read_by || null,
+      statut: row.statut || 'activee',
+      activated_by: row.activated_by || null, activated_at: row.activated_at || null
     }));
-  } catch (error) {
-    console.error('Erreur lecture rapports Supabase:', error);
-    return [];
-  }
+  } catch (error) { console.error('Erreur lecture rapports Supabase:', error); return []; }
 }
 
 async function getAllReports() {
   const stored = await getStoredReports();
-  return deduplicateReports([...stored, ...importedReports]).sort((left, right) => {
-    return new Date(right.savedAt || right.meta?.date_generation || 0) - new Date(left.savedAt || left.meta?.date_generation || 0);
-  });
+  return deduplicateReports([...stored, ...importedReports]).sort((left, right) =>
+    new Date(right.savedAt || right.meta?.date_generation || 0) - new Date(left.savedAt || left.meta?.date_generation || 0)
+  );
 }
 
 function deduplicateReports(reports) {
   const seen = new Set();
   return reports.filter((report) => {
     const fingerprint = getReportFingerprint(report);
-    if (seen.has(fingerprint)) {
-      return false;
-    }
-    seen.add(fingerprint);
+    if (seen.has(fingerprint)) return false;
+    seen.add(fingerprint); return true;
+  });
+}
+
+function removeReportFromLocalState(reportId, importId = '') {
+  const target = REPORTS_CACHE.find((report) => report.id === reportId || (importId && report.importId === importId));
+  const targetFingerprint = target ? getReportFingerprint(target) : null;
+
+  REPORTS_CACHE = REPORTS_CACHE.filter((report) => {
+    if (reportId && report.id === reportId) return false;
+    if (importId && report.importId === importId) return false;
+    if (targetFingerprint && getReportFingerprint(report) === targetFingerprint) return false;
     return true;
   });
+
+  const nextImportedReports = importedReports.filter((report) => {
+    if (reportId && report.id === reportId) return false;
+    if (importId && report.importId === importId) return false;
+    if (targetFingerprint && getReportFingerprint(report) === targetFingerprint) return false;
+    return true;
+  });
+
+  if (nextImportedReports.length !== importedReports.length) {
+    importedReports = nextImportedReports;
+    persistImportedReports();
+    renderImportedReportsList();
+  }
 }
 
 function normalizeReport(candidate, source) {
   if (candidate?.payload?.meta && Array.isArray(candidate.payload.missions)) {
-    return {
-      ...candidate.payload,
-      savedAt: candidate.savedAt || candidate.payload.meta?.date_generation || new Date().toISOString(),
-      source: candidate.source || source
-    };
+    return { ...candidate.payload, savedAt: candidate.savedAt || candidate.payload.meta?.date_generation || new Date().toISOString(), source: candidate.source || source };
   }
-
   if (candidate?.meta && Array.isArray(candidate.missions)) {
-    return {
-      ...candidate,
-      savedAt: candidate.meta?.date_generation || new Date().toISOString(),
-      source
-    };
+    return { ...candidate, savedAt: candidate.meta?.date_generation || new Date().toISOString(), source };
   }
-
   return null;
 }
 
@@ -954,30 +902,23 @@ async function handleFileImport(event) {
   const files = Array.from(event.target.files || []);
   const loaded = [];
   const existingFingerprints = new Set(importedReports.map((report) => getReportFingerprint(report)));
-
   for (const file of files) {
     try {
       const text = await file.text();
       const parsed = JSON.parse(text);
       const normalized = normalizeReport(parsed, file.name);
       if (!normalized) continue;
-
       const candidate = {
         ...normalized,
         importId: `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
-        importLabel: file.name,
-        importedAt: new Date().toISOString()
+        importLabel: file.name, importedAt: new Date().toISOString()
       };
       const fingerprint = getReportFingerprint(candidate);
       if (existingFingerprints.has(fingerprint)) continue;
       existingFingerprints.add(fingerprint);
       loaded.push(candidate);
-    } catch (error) {
-      console.error(error);
-      showToast(`Erreur fichier: ${file.name}`);
-    }
+    } catch (error) { console.error(error); showToast(`Erreur fichier: ${file.name}`); }
   }
-
   importedReports = [...importedReports, ...loaded];
   persistImportedReports();
   document.getElementById('json-files').value = '';
@@ -1003,10 +944,7 @@ async function clearDashboardData() {
 
 async function removeImportedReport(importId) {
   const nextReports = importedReports.filter((report) => report.importId !== importId);
-  if (nextReports.length === importedReports.length) {
-    return;
-  }
-
+  if (nextReports.length === importedReports.length) return;
   importedReports = nextReports;
   persistImportedReports();
   await refreshDashboard();
@@ -1017,100 +955,114 @@ function renderImportedReportsList() {
   const list = document.getElementById('import-list');
   const summary = document.getElementById('import-summary');
   const badges = document.getElementById('import-badges');
+  if (!list || !summary || !badges) return;
 
   if (!importedReports.length) {
     summary.textContent = 'Aucun import supplémentaire chargé.';
     badges.innerHTML = '';
-    list.innerHTML = '<div class="empty-state">Importez un ou plusieurs fichiers JSON pour compléter les rapports stockés localement.</div>';
+    list.innerHTML = '<p class="text-muted text-center py-3 mb-0">Importez un ou plusieurs fichiers JSON pour compléter les rapports.</p>';
     return;
   }
 
-  const provinceCounts = importedReports.reduce((accumulator, report) => {
+  const provinceCounts = importedReports.reduce((acc, report) => {
     const province = getReportProvinceLabel(report) || 'Non renseignée';
-    accumulator[province] = (accumulator[province] || 0) + 1;
-    return accumulator;
+    acc[province] = (acc[province] || 0) + 1; return acc;
   }, {});
 
   summary.textContent = `${importedReports.length} fichier(s) JSON importé(s) et conservé(s) dans le tableau de bord.`;
-  badges.innerHTML = Object.entries(provinceCounts)
-    .sort((left, right) => left[0].localeCompare(right[0], 'fr'))
-    .map(([province, count]) => `<div class="import-badge"><span>${escapeHtml(province)}</span><strong>${count}</strong></div>`)
-    .join('');
+  badges.innerHTML = Object.entries(provinceCounts).sort((a, b) => a[0].localeCompare(b[0], 'fr'))
+    .map(([province, count]) => `<div class="import-badge"><span>${escapeHtml(province)}</span><strong>${count}</strong></div>`).join('');
+
   list.innerHTML = importedReports.map((report) => `
-    <div class="import-item">
+    <div class="import-item mb-2">
       <div>
         <strong>${escapeHtml(report.importLabel || report.source || 'import-manuel.json')}</strong>
         <div class="import-meta">
           Province: ${escapeHtml(getReportProvinceLabel(report) || '—')} · Rapporteur: ${escapeHtml(report.meta?.rapporteur || '—')} · Missions: ${escapeHtml(String(report.meta?.total_missions || report.missions?.length || 0))} · Ajouté le ${escapeHtml(formatDate(report.importedAt || report.savedAt))}
         </div>
       </div>
-      <button class="btn-inline-danger" data-import-id="${escapeHtml(report.importId)}" onclick="removeImportedReport(this.dataset.importId)">Supprimer</button>
+      <button class="btn btn-outline-danger btn-sm" data-import-id="${escapeHtml(report.importId)}" onclick="removeImportedReport(this.dataset.importId)">
+        <i class="bi bi-trash3"></i>
+      </button>
     </div>
   `).join('');
 }
 
 function renderSummaryCards() {
   const reports = getFilteredReports();
+  const allReports = REPORTS_CACHE;
   const missions = reports.flatMap((report) => report.missions || []);
-  const totalMontant = missions.reduce((sum, mission) => sum + Number(mission.montant_usd || 0), 0);
-  const totalAvance = missions.reduce((sum, mission) => sum + Number(mission.avance_usd || 0), 0);
-  const totalSolde = missions.reduce((sum, mission) => sum + Number(mission.solde_usd || 0), 0);
-
-  const cards = [
-    { label: 'Rapports consolidés', value: reports.length },
-    { label: 'Missions consolidées', value: missions.length },
-    { label: 'Montant total USD', value: formatCurrency(totalMontant) },
-    { label: 'Solde total USD', value: formatCurrency(totalSolde) }
-  ];
-
-  document.getElementById('summary-grid').innerHTML = cards.map((card) => `
-    <article class="summary-card">
-      <span>${card.label}</span>
-      <strong>${card.value}</strong>
-    </article>
-  `).join('');
+  const totalGeneral = missions.reduce((sum, m) => sum + Number(m.total_usd || 0), 0);
+  document.getElementById('stat-reports').textContent = reports.length;
+  document.getElementById('stat-missions').textContent = missions.length;
+  document.getElementById('stat-total').textContent = formatCurrency(totalGeneral);
+  document.getElementById('stat-en-attente').textContent = allReports.filter((r) => (r.statut||'activee') === 'en_attente').length;
+  document.getElementById('stat-activee').textContent   = allReports.filter((r) => (r.statut||'activee') === 'activee').length;
+  document.getElementById('stat-realisee').textContent  = allReports.filter((r) => (r.statut||'activee') === 'realisee').length;
 }
 
 function renderPanels() {
   const filteredReports = getFilteredReports();
   const panels = document.getElementById('panels');
+  const session = getSession();
+  const isSuperAdmin = session?.role === 'super_admin';
   panels.innerHTML = '';
-  panels.appendChild(buildGeneralPanel(filteredReports));
-  REFERENCE.provinces.forEach((province) => panels.appendChild(buildProvincePanel(province, filteredReports)));
+  if (isSuperAdmin) {
+    panels.appendChild(buildGeneralPanel(filteredReports));
+  }
+  const provinces = getAdminProvinces(session);
+  provinces.forEach((province) => panels.appendChild(buildProvincePanel(province, filteredReports)));
 }
 
 function buildGeneralPanel(reports = getFilteredReports()) {
   const provinceRows = REFERENCE.provinces.map((province) => summarizeProvince(province.name, reports));
-  const panel = document.createElement('section');
-  panel.className = `panel${activeTab === 'general' ? ' active' : ''}`;
+  const panel = document.createElement('div');
+  panel.className = `pnda-panel${activeTab === 'general' ? ' active' : ''}`;
   panel.dataset.tab = 'general';
   panel.innerHTML = `
-    <div class="panel-head">
-      <h3>Vue générale</h3>
-      <p>${reports.length} rapport(s) disponible(s), toutes sources confondues.</p>
-    </div>
     <div class="panel-grid">
-      <div class="table-card">
-        <h4>Consolidation par province</h4>
-        ${renderTable(
-          ['Province', 'Rapports', 'Missions', 'Montant USD', 'Solde USD'],
-          provinceRows.map((row) => [row.label, row.reports, row.missions, formatCurrency(row.montant), formatCurrency(row.solde)]),
-          'Aucune donnée consolidée pour le moment.'
-        )}
+      <div class="card">
+        <div class="card-header py-3"><h6><i class="bi bi-bar-chart me-2"></i>Consolidation par province</h6></div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+              <thead><tr><th>Province</th><th>Rapports</th><th>Missions</th><th>Montant</th><th>Autres frais</th><th>Total USD</th><th>Solde USD</th></tr></thead>
+              <tbody>${provinceRows.length ? provinceRows.map((row) => `
+                <tr><td>${escapeHtml(row.label)}</td><td>${row.reports}</td><td>${row.missions}</td>
+                <td class="text-end">${formatCurrency(row.montant)}</td>
+                <td class="text-end">${formatCurrency(row.autresFrais)}</td>
+                <td class="text-end fw-bold">${formatCurrency(row.total)}</td>
+                <td class="text-end">${formatCurrency(row.solde)}</td></tr>
+              `).join('') : '<tr><td colspan="7" class="text-center text-muted py-4">Aucune donnée consolidée.</td></tr>'}</tbody>
+            </table>
+          </div>
+        </div>
       </div>
-      <div class="table-card">
-        <h4>Derniers rapports</h4>
-        ${renderTable(
-          ['Date', 'Province', 'Rapporteur', 'Missions', 'Source'],
-          reports.slice(0, 8).map((report) => [
-            formatDate(report.savedAt),
-            getReportProvinceLabel(report) || '—',
-            report.meta?.rapporteur || '—',
-            String(report.meta?.total_missions || report.missions.length || 0),
-            `<span class="pill">${escapeHtml(report.source || 'stockage local')}</span>`
-          ]),
-          'Aucun rapport disponible.'
-        )}
+      <div class="card">
+        <div class="card-header py-3"><h6><i class="bi bi-clock-history me-2"></i>Derniers rapports</h6></div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+              <thead><tr><th>Date</th><th>Province</th><th>Rapporteur</th><th>Missions</th><th>Total USD</th><th>Statut</th></tr></thead>
+              <tbody>${reports.length ? reports.slice(0, 10).map((report) => {
+                const rm = report.missions || [];
+                const rTotal = rm.reduce((s,m) => s + Number(m.total_usd||0), 0);
+                const st = report.statut || 'activee';
+                const sb = st === 'en_attente'
+                  ? '<span class="badge bg-warning text-dark" style="font-size:.65rem">En attente</span>'
+                  : st === 'realisee'
+                    ? '<span class="badge bg-secondary" style="font-size:.65rem">Réalisée</span>'
+                    : '<span class="badge bg-success" style="font-size:.65rem">Activée</span>';
+                return `
+                <tr><td>${formatDate(report.savedAt)}</td><td>${escapeHtml(getReportProvinceLabel(report) || '—')}</td>
+                <td>${escapeHtml(report.meta?.rapporteur || '—')}</td>
+                <td><span class="badge bg-secondary">${rm.length}</span></td>
+                <td class="text-end fw-bold">${formatCurrency(rTotal)}</td>
+                <td class="text-center">${sb}</td></tr>`;
+              }).join('') : '<tr><td colspan="6" class="text-center text-muted py-4">Aucun rapport.</td></tr>'}</tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -1118,76 +1070,223 @@ function buildGeneralPanel(reports = getFilteredReports()) {
 }
 
 function buildProvincePanel(province, reportsSource = getFilteredReports()) {
+  const session = getSession();
+  const isSuperAdmin = session?.role === 'super_admin';
   const reports = reportsSource.filter((report) => getReportProvinceName(report) === province.name);
   const missions = reports.flatMap((report) => report.missions || []);
-  const missionGroups = Object.values(missions.reduce((accumulator, mission) => {
-    const key = `${mission.mission_reference_id || mission.nature}__${mission.objectif}`;
-    if (!accumulator[key]) {
-      accumulator[key] = {
-        nature: mission.nature || '—',
-        objectif: mission.objectif || '—',
-        occurrences: 0,
-        montant: 0
-      };
-    }
-    accumulator[key].occurrences += 1;
-    accumulator[key].montant += Number(mission.montant_usd || 0);
-    return accumulator;
-  }, {})).sort((left, right) => right.occurrences - left.occurrences);
+  const totalMontant = missions.reduce((s, m) => s + Number(m.montant_usd || 0), 0);
+  const totalAutres  = missions.reduce((s, m) => s + Number(m.autres_frais_usd || 0), 0);
+  const totalGeneral = missions.reduce((s, m) => s + Number(m.total_usd || 0), 0);
+  const totalSolde   = missions.reduce((s, m) => s + Number(m.solde_usd || 0), 0);
 
-  const panel = document.createElement('section');
-  panel.className = `panel${activeTab === province.name ? ' active' : ''}`;
+  const panel = document.createElement('div');
+  panel.className = `pnda-panel${activeTab === province.name ? ' active' : ''}`;
   panel.dataset.tab = province.name;
   panel.innerHTML = `
-    <div class="panel-head">
-      <h3>${province.label}</h3>
-      <p>${reports.length} rapport(s) et ${missions.length} mission(s) consolidé(s).</p>
-    </div>
-    <div class="panel-grid">
-      <div class="table-card">
-        <h4>Rapports de la province</h4>
-        ${renderTable(
-          ['Date', 'Rapporteur', 'Trimestre', 'Missions', 'Montant USD'],
-          reports.map((report) => [
-            formatDate(report.savedAt),
-            report.meta?.rapporteur || '—',
-            `${report.meta?.trimestre || '—'} ${report.meta?.annee || ''}`.trim(),
-            String(report.meta?.total_missions || report.missions.length || 0),
-            formatCurrency(Number(report.meta?.total_montant_usd || 0))
-          ]),
-          'Aucun rapport pour cette province.'
-        )}
+    <div class="d-flex justify-content-between align-items-baseline mb-3">
+      <div>
+        <h5 class="page-title" style="font-size:1.15rem">${escapeHtml(province.label)}</h5>
+        <p class="text-muted small mb-0">${reports.length} rapport(s) · ${missions.length} mission(s) · Total: ${formatCurrency(totalGeneral)} USD</p>
       </div>
-      <div class="table-card">
-        <h4>Missions les plus fréquentes</h4>
-        ${renderTable(
-          ['Nature', 'Objectif', 'Occurrences', 'Montant USD'],
-          missionGroups.slice(0, 12).map((group) => [group.nature, group.objectif, String(group.occurrences), formatCurrency(group.montant)]),
-          'Aucune mission consolidée pour cette province.'
-        )}
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header py-3"><h6><i class="bi bi-folder2-open me-2"></i>Rapports de la province</h6></div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover table-sm mb-0">
+            <thead><tr><th>Date</th><th>Rapporteur</th><th>Trimestre</th><th>Missions</th><th>Total USD</th><th>Statut</th><th>Lu</th><th>Actions</th></tr></thead>
+            <tbody>${reports.length ? reports.map((report, idx) => {
+              const rm = report.missions || [];
+              const rTotal   = rm.reduce((s,m) => s + Number(m.total_usd||0), 0);
+              const isUnread = !report.is_read;
+              const st = report.statut || 'activee';
+              const statutBadge = st === 'en_attente'
+                ? '<span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>En attente</span>'
+                : st === 'realisee'
+                  ? '<span class="badge bg-secondary"><i class="bi bi-check2-all me-1"></i>Réalisée</span>'
+                  : '<span class="badge bg-success"><i class="bi bi-lightning-charge-fill me-1"></i>Activée</span>';
+              const rid = escapeHtml(report.id || '');
+              const importId = escapeHtml(report.importId || '');
+              const isLocalOnly = !report.id && !!report.importId;
+              return `
+                <tr class="report-row${isUnread ? ' unread' : ''}" data-report-idx="${idx}" data-report-id="${rid}" data-province="${escapeHtml(province.name)}" style="cursor:pointer">
+                  <td>${formatDate(report.savedAt)}</td>
+                  <td>${escapeHtml(report.meta?.rapporteur || '—')}</td>
+                  <td>${escapeHtml(((report.meta?.trimestre||'')+' '+(report.meta?.annee||'')).trim()||'—')}</td>
+                  <td><span class="badge bg-secondary">${rm.length}</span></td>
+                  <td class="text-end fw-bold">${formatCurrency(rTotal)}</td>
+                  <td>${statutBadge}</td>
+                  <td class="text-center">${isUnread ? '<span class="badge bg-danger badge-nouveau">Nouveau</span>' : '<span class="badge bg-light text-muted border" style="font-size:.65rem">Lu</span>'}</td>
+                  <td class="text-nowrap" style="min-width:170px">
+                    ${isUnread && isSuperAdmin ? `<button class="btn btn-outline-success btn-sm me-1" onclick="event.stopPropagation();markAsRead('${rid}')" title="Marquer comme lu"><i class="bi bi-check2-circle"></i></button>` : ''}
+                    ${st === 'activee' ? `<button class="btn btn-sm btn-outline-secondary me-1" onclick="event.stopPropagation();updateReportStatut('${rid}','realisee')" title="Marquer réalisée"><i class="bi bi-flag-fill"></i></button>` : ''}
+                    ${st === 'realisee' ? `<button class="btn btn-sm btn-outline-warning me-1" onclick="event.stopPropagation();updateReportStatut('${rid}','activee')" title="Remettre en Activée"><i class="bi bi-arrow-counterclockwise"></i></button>` : ''}
+                    <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteReport('${rid}','${importId}')" title="${isLocalOnly ? 'Retirer du tableau de bord' : 'Supprimer'}"><i class="bi bi-trash3-fill"></i></button>
+                    <i class="bi bi-chevron-down text-muted small ms-1 chevron-icon"></i>
+                  </td>
+                </tr>
+                <tr class="report-detail" id="detail-${escapeHtml(province.name)}-${idx}" style="display:none">
+                  <td colspan="8" class="p-0">
+                    <div class="bg-light p-3">
+                      <h6 class="small fw-bold text-uppercase text-muted mb-2"><i class="bi bi-list-check me-1"></i>Missions du rapport</h6>
+                      <div class="table-responsive">
+                        <table class="table table-sm table-bordered mb-0" style="font-size:.82rem">
+                          <thead><tr>
+                            <th>N°</th><th>Nature</th><th>Objectif</th><th>Prov. dest.</th><th>Territoire</th><th>Secteur</th>
+                            <th>Début</th><th>Fin</th><th>Nuitées</th><th>Taux</th>
+                            <th>Montant</th><th>Autres</th><th>Total</th><th>Avance</th><th>Solde</th><th>Section</th><th>Observation</th>
+                          </tr></thead>
+                          <tbody>${rm.map((m) => `<tr>
+                            <td>${escapeHtml(m.numero||'—')}</td><td>${escapeHtml(m.nature||'—')}</td>
+                            <td class="small">${escapeHtml(m.objectif||'—')}</td>
+                            <td>${escapeHtml(m.destination_province_label||'—')}</td>
+                            <td>${escapeHtml(m.territoire_label||'—')}</td><td>${escapeHtml(m.secteur_label||'—')}</td>
+                            <td>${escapeHtml(m.date_debut||'—')}</td><td>${escapeHtml(m.date_fin||'—')}</td>
+                            <td class="text-end">${m.nuitees||0}</td><td class="text-end">${formatCurrency(Number(m.taux_per_diem||0))}</td>
+                            <td class="text-end">${formatCurrency(Number(m.montant_usd||0))}</td>
+                            <td class="text-end">${formatCurrency(Number(m.autres_frais_usd||0))}</td>
+                            <td class="text-end fw-bold">${formatCurrency(Number(m.total_usd||0))}</td>
+                            <td class="text-end">${formatCurrency(Number(m.avance_usd||0))}</td>
+                            <td class="text-end">${formatCurrency(Number(m.solde_usd||0))}</td>
+                            <td>${escapeHtml(m.section||'—')}</td>
+                            <td class="small">${escapeHtml(m.observation||'')}</td>
+                          </tr>`).join('')}</tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </td>
+                </tr>`;
+            }).join('') : '<tr><td colspan="8" class="text-center text-muted py-4">Aucun rapport pour cette province.</td></tr>'}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header py-3"><h6><i class="bi bi-bar-chart me-2"></i>Résumé financier</h6></div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm mb-0">
+            <tbody>
+              <tr><td class="fw-semibold">Montant missions</td><td class="text-end">${formatCurrency(totalMontant)} USD</td></tr>
+              <tr><td class="fw-semibold">Autres frais</td><td class="text-end">${formatCurrency(totalAutres)} USD</td></tr>
+              <tr class="table-warning"><td class="fw-bold">Total général</td><td class="text-end fw-bold">${formatCurrency(totalGeneral)} USD</td></tr>
+              <tr><td class="fw-semibold">Solde</td><td class="text-end">${formatCurrency(totalSolde)} USD</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   `;
+  // Bind click to expand/collapse report details (action buttons use inline onclick)
+  panel.querySelectorAll('.report-row').forEach((row) => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      const idx = row.dataset.reportIdx;
+      const prov = row.dataset.province;
+      const detail = document.getElementById(`detail-${prov}-${idx}`);
+      if (detail) {
+        const isOpen = detail.style.display !== 'none';
+        detail.style.display = isOpen ? 'none' : '';
+        const chevron = row.querySelector('.chevron-icon');
+        if (chevron) chevron.className = isOpen ? 'bi bi-chevron-down text-muted small ms-1 chevron-icon' : 'bi bi-chevron-up text-muted small ms-1 chevron-icon';
+      }
+    });
+  });
   return panel;
+}
+
+async function markAsRead(reportId) {
+  try {
+    const session = getSession();
+    const { error } = await db.from('reports').update({
+      is_read: true, read_at: new Date().toISOString(), read_by: session?.user || null
+    }).eq('id', reportId);
+    if (error) throw error;
+    showToast('Rapport marqué comme lu.');
+    await refreshDashboard();
+  } catch (e) { console.error(e); showToast('Erreur lors du marquage.'); }
+}
+
+async function updateReportStatut(reportId, newStatut) {
+  const labels = { en_attente: 'En attente', activee: 'Activée', realisee: 'Réalisée' };
+  const okClass = newStatut === 'realisee' ? 'btn-secondary' : 'btn-warning';
+  askConfirm(
+    `Changer le statut de ce rapport en "${labels[newStatut] || newStatut}" ?`,
+    async () => {
+      try {
+        const session = getSession();
+        const payload = { statut: newStatut };
+        if (newStatut === 'realisee') {
+          payload.completed_by = session?.user || null;
+          payload.completed_at = new Date().toISOString();
+        }
+        const { error } = await db.from('reports').update(payload).eq('id', reportId);
+        if (error) throw error;
+        showToast(`✓ Rapport marqué comme "${labels[newStatut]}".`);
+        await refreshDashboard();
+      } catch (e) { console.error(e); showToast('Erreur lors de la mise à jour.'); }
+    },
+    'Changer le statut', labels[newStatut] || newStatut, okClass
+  );
+}
+
+async function deleteReport(reportId, importId = '') {
+  askConfirm(
+    reportId
+      ? 'Supprimer définitivement ce rapport et toutes ses missions ? Cette action est irréversible.'
+      : 'Retirer ce rapport importé du tableau de bord local ?',
+    async () => {
+      try {
+        if (!reportId && importId) {
+          removeReportFromLocalState('', importId);
+          renderSummaryCards();
+          renderPanels();
+          updateActiveTab();
+          updateAdminNotifBadge();
+          showToast('✓ Rapport importé retiré du tableau de bord.');
+          return;
+        }
+        console.log('[deleteReport] Tentative suppression id=', reportId);
+        const { error } = await db.from('reports').delete().eq('id', reportId);
+        if (error) {
+          console.error('[deleteReport] Erreur Supabase:', error);
+          showToast('Erreur suppression : ' + (error.message || error.code || JSON.stringify(error)));
+          return;
+        }
+        console.log('[deleteReport] Suppression OK');
+        removeReportFromLocalState(reportId, importId);
+        renderSummaryCards();
+        renderPanels();
+        updateActiveTab();
+        updateAdminNotifBadge();
+        showToast('✓ Rapport supprimé.');
+        await refreshDashboard();
+      } catch (e) {
+        console.error('[deleteReport] Exception:', e);
+        showToast('Erreur lors de la suppression : ' + (e?.message || String(e)));
+      }
+    },
+    'Supprimer le rapport'
+  );
 }
 
 function summarizeProvince(provinceName, reportsSource = getFilteredReports()) {
   const reports = reportsSource.filter((report) => getReportProvinceName(report) === provinceName);
   const missions = reports.flatMap((report) => report.missions || []);
   return {
-    label: REFERENCE.provinces.find((province) => province.name === provinceName)?.label || provinceName,
-    reports: reports.length,
-    missions: missions.length,
-    montant: missions.reduce((sum, mission) => sum + Number(mission.montant_usd || 0), 0),
-    solde: missions.reduce((sum, mission) => sum + Number(mission.solde_usd || 0), 0)
+    label: REFERENCE.provinces.find((p) => p.name === provinceName)?.label || provinceName,
+    reports: reports.length, missions: missions.length,
+    montant: missions.reduce((s, m) => s + Number(m.montant_usd || 0), 0),
+    autresFrais: missions.reduce((s, m) => s + Number(m.autres_frais_usd || 0), 0),
+    total: missions.reduce((s, m) => s + Number(m.total_usd || 0), 0),
+    solde: missions.reduce((s, m) => s + Number(m.solde_usd || 0), 0)
   };
 }
 
 async function saveFileDesktop(options) {
-  if (!window.PNDA_DESKTOP?.saveFile) {
-    return { canceled: true, unsupported: true };
-  }
-
+  if (!window.PNDA_DESKTOP?.saveFile) return { canceled: true, unsupported: true };
   return window.PNDA_DESKTOP.saveFile(options);
 }
 
@@ -1195,32 +1294,20 @@ async function exportExcelWorkbook() {
   const date = new Date().toISOString().slice(0, 10);
   const signatory = getSignatory();
   const reports = getFilteredReports();
-
   if (window.PNDA_DESKTOP?.exportExcelWorkbook) {
     const result = await window.PNDA_DESKTOP.exportExcelWorkbook({
-      defaultFileName: `PNDA_dashboard_${date}.xlsx`,
-      exportedAt: new Date().toISOString(),
+      defaultFileName: `PNDA_dashboard_${date}.xlsx`, exportedAt: new Date().toISOString(),
       exportedBy: document.getElementById('session-user').textContent || '—',
-      signatory,
-      provinces: REFERENCE.provinces,
-      reports
+      signatory, provinces: REFERENCE.provinces, reports
     });
-
-    if (!result.canceled) {
-      showToast('Export Excel enregistré.');
-    }
+    if (!result.canceled) showToast('Export Excel enregistré.');
     return;
   }
-
   const workbookXml = buildExcelWorkbookXml(signatory, reports);
   const fileName = `PNDA_dashboard_${date}.xls`;
-
   const blob = new Blob([workbookXml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = fileName;
-  link.click();
+  const a = document.createElement('a'); a.href = url; a.download = fileName; a.click();
   URL.revokeObjectURL(url);
   showToast('Export Excel généré.');
 }
@@ -1228,13 +1315,11 @@ async function exportExcelWorkbook() {
 function buildExcelWorkbookXml(signatory = {}, reports = getFilteredReports()) {
   const worksheets = [
     buildWorksheetXml('General', buildGeneralSheetRows(signatory, reports), [220, 140, 120, 120, 120]),
-    ...REFERENCE.provinces.map((province) => buildWorksheetXml(sheetNameForProvince(province.label), buildProvinceSheetRows(province, signatory, reports), [120, 120, 110, 90, 260, 260, 130, 130])),
-    buildWorksheetXml('Toutes_Missions', buildAllMissionsSheetRows(signatory, reports), [110, 180, 90, 80, 80, 130, 260, 260, 110, 110, 110])
+    ...REFERENCE.provinces.map((province) => buildWorksheetXml(sheetNameForProvince(province.label), buildProvinceSheetRows(province, signatory, reports), [110, 110, 90, 110, 260, 130, 130, 70, 80, 130, 130, 110, 110, 110, 110, 200])),
+    buildWorksheetXml('Toutes_Missions', buildAllMissionsSheetRows(signatory, reports), [110, 180, 90, 80, 80, 130, 260, 260, 130, 130, 130, 130, 70, 80, 110, 110, 110, 110, 110, 200])
   ].join('');
-
   return [
-    '<?xml version="1.0" encoding="UTF-8"?>',
-    '<?mso-application progid="Excel.Sheet"?>',
+    '<?xml version="1.0" encoding="UTF-8"?>','<?mso-application progid="Excel.Sheet"?>',
     '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"',
     ' xmlns:o="urn:schemas-microsoft-com:office:office"',
     ' xmlns:x="urn:schemas-microsoft-com:office:excel"',
@@ -1259,9 +1344,8 @@ function buildExcelWorkbookXml(signatory = {}, reports = getFilteredReports()) {
 }
 
 function buildGeneralSheetRows(signatory = {}, reports = getFilteredReports()) {
-  const missions = reports.flatMap((report) => report.missions || []);
-  const provinceRows = REFERENCE.provinces.map((province) => summarizeProvince(province.name, reports));
-
+  const missions = reports.flatMap((r) => r.missions || []);
+  const provinceRows = REFERENCE.provinces.map((p) => summarizeProvince(p.name, reports));
   return [
     ...buildWorkbookHeaderRows('Tableau de bord général', 5),
     [{ value: 'PNDA-SE - Tableau de bord général', style: 'title', mergeAcross: 4 }],
@@ -1271,107 +1355,112 @@ function buildGeneralSheetRows(signatory = {}, reports = getFilteredReports()) {
     [{ value: 'Indicateur', style: 'header' }, { value: 'Valeur', style: 'header' }],
     [{ value: 'Rapports consolidés', style: 'text' }, { value: reports.length, type: 'Number', style: 'integer' }],
     [{ value: 'Missions consolidées', style: 'text' }, { value: missions.length, type: 'Number', style: 'integer' }],
-    [{ value: 'Montant total USD', style: 'text' }, { value: missions.reduce((sum, mission) => sum + Number(mission.montant_usd || 0), 0), type: 'Number', style: 'currency' }],
-    [{ value: 'Avance totale USD', style: 'text' }, { value: missions.reduce((sum, mission) => sum + Number(mission.avance_usd || 0), 0), type: 'Number', style: 'currency' }],
-    [{ value: 'Solde total USD', style: 'text' }, { value: missions.reduce((sum, mission) => sum + Number(mission.solde_usd || 0), 0), type: 'Number', style: 'currency' }],
+    [{ value: 'Montant total USD', style: 'text' }, { value: missions.reduce((s, m) => s + Number(m.montant_usd || 0), 0), type: 'Number', style: 'currency' }],
+    [{ value: 'Avance totale USD', style: 'text' }, { value: missions.reduce((s, m) => s + Number(m.avance_usd || 0), 0), type: 'Number', style: 'currency' }],
+    [{ value: 'Solde total USD', style: 'text' }, { value: missions.reduce((s, m) => s + Number(m.solde_usd || 0), 0), type: 'Number', style: 'currency' }],
     [],
     [{ value: 'Consolidation par province', style: 'title', mergeAcross: 4 }],
     [{ value: 'Province', style: 'header' }, { value: 'Rapports', style: 'header' }, { value: 'Missions', style: 'header' }, { value: 'Montant USD', style: 'header' }, { value: 'Solde USD', style: 'header' }],
     ...provinceRows.map((row) => [
-      { value: row.label, style: 'text' },
-      { value: row.reports, type: 'Number', style: 'integer' },
-      { value: row.missions, type: 'Number', style: 'integer' },
-      { value: row.montant, type: 'Number', style: 'currency' },
+      { value: row.label, style: 'text' }, { value: row.reports, type: 'Number', style: 'integer' },
+      { value: row.missions, type: 'Number', style: 'integer' }, { value: row.montant, type: 'Number', style: 'currency' },
       { value: row.solde, type: 'Number', style: 'currency' }
     ]),
     [],
     [{ value: 'Derniers rapports', style: 'title', mergeAcross: 4 }],
     [{ value: 'Date', style: 'header' }, { value: 'Province', style: 'header' }, { value: 'Rapporteur', style: 'header' }, { value: 'Missions', style: 'header' }, { value: 'Source', style: 'header' }],
-    ...reports.slice(0, 20).map((report) => [
-      { value: formatDate(report.savedAt), style: 'date' },
-      { value: getReportProvinceLabel(report) || '—', style: 'text' },
-      { value: report.meta?.rapporteur || '—', style: 'text' },
-      { value: report.meta?.total_missions || report.missions.length || 0, type: 'Number', style: 'integer' },
-      { value: report.source || 'stockage local', style: 'text' }
+    ...reports.slice(0, 20).map((r) => [
+      { value: formatDate(r.savedAt), style: 'date' }, { value: getReportProvinceLabel(r) || '—', style: 'text' },
+      { value: r.meta?.rapporteur || '—', style: 'text' },
+      { value: r.meta?.total_missions || r.missions.length || 0, type: 'Number', style: 'integer' },
+      { value: r.source || 'stockage local', style: 'text' }
     ]),
-    [],
-    ...buildSignatureRows(signatory, 5)
+    [], ...buildSignatureRows(signatory, 5)
   ];
 }
 
 function buildProvinceSheetRows(province, signatory = {}, reportsSource = getFilteredReports()) {
-  const reports = reportsSource.filter((report) => getReportProvinceName(report) === province.name);
-  const missions = reports.flatMap((report) => (report.missions || []).map((mission) => ({ ...mission, __report: report })));
-
+  const reports = reportsSource.filter((r) => getReportProvinceName(r) === province.name);
+  const missions = reports.flatMap((r) => (r.missions || []).map((m) => ({ ...m, __report: r })));
   return [
-    ...buildWorkbookHeaderRows(`Province - ${province.label}`, 8),
-    [{ value: `Province - ${province.label}`, style: 'title', mergeAcross: 7 }],
+    ...buildWorkbookHeaderRows(`Province - ${province.label}`, 16),
+    [{ value: `Province - ${province.label}`, style: 'title', mergeAcross: 15 }],
     [{ value: 'Rapports', style: 'subtitle' }, { value: reports.length, type: 'Number', style: 'integer' }],
     [{ value: 'Missions', style: 'subtitle' }, { value: missions.length, type: 'Number', style: 'integer' }],
     [],
     [{ value: 'Rapports', style: 'title', mergeAcross: 5 }],
     [{ value: 'Date', style: 'header' }, { value: 'Rapporteur', style: 'header' }, { value: 'Trimestre', style: 'header' }, { value: 'Année', style: 'header' }, { value: 'Montant USD', style: 'header' }, { value: 'Solde USD', style: 'header' }],
-    ...reports.map((report) => [
-      { value: formatDate(report.savedAt), style: 'date' },
-      { value: report.meta?.rapporteur || '—', style: 'text' },
-      { value: report.meta?.trimestre || '—', style: 'text' },
-      { value: report.meta?.annee || '—', style: 'integer' },
-      { value: Number(report.meta?.total_montant_usd || 0), type: 'Number', style: 'currency' },
-      { value: Number(report.meta?.total_solde_usd || 0), type: 'Number', style: 'currency' }
+    ...reports.map((r) => [
+      { value: formatDate(r.savedAt), style: 'date' }, { value: r.meta?.rapporteur || '—', style: 'text' },
+      { value: r.meta?.trimestre || '—', style: 'text' }, { value: r.meta?.annee || '—', style: 'integer' },
+      { value: Number(r.meta?.total_montant_usd || 0), type: 'Number', style: 'currency' },
+      { value: Number(r.meta?.total_solde_usd || 0), type: 'Number', style: 'currency' }
     ]),
     [],
-    [{ value: 'Détail des missions', style: 'title', mergeAcross: 7 }],
-    [{ value: 'Date mission', style: 'header' }, { value: 'Numero', style: 'header' }, { value: 'Nature', style: 'header' }, { value: 'Objectif', style: 'header' }, { value: 'Rapporteur', style: 'header' }, { value: 'Montant USD', style: 'header' }, { value: 'Avance USD', style: 'header' }, { value: 'Solde USD', style: 'header' }],
-    ...missions.map((mission) => [
-      { value: mission.date || formatDate(mission.__report.savedAt), style: 'date' },
-      { value: mission.numero || '—', style: 'text' },
-      { value: mission.nature || '—', style: 'text' },
-      { value: mission.objectif || '—', style: 'text' },
-      { value: mission.__report.meta?.rapporteur || '—', style: 'text' },
-      { value: Number(mission.montant_usd || 0), type: 'Number', style: 'currency' },
-      { value: Number(mission.avance_usd || 0), type: 'Number', style: 'currency' },
-      { value: Number(mission.solde_usd || 0), type: 'Number', style: 'currency' }
+    [{ value: 'Détail des missions', style: 'title', mergeAcross: 16 }],
+    [{ value:'Début',style:'header' },{ value:'Fin prévue',style:'header' },{ value:'Numero',style:'header' },{ value:'Nature',style:'header' },{ value:'Objectif',style:'header' },
+     { value:'Prov. dest.',style:'header' },{ value:'Territoire',style:'header' },{ value:'Secteur',style:'header' },
+     { value:'Rapporteur',style:'header' },{ value:'Nuitées',style:'header' },{ value:'Taux/nuit',style:'header' },
+     { value:'Montant USD',style:'header' },{ value:'Autres frais',style:'header' },{ value:'Total USD',style:'header' },
+     { value:'Avance USD',style:'header' },{ value:'Solde USD',style:'header' },{ value:'Observation',style:'header' }],
+    ...missions.map((m) => [
+      { value: m.date_debut || m.date || formatDate(m.__report.savedAt), style: 'date' },
+      { value: m.date_fin || '—', style: 'date' },
+      { value: m.numero || '—', style: 'text' }, { value: m.nature || '—', style: 'text' },
+      { value: m.objectif || '—', style: 'text' },
+      { value: m.destination_province_label || '—', style: 'text' }, { value: m.territoire_label || '—', style: 'text' }, { value: m.secteur_label || '—', style: 'text' },
+      { value: m.__report.meta?.rapporteur || '—', style: 'text' },
+      { value: Number(m.nuitees || 0), type: 'Number', style: 'integer' },
+      { value: Number(m.taux_per_diem || 0), type: 'Number', style: 'currency' },
+      { value: Number(m.montant_usd || 0), type: 'Number', style: 'currency' },
+      { value: Number(m.autres_frais_usd || 0), type: 'Number', style: 'currency' },
+      { value: Number(m.total_usd || m.montant_usd || 0), type: 'Number', style: 'currency' },
+      { value: Number(m.avance_usd || 0), type: 'Number', style: 'currency' },
+      { value: Number(m.solde_usd || 0), type: 'Number', style: 'currency' },
+      { value: m.observation || '', style: 'text' }
     ]),
-    [],
-    ...buildSignatureRows(signatory, 8)
+    [], ...buildSignatureRows(signatory, 17)
   ];
 }
 
 function buildAllMissionsSheetRows(signatory = {}, reports = getFilteredReports()) {
-  const missions = reports.flatMap((report) => (report.missions || []).map((mission) => ({ ...mission, __report: report })));
-
+  const missions = reports.flatMap((r) => (r.missions || []).map((m) => ({ ...m, __report: r })));
   return [
-    ...buildWorkbookHeaderRows('Toutes les missions', 11),
-    [{ value: 'Toutes les missions', style: 'title', mergeAcross: 10 }],
-    [{ value: 'Province', style: 'header' }, { value: 'Rapporteur', style: 'header' }, { value: 'Trimestre', style: 'header' }, { value: 'Année', style: 'header' }, { value: 'Numero', style: 'header' }, { value: 'Mission ref', style: 'header' }, { value: 'Nature', style: 'header' }, { value: 'Objectif', style: 'header' }, { value: 'Montant USD', style: 'header' }, { value: 'Avance USD', style: 'header' }, { value: 'Solde USD', style: 'header' }],
-    ...missions.map((mission) => [
-      { value: getReportProvinceLabel(mission.__report) || '—', style: 'text' },
-      { value: mission.__report.meta?.rapporteur || '—', style: 'text' },
-      { value: mission.__report.meta?.trimestre || '—', style: 'text' },
-      { value: mission.__report.meta?.annee || '—', style: 'integer' },
-      { value: mission.numero || '—', style: 'text' },
-      { value: mission.mission_reference_id || '—', style: 'text' },
-      { value: mission.nature || '—', style: 'text' },
-      { value: mission.objectif || '—', style: 'text' },
-      { value: Number(mission.montant_usd || 0), type: 'Number', style: 'currency' },
-      { value: Number(mission.avance_usd || 0), type: 'Number', style: 'currency' },
-      { value: Number(mission.solde_usd || 0), type: 'Number', style: 'currency' }
+    ...buildWorkbookHeaderRows('Toutes les missions', 21),
+    [{ value: 'Toutes les missions', style: 'title', mergeAcross: 20 }],
+    [{ value:'Province',style:'header' },{ value:'Rapporteur',style:'header' },{ value:'Trimestre',style:'header' },{ value:'Année',style:'header' },{ value:'Numero',style:'header' },{ value:'Mission ref',style:'header' },{ value:'Nature',style:'header' },{ value:'Objectif',style:'header' },
+     { value:'Prov. dest.',style:'header' },{ value:'Territoire',style:'header' },{ value:'Secteur',style:'header' },
+     { value:'Début',style:'header' },{ value:'Fin prévue',style:'header' },
+     { value:'Nuitées',style:'header' },{ value:'Taux/nuit',style:'header' },
+     { value:'Montant USD',style:'header' },{ value:'Autres frais',style:'header' },{ value:'Total USD',style:'header' },
+     { value:'Avance USD',style:'header' },{ value:'Solde USD',style:'header' },{ value:'Observation',style:'header' }],
+    ...missions.map((m) => [
+      { value: getReportProvinceLabel(m.__report) || '—', style: 'text' },
+      { value: m.__report.meta?.rapporteur || '—', style: 'text' },
+      { value: m.__report.meta?.trimestre || '—', style: 'text' },
+      { value: m.__report.meta?.annee || '—', style: 'integer' },
+      { value: m.numero || '—', style: 'text' }, { value: m.mission_reference_id || '—', style: 'text' },
+      { value: m.nature || '—', style: 'text' }, { value: m.objectif || '—', style: 'text' },
+      { value: m.destination_province_label || '—', style: 'text' }, { value: m.territoire_label || '—', style: 'text' }, { value: m.secteur_label || '—', style: 'text' },
+      { value: m.date_debut || m.date || '—', style: 'text' }, { value: m.date_fin || '—', style: 'text' },
+      { value: Number(m.nuitees || 0), type: 'Number', style: 'integer' },
+      { value: Number(m.taux_per_diem || 0), type: 'Number', style: 'currency' },
+      { value: Number(m.montant_usd || 0), type: 'Number', style: 'currency' },
+      { value: Number(m.autres_frais_usd || 0), type: 'Number', style: 'currency' },
+      { value: Number(m.total_usd || m.montant_usd || 0), type: 'Number', style: 'currency' },
+      { value: Number(m.avance_usd || 0), type: 'Number', style: 'currency' },
+      { value: Number(m.solde_usd || 0), type: 'Number', style: 'currency' },
+      { value: m.observation || '', style: 'text' }
     ]),
-    [],
-    ...buildSignatureRows(signatory, 11)
+    [], ...buildSignatureRows(signatory, 21)
   ];
 }
 
 function buildWorkbookHeaderRows(sheetTitle, totalColumns) {
   const trailingColumns = Math.max(totalColumns - 2, 0);
   return [
-    [
-      { value: 'PNDA', style: 'logoMark' },
-      { value: 'PNDA-SE', style: 'brandTitle', mergeAcross: trailingColumns }
-    ],
-    [
-      { value: `Programme National de Développement Agricole - ${sheetTitle}`, style: 'brandSubtitle', mergeAcross: Math.max(totalColumns - 1, 0) }
-    ],
+    [{ value: 'PNDA', style: 'logoMark' }, { value: 'PNDA-SE', style: 'brandTitle', mergeAcross: trailingColumns }],
+    [{ value: `Programme National de Développement Agricole - ${sheetTitle}`, style: 'brandSubtitle', mergeAcross: Math.max(totalColumns - 1, 0) }],
     []
   ];
 }
@@ -1379,34 +1468,22 @@ function buildWorkbookHeaderRows(sheetTitle, totalColumns) {
 function buildWorksheetXml(name, rows, columnWidths = []) {
   return [
     `<Worksheet ss:Name="${xmlEscape(sheetName(name))}">`,
-    buildWorksheetOptionsXml(),
-    '<Table>',
-    columnWidths.map((width) => `<Column ss:AutoFitWidth="0" ss:Width="${width}"/>`).join(''),
+    buildWorksheetOptionsXml(), '<Table>',
+    columnWidths.map((w) => `<Column ss:AutoFitWidth="0" ss:Width="${w}"/>`).join(''),
     rows.map((row) => `<Row>${(row || []).map((cell) => buildCellXml(cell)).join('')}</Row>`).join(''),
-    '</Table>',
-    '</Worksheet>'
+    '</Table>', '</Worksheet>'
   ].join('');
 }
 
 function buildWorksheetOptionsXml() {
   return [
     '<WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">',
-    '<PageSetup>',
-    '<Layout x:Orientation="Landscape"/>',
-    '<PageMargins x:Bottom="0.45" x:Left="0.25" x:Right="0.25" x:Top="0.35"/>',
-    '</PageSetup>',
-    '<FitToPage/>',
-    '<Print>',
-    '<ValidPrinterInfo/>',
-    '<PaperSizeIndex>9</PaperSizeIndex>',
-    '<FitWidth>1</FitWidth>',
-    '<FitHeight>0</FitHeight>',
-    '</Print>',
-    '<FreezePanes/>',
-    '<FrozenNoSplit/>',
-    '<SplitHorizontal>1</SplitHorizontal>',
-    '<TopRowBottomPane>1</TopRowBottomPane>',
-    '<ActivePane>2</ActivePane>',
+    '<PageSetup><Layout x:Orientation="Landscape"/>',
+    '<PageMargins x:Bottom="0.45" x:Left="0.25" x:Right="0.25" x:Top="0.35"/></PageSetup>',
+    '<FitToPage/><Print><ValidPrinterInfo/><PaperSizeIndex>9</PaperSizeIndex>',
+    '<FitWidth>1</FitWidth><FitHeight>0</FitHeight></Print>',
+    '<FreezePanes/><FrozenNoSplit/><SplitHorizontal>1</SplitHorizontal>',
+    '<TopRowBottomPane>1</TopRowBottomPane><ActivePane>2</ActivePane>',
     '</WorksheetOptions>'
   ].join('');
 }
@@ -1417,7 +1494,6 @@ function buildSignatureRows(signatory, totalColumns) {
   const location = signatory.location || '........................';
   const exportDate = new Date().toLocaleDateString('fr-FR');
   const mergeAcross = Math.max(totalColumns - 2, 0);
-
   return [
     [{ value: `Fait à ${location}, le ${exportDate}`, style: 'subtitle', mergeAcross }],
     [{ value: 'Signature', style: 'subtitle', mergeAcross }],
@@ -1429,54 +1505,18 @@ function buildSignatureRows(signatory, totalColumns) {
 }
 
 function buildCellXml(cell) {
-  if (!cell) {
-    return '<Cell><Data ss:Type="String"></Data></Cell>';
-  }
-
-  const type = cell.type || inferCellType(cell.value);
+  if (!cell) return '<Cell><Data ss:Type="String"></Data></Cell>';
+  const type = cell.type || (typeof cell.value === 'number' ? 'Number' : 'String');
   const style = cell.style ? ` ss:StyleID="${cell.style}"` : '';
-  const mergeAcross = Number.isInteger(cell.mergeAcross) && cell.mergeAcross > 0 ? ` ss:MergeAcross="${cell.mergeAcross}"` : '';
-  return `<Cell${style}${mergeAcross}><Data ss:Type="${type}">${xmlEscape(cell.value)}</Data></Cell>`;
+  const merge = Number.isInteger(cell.mergeAcross) && cell.mergeAcross > 0 ? ` ss:MergeAcross="${cell.mergeAcross}"` : '';
+  return `<Cell${style}${merge}><Data ss:Type="${type}">${xmlEscape(cell.value)}</Data></Cell>`;
 }
 
-function inferCellType(value) {
-  return typeof value === 'number' ? 'Number' : 'String';
-}
-
-function sheetNameForProvince(label) {
-  return label
-    .replace(/[\\/*?:\[\]]/g, '_')
-    .slice(0, 31);
-}
-
-function sheetName(value) {
-  return String(value || 'Sheet1').replace(/[\\/*?:\[\]]/g, '_').slice(0, 31);
-}
+function sheetNameForProvince(label) { return label.replace(/[\\/*?:\[\]]/g, '_').slice(0, 31); }
+function sheetName(value) { return String(value || 'Sheet1').replace(/[\\/*?:\[\]]/g, '_').slice(0, 31); }
 
 function xmlEscape(value) {
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&apos;');
-}
-
-function renderTable(headers, rows, emptyText) {
-  if (!rows.length) {
-    return `<div class="empty-state">${emptyText}</div>`;
-  }
-
-  return `
-    <table>
-      <thead>
-        <tr>${headers.map((header) => `<th>${header}</th>`).join('')}</tr>
-      </thead>
-      <tbody>
-        ${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`).join('')}
-      </tbody>
-    </table>
-  `;
+  return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&apos;');
 }
 
 function formatCurrency(value) {
@@ -1490,21 +1530,7 @@ function formatDate(value) {
 }
 
 function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
-
-function showToast(message) {
-  const toast = document.getElementById('toast');
-  toast.textContent = message;
-  toast.style.display = 'block';
-  setTimeout(() => {
-    toast.style.display = 'none';
-  }, 2600);
+  return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 </script>
 </body>

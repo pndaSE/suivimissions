@@ -4,165 +4,152 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PNDA-SE — Suivi des Missions</title>
+
+<!-- Bootstrap 5 CSS -->
+<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
+<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,500,0,0" rel="stylesheet">
+
 <style>
   :root {
-    --forest:    #123524;
-    --forest-md: #1d4c34;
-    --forest-lt: #2f6a48;
-    --gold:      #d3a52c;
-    --gold-lt:   #f1c85b;
-    --cream:     #f6f1df;
-    --parchment: #efe4bc;
-    --text:      #1b2019;
-    --muted:     #566458;
-    --border:    #d8c88a;
-    --error:     #b93232;
-    --white:     #fffdf7;
-    --shadow:    0 8px 30px rgba(18,53,36,0.14);
+    --pnda-green:    #123524;
+    --pnda-green-md: #1d4c34;
+    --pnda-green-lt: #2f6a48;
+    --pnda-gold:     #d3a52c;
+    --pnda-gold-lt:  #f1c85b;
+    --pnda-cream:    #f6f1df;
+    --pnda-paper:    #fffdf7;
   }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: 'Source Sans 3', sans-serif;
-    background:
-      radial-gradient(circle at top left, rgba(211,165,44,0.18), transparent 26%),
-      radial-gradient(circle at top right, rgba(47,106,72,0.14), transparent 32%),
-      linear-gradient(180deg, #f8f5e8 0%, var(--cream) 45%, #efe7cb 100%);
-    color: var(--text);
+    background: linear-gradient(180deg, #f8f5e8 0%, var(--pnda-cream) 45%, #efe7cb 100%);
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
   }
 
-  /* ── HEADER ────────────────────────────────────────────────── */
-  header {
-    background: #ffffff;
-    color: var(--forest);
-    padding: 0;
-    /* position: sticky; */
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.14);
-    border-bottom: 1px solid rgba(18,53,36,0.12);
+  /* ── NAVBAR ──────────────────────────────────────────────── */
+  .navbar-pnda {
+    background: #fff;
+    border-bottom: 3px solid var(--pnda-gold);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   }
-  .header-top {
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: 12px 28px 16px;
-    display: grid;
-    justify-items: center;
-    gap: 10px;
-    border-bottom: 3px solid rgba(18,53,36,0.12);
-  }
-  .header-logos-row {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 18px;
-  }
-  .header-logo-side,
-  .header-logo-center {
-    display: flex;
-    align-items: center;
-  }
-  .header-logo-side.left { justify-content: flex-start; }
-  .header-logo-side.right { justify-content: flex-end; }
-  .header-logo-center { justify-content: center; }
-  .header-logo-shell {
-    background: #ffffff;
-    padding: 4px 8px;
-  }
-  .header-logo-shell img {
-    display: block;
-    object-fit: contain;
-  }
-  .logo-ministere img { width: 205px; height: 84px; }
-  .logo-programme img { width: 200px; height: 92px; }
-  .logo-pnda img { width: 126px; height: 92px; }
-  .header-titles {
-    text-align: center;
-    max-width: 840px;
-  }
-  .header-titles h1 {
+  .navbar-pnda .navbar-brand {
     font-family: 'Playfair Display', serif;
-    font-size: 1.45rem;
+    font-size: 1rem;
+    color: var(--pnda-green);
     font-weight: 700;
-    letter-spacing: 0.5px;
-    line-height: 1.2;
-    color: var(--forest);
   }
-  .header-titles span {
-    font-size: 0.8rem;
-    color: var(--forest-lt);
-    font-weight: 500;
-    letter-spacing: 1.5px;
+  .navbar-pnda .navbar-brand small {
+    display: block;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 400;
+    color: #6c757d;
     text-transform: uppercase;
-  }
-  .header-nav {
-    display: flex; align-items: center; gap: 18px;
-    padding: 12px 28px;
-    font-size: 0.82rem;
-    font-weight: 500;
     letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: var(--muted);
-    background: #ffffff;
-    max-width: 1320px;
-    margin: 0 auto;
   }
-  .header-nav span { color: var(--forest-lt); }
-  .nav-spacer { flex: 1; }
-  .nav-action {
-    border: 1px solid rgba(18,53,36,0.18);
-    background: #ffffff;
-    color: var(--forest);
-    border-radius: 999px;
-    padding: 8px 14px;
-    font: inherit;
+  .nav-user { text-align: right; font-size: 0.82rem; }
+  .nav-user strong { color: var(--pnda-green); display: block; }
+  .nav-user span { color: #6c757d; font-size: 0.72rem; }
+
+  /* ── LOGOS HEADER ────────────────────────────────────────── */
+  .logos-bar {
+    background: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    padding: 12px 0;
+  }
+  .logos-bar img { height: 72px; object-fit: contain; }
+
+  /* ── TITLES ──────────────────────────────────────────────── */
+  .page-title { font-family: 'Playfair Display', serif; color: var(--pnda-green); }
+
+  /* ── CARDS ───────────────────────────────────────────────── */
+  .card { border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .card-header-pnda {
+    background: linear-gradient(180deg, #f5f0e0 0%, #ede7cc 100%);
+    border-bottom: 2px solid rgba(216,200,138,0.5);
+    font-weight: 600;
+    color: var(--pnda-green);
+  }
+  .card-header-pnda h5 { font-family: 'Playfair Display', serif; margin: 0; font-size: 1rem; }
+
+  .step-num {
+    width: 30px; height: 30px;
+    background: var(--pnda-green); color: #fff;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+  }
+  .step-num-gold { background: var(--pnda-gold); color: var(--pnda-green); }
+
+  /* ── BUTTONS ─────────────────────────────────────────────── */
+  .btn-pnda { background: var(--pnda-green); color: #fff; border: none; }
+  .btn-pnda:hover { background: var(--pnda-green-lt); color: #fff; }
+  .btn-gold { background: var(--pnda-gold); color: var(--pnda-green); border: none; font-weight: 600; }
+  .btn-gold:hover { background: var(--pnda-gold-lt); color: var(--pnda-green); }
+
+  /* ── MISSION ROW ─────────────────────────────────────────── */
+  .mission-row {
+    background: var(--pnda-cream);
+    border: 1px solid rgba(216,200,138,0.6);
+    border-radius: 6px;
+    padding: 18px;
+    margin-bottom: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .mission-row:hover { border-color: var(--pnda-green-lt); box-shadow: 0 2px 10px rgba(18,53,36,0.08); }
+  .mission-meta {
+    font-size: 0.78rem;
+    color: #6c757d;
+    background: rgba(255,255,255,0.8);
+    border: 1px solid rgba(211,165,44,0.3);
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-top: 10px;
+  }
+
+  /* ── SUMMARY ─────────────────────────────────────────────── */
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--pnda-green);
+  }
+  .summary-table th {
+    font-size: 0.73rem;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    background: rgba(237,231,204,0.35);
+  }
+
+  /* ── FOOTER ──────────────────────────────────────────────── */
+  .footer-pnda {
+    background: var(--pnda-green);
+    border-top: 3px solid var(--pnda-gold);
+    color: rgba(255,255,255,0.5);
     font-size: 0.76rem;
+    letter-spacing: 0.3px;
+  }
+  .footer-pnda strong { color: var(--pnda-gold-lt); }
+
+  /* ── FORM LABELS ─────────────────────────────────────────── */
+  .form-label-sm {
+    font-size: 0.73rem;
     font-weight: 600;
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    cursor: pointer;
+    color: #6c757d;
   }
-  .nav-action:hover { background: rgba(18,53,36,0.06); }
-  .nav-action[hidden] { display: none; }
+  .req { color: var(--pnda-gold); }
 
-  /* ── AUTH OVERLAY ───────────────────────────────────────────── */
-  #auth-screen {
-    position: fixed; inset: 0;
-    background: rgba(26,58,42,0.92);
-    z-index: 200;
-    display: flex; align-items: center; justify-content: center;
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+  /* ── AUTH MODAL ──────────────────────────────────────────── */
+  .modal-auth-header {
+    background: linear-gradient(135deg, var(--pnda-green) 0%, var(--pnda-green-md) 100%);
+    border-bottom: 3px solid var(--pnda-gold);
+    color: #fff;
   }
-  .auth-card {
-    background: var(--white);
-    border-radius: 4px;
-    width: 380px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-    animation: slideUp 0.4s ease;
-  }
-  @keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
-  }
-  .auth-header {
-    background: linear-gradient(135deg, var(--forest) 0%, var(--forest-md) 100%);
-    color: var(--white);
-    padding: 28px 32px 22px;
-    border-bottom: 3px solid var(--gold);
-  }
-  .auth-header .logo-row {
-    display: flex; align-items: center; gap: 14px; margin-bottom: 10px;
-  }
-  .auth-header .logo-sm {
+  .modal-auth-header .logo-sm {
     width: 56px; height: 56px;
     background: linear-gradient(180deg, #fffefb 0%, #f2ecd5 100%);
     border-radius: 14px;
@@ -170,730 +157,393 @@
     padding: 6px;
     border: 1px solid rgba(211,165,44,0.55);
   }
-  .auth-header .logo-sm img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  }
-  .auth-header h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem; line-height: 1.3;
-  }
-  .auth-header p { font-size: 0.76rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
-  .auth-body { padding: 28px 32px 32px; }
-  .auth-body label {
-    display: block;
-    font-size: 0.75rem; font-weight: 600;
-    letter-spacing: 1px; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 6px; margin-top: 18px;
-  }
-  .auth-body label:first-child { margin-top: 0; }
-  .auth-body input, .auth-body select {
-    width: 100%; padding: 10px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 3px;
-    font-family: 'Source Sans 3', sans-serif;
-    font-size: 0.92rem;
-    background: var(--cream);
-    color: var(--text);
-    transition: border-color 0.2s;
-    outline: none;
-  }
-  .auth-body input:focus, .auth-body select:focus {
-    border-color: var(--forest-lt);
-    background: var(--white);
-  }
-  #auth-error {
-    display: none; color: var(--error);
-    font-size: 0.8rem; margin-top: 10px; text-align: center;
-  }
-  .btn-primary {
-    width: 100%; margin-top: 24px;
-    padding: 12px;
-    background: var(--forest);
-    color: var(--white);
-    border: none; border-radius: 3px;
-    font-family: 'Source Sans 3', sans-serif;
-    font-size: 0.88rem; font-weight: 600;
-    letter-spacing: 1.2px; text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-  }
-  .btn-primary:hover  { background: var(--forest-lt); }
-  .btn-primary:active { transform: scale(0.98); }
+  .modal-auth-header .logo-sm img { width: 100%; height: 100%; object-fit: contain; }
 
-  /* ── MAIN CONTENT ───────────────────────────────────────────── */
-  main {
-    flex: 1;
-    max-width: 960px;
-    width: 100%;
-    margin: 40px auto;
-    padding: 0 24px 60px;
-  }
+  /* ── TOAST ───────────────────────────────────────────────── */
+  .toast-container { z-index: 9999; }
 
-  .page-title {
-    display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px;
-  }
-  .page-title h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.7rem; color: var(--forest);
-  }
-  .page-title .trimestre-badge {
-    background: var(--gold);
-    color: var(--forest);
-    font-size: 0.72rem; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 3px 10px; border-radius: 2px;
-  }
-  .page-subtitle {
-    font-size: 0.88rem; color: var(--muted); margin-bottom: 32px;
-    border-bottom: 1px solid var(--border); padding-bottom: 20px;
-  }
-
-  /* ── SECTION CARD ───────────────────────────────────────────── */
-  .card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
-  .card-head {
-    background: linear-gradient(180deg, #f3e8be 0%, var(--parchment) 100%);
-    border-bottom: 2px solid var(--border);
-    padding: 14px 24px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .card-head .step-num {
-    width: 28px; height: 28px;
-    background: var(--forest);
-    color: var(--white);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.8rem; font-weight: 700;
-    flex-shrink: 0;
-  }
-  .card-head h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1rem; color: var(--forest);
-  }
-  .card-body { padding: 24px; }
-
-  /* ── FORM GRID ──────────────────────────────────────────────── */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
-  .col-full { grid-column: 1 / -1; }
-
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field label {
-    font-size: 0.73rem; font-weight: 600;
-    letter-spacing: 0.9px; text-transform: uppercase;
-    color: var(--muted);
-  }
-  .field label .req { color: var(--gold); margin-left: 2px; }
-  .field input, .field select, .field textarea {
-    padding: 9px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 3px;
-    font-family: 'Source Sans 3', sans-serif;
-    font-size: 0.9rem;
-    background: var(--cream);
-    color: var(--text);
-    transition: border-color 0.2s, background 0.2s;
-    outline: none;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus {
-    border-color: var(--forest-lt);
-    background: var(--white);
-  }
-  .field textarea { resize: vertical; min-height: 72px; }
-  .field-help {
-    font-size: 0.78rem;
-    color: var(--muted);
-  }
-  .auth-note {
-    margin-top: 8px;
-    font-size: 0.82rem;
-    color: rgba(255,255,255,0.5);
-  }
-  .auth-accounts {
-    margin-top: 14px;
-    padding: 10px 12px;
-    border-radius: 3px;
-    background: rgba(18,53,36,0.07);
-    border: 1px solid rgba(211,165,44,0.28);
-    font-size: 0.78rem;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-  .header-userbox {
-    text-align: right;
-    font-size: 0.8rem;
-    color: var(--muted);
-  }
-  .header-user {
-    font-weight: 600;
-    color: var(--forest);
-  }
-  .header-user-province {
-    font-size: 0.72rem;
-    letter-spacing: 0.8px;
-    color: var(--muted);
-  }
-  .nav-separator {
-    color: rgba(18,53,36,0.2);
-  }
-  .nav-spacer {
-    flex: 1;
-  }
-  .header-date {
-    color: var(--muted);
-    font-size: 0.76rem;
-  }
-  .card-note {
-    font-size: 0.88rem;
-    color: var(--muted);
-    margin-bottom: 18px;
-  }
-  .btn-copy {
-    background: #2563a8;
-  }
-  .btn-copy:hover {
-    background: #1f528a;
-  }
-  .step-num-complete {
-    background: var(--gold);
-    color: var(--forest);
-  }
-
-  /* ── MISSIONS TABLE ─────────────────────────────────────────── */
-  .mission-row {
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 16px 18px;
-    margin-bottom: 12px;
-    position: relative;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .mission-row:hover { border-color: var(--forest-lt); box-shadow: 0 2px 8px rgba(26,58,42,0.08); }
-  .mission-meta {
-    margin-top: 8px;
-    font-size: 0.78rem;
-    color: var(--muted);
-    background: rgba(255,255,255,0.82);
-    border: 1px solid rgba(211,165,44,0.35);
-    border-radius: 3px;
-    padding: 8px 10px;
-  }
-  .mission-row-header {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
-  }
-  .mission-num {
-    background: var(--forest); color: var(--white);
-    width: 24px; height: 24px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
-  }
-  .mission-num-label {
-    font-size: 0.8rem; font-weight: 600; color: var(--forest); flex: 1;
-  }
-  .btn-remove {
-    background: none; border: 1.5px solid #ddd;
-    color: #999; border-radius: 3px;
-    padding: 3px 10px; font-size: 0.78rem; cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-remove:hover { border-color: var(--error); color: var(--error); background: #fff0f0; }
-
-  .btn-add {
-    display: flex; align-items: center; gap: 8px;
-    background: none; border: 1.5px dashed var(--forest-lt);
-    color: var(--forest); padding: 10px 18px;
-    border-radius: 3px; font-family: 'Source Sans 3', sans-serif;
-    font-size: 0.85rem; font-weight: 600; cursor: pointer;
-    width: 100%; justify-content: center;
-    transition: all 0.2s;
-  }
-  .btn-add:hover { background: #eaf4ee; border-style: solid; }
-
-  /* ── ACTIONS ────────────────────────────────────────────────── */
-  .actions {
-    display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px;
-  }
-  .btn-export {
-    flex: 1; min-width: 200px;
-    padding: 13px 24px;
-    background: var(--forest);
-    color: var(--white);
-    border: none; border-radius: 3px;
-    font-family: 'Source Sans 3', sans-serif;
-    font-size: 0.88rem; font-weight: 600;
-    letter-spacing: 1px; text-transform: uppercase;
-    cursor: pointer; transition: background 0.2s, transform 0.1s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-export:hover  { background: var(--forest-lt); }
-  .btn-export:active { transform: scale(0.98); }
-  .btn-export.gold   { background: var(--gold); color: var(--forest); }
-  .btn-export.gold:hover { background: var(--gold-lt); }
-  .btn-export.sky { background: #dbeafe; color: #12406a; }
-  .btn-export.sky:hover { background: #bfdbfe; }
-  .btn-export.print { background: #ede9fe; color: #432b84; }
-  .btn-export.print:hover { background: #ddd6fe; }
-  .material-symbols-rounded {
-    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
-    font-size: 1.1rem;
-    line-height: 1;
-  }
-
-  /* ── SUMMARY TABLE ─────────────────────────────────────────── */
-  .summary-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 18px;
-    flex-wrap: wrap;
-  }
-  .summary-copy h4 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.08rem;
-    color: var(--forest);
-    margin-bottom: 4px;
-  }
-  .summary-copy p {
-    font-size: 0.84rem;
-    color: var(--muted);
-  }
-  .summary-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .summary-actions .btn-export {
-    flex: 0 0 auto;
-    min-width: 180px;
-    padding: 11px 16px;
-    font-size: 0.82rem;
-  }
-  .summary-metrics {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-    margin-bottom: 18px;
-  }
-  .summary-metric {
-    border: 1px solid rgba(18,53,36,0.12);
-    background: linear-gradient(180deg, #fffef8 0%, #f7f0d7 100%);
-    border-radius: 4px;
-    padding: 12px 14px;
-  }
-  .summary-metric span {
-    display: block;
-    font-size: 0.74rem;
-    letter-spacing: 0.9px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-  .summary-metric strong {
-    display: block;
-    font-size: 1.15rem;
-    color: var(--forest);
-  }
-  .table-wrap {
-    border: 1px solid rgba(18,53,36,0.12);
-    border-radius: 4px;
-    overflow: auto;
-    background: #fffefb;
-  }
-  .summary-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 980px;
-  }
-  .summary-table th,
-  .summary-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(18,53,36,0.1);
-    text-align: left;
-    vertical-align: top;
-    font-size: 0.86rem;
-  }
-  .summary-table thead th {
-    position: sticky;
-    top: 0;
-    background: linear-gradient(180deg, #eff6f1 0%, #dfeede 100%);
-    color: var(--forest);
-    font-size: 0.75rem;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    z-index: 1;
-  }
-  .summary-table tbody tr:nth-child(even) {
-    background: rgba(239,228,188,0.24);
-  }
-  .summary-table .numeric {
-    text-align: right;
-    white-space: nowrap;
-  }
-  .summary-empty {
-    padding: 22px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-
-  /* ── JSON PREVIEW ───────────────────────────────────────────── */
-  #json-preview-section { display: none; }
-  #json-output {
-    background: #0f1f18;
-    color: #7ec997;
-    font-family: 'Courier New', monospace;
-    font-size: 0.78rem;
-    padding: 20px;
-    border-radius: 3px;
-    overflow-x: auto;
-    white-space: pre;
-    max-height: 380px;
-    overflow-y: auto;
-    line-height: 1.6;
-  }
-
-  /* ── FOOTER ─────────────────────────────────────────────────── */
-  footer {
-    background: var(--forest);
-    color: rgba(255,255,255,0.5);
-    text-align: center;
-    padding: 16px;
-    font-size: 0.76rem;
-    letter-spacing: 0.5px;
-    border-top: 3px solid var(--gold);
-  }
-  footer strong { color: var(--gold-lt); }
-
-  /* ── TOAST ──────────────────────────────────────────────────── */
-  #toast {
-    position: fixed; bottom: 28px; right: 28px;
-    background: var(--forest); color: var(--white);
-    padding: 12px 22px; border-radius: 3px;
-    font-size: 0.84rem; font-weight: 500;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    display: none; z-index: 9999;
-    border-left: 4px solid var(--gold);
-    animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform:none; } }
-
-  @media (max-width: 600px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .header-top { padding: 12px 16px 16px; }
-    .header-logos-row { grid-template-columns: 1fr; gap: 10px; }
-    .header-logo-side.left,
-    .header-logo-side.right,
-    .header-logo-center { justify-content: center; }
-    .header-nav { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
-    .header-userbox { width: 100%; text-align: center; }
-    main { padding: 0 12px 40px; margin-top: 24px; }
-    .summary-metrics { grid-template-columns: 1fr 1fr; }
-    .summary-actions .btn-export { min-width: 100%; }
-  }
-
+  /* ── PRINT ───────────────────────────────────────────────── */
   @media print {
-    body {
-      background: #ffffff;
-    }
-    header,
-    footer,
-    #auth-screen,
-    #toast,
+    body { background: #fff !important; }
+    .navbar-pnda, .logos-bar, footer, .toast-container,
     .card:not(#selected-missions-section),
-    .page-title,
-    .page-subtitle {
-      display: none !important;
-    }
-    main {
-      max-width: none;
-      margin: 0;
-      padding: 0;
-    }
-    #selected-missions-section {
-      box-shadow: none;
-      border: none;
-      margin: 0;
-    }
-    .summary-actions {
-      display: none !important;
-    }
-    .table-wrap {
-      overflow: visible;
-      border: none;
-    }
-    .summary-table {
-      min-width: 0;
-    }
-    .summary-table th,
-    .summary-table td {
-      font-size: 11px;
-      padding: 6px 8px;
-    }
+    #archive-section { display: none !important; }
+    main { max-width: none; margin: 0; padding: 0; }
+    #selected-missions-section { box-shadow: none; border: none; }
+  }
+
+  /* ── CHAMPS COMPTABLE ────────────────────────────────────── */
+  .comptable-field { position: relative; }
+  .comptable-field::before {
+    content: '';
+    position: absolute; top: 0; left: 4px; right: 4px; bottom: 0;
+    background: rgba(211,165,44,0.08);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+  body.mode-missionnaire .comptable-field input,
+  body.mode-missionnaire .comptable-field select {
+    background: #f5f0e0 !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  body.mode-missionnaire .comptable-field label::after {
+    content: ' 🔒';
+    font-size: 0.7em;
+    opacity: 0.5;
+  }
+
+  /* ── STATUT BADGES ───────────────────────────────────────── */
+  .badge-statut-attente  { background: #d3a52c; color: #fff; }
+  .badge-statut-activee  { background: #198754; color: #fff; }
+  .badge-statut-realisee { background: #6c757d; color: #fff; }
+
+  /* ── COMPLETION FORM ─────────────────────────────────────── */
+  .completion-mission-card {
+    border: 1px solid rgba(211,165,44,0.4);
+    border-radius: 8px; padding: 16px; margin-bottom: 14px;
+    background: var(--pnda-paper);
+  }
+  .completion-mission-card .readonly-section {
+    background: rgba(18,53,36,0.04);
+    border-radius: 6px; padding: 10px 12px; margin-bottom: 12px;
+    font-size: 0.85rem;
+  }
+  .completion-mission-card .readonly-section strong { color: var(--pnda-green); display: block; font-size: 0.92rem; }
+  .completion-financial-section {
+    background: rgba(211,165,44,0.08);
+    border: 1px solid rgba(211,165,44,0.3);
+    border-radius: 6px; padding: 12px;
   }
 </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
-<!-- ══════════════ AUTH OVERLAY ══════════════ -->
-<div id="auth-screen">
-  <div class="auth-card">
-    <div class="auth-header">
-      <div class="logo-row">
-        <div class="logo-sm"><img src="logo_pnda.png" alt="Logo PNDA"></div>
-        <div>
-          <h2>PNDA-SE</h2>
-          <p>Programme National de Développement Agricole</p>
+<!-- ══════════════ AUTH MODAL (toujours visible au démarrage) ══════════════ -->
+<div class="modal fade" id="authModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg overflow-hidden">
+      <div class="modal-auth-header p-4">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="logo-sm"><img src="logo_pnda.png" alt="PNDA"></div>
+          <div>
+            <h5 class="mb-0 fw-bold" style="font-family:'Playfair Display',serif">PNDA-SE</h5>
+            <small class="opacity-50">Programme National de Développement Agricole</small>
+          </div>
         </div>
+        <small class="d-block mt-1 opacity-50">Connexion requise pour accéder au formulaire de suivi des missions</small>
       </div>
-      <p class="auth-note">
-        Connexion requise pour accéder au formulaire de suivi des missions
-      </p>
-    </div>
-    <div class="auth-body">
-      <label>Province</label>
-      <select id="auth-province" title="Province de connexion">
-        <option value="">— Chargement des provinces —</option>
-      </select>
-      <label>Identifiant</label>
-      <input type="text" id="auth-user" placeholder="Nom d'utilisateur" autocomplete="username">
-      <label>Mot de passe</label>
-      <input type="password" id="auth-pass" placeholder="••••••••" autocomplete="current-password">
-      <div id="auth-error">Identifiants incorrects. Veuillez réessayer.</div>
-      <!-- <div class="auth-accounts">
-        Comptes province: <strong>compte_kwilu@pnda.cd</strong>, <strong>compte_kasaic@pnda.cd</strong>, <strong>compte_kasai@pnda.cd</strong>, <strong>compte_uncp@pnda.cd</strong>.<br>
-        Les mots de passe temporaires sont fournis par l'administration.<br>
-        Comptes tableau de bord: <strong>rnse@pnda.cd</strong> et <strong>raf@pnda.cd</strong>. La province n'est pas requise pour ces deux comptes.
-      </div> -->
-      <button class="btn-primary" onclick="doLogin()">Se connecter</button>
+      <div class="modal-body p-4">
+        <div class="mb-3">
+          <label class="form-label form-label-sm">Province</label>
+          <select class="form-select form-select-sm" id="auth-province">
+            <option value="">— Chargement des provinces —</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label form-label-sm">Identifiant</label>
+          <input type="text" class="form-control form-control-sm" id="auth-user" placeholder="Nom d'utilisateur" autocomplete="username">
+        </div>
+        <div class="mb-3">
+          <label class="form-label form-label-sm">Mot de passe</label>
+          <input type="password" class="form-control form-control-sm" id="auth-pass" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <div class="alert alert-danger py-2 small" id="auth-error" style="display:none">
+          Identifiants incorrects. Veuillez réessayer.
+        </div>
+        <button class="btn btn-pnda w-100 text-uppercase fw-semibold" onclick="doLogin()">
+          <i class="bi bi-box-arrow-in-right me-1"></i>Se connecter
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════ HEADER ══════════════ -->
-<header>
-  <div class="header-top">
-    <div class="header-logos-row">
-      <div class="header-logo-side left">
-        <div class="header-logo-shell logo-ministere"><img src="logo_ministere.png" alt="Logo Ministère"></div>
-      </div>
-      <div class="header-logo-center">
-        <div class="header-logo-shell logo-programme"><img src="logo_programme.png" alt="Logo Programme"></div>
-      </div>
-      <div class="header-logo-side right">
-        <div class="header-logo-shell logo-pnda"><img src="logo_pnda.png" alt="Logo PNDA"></div>
-      </div>
-    </div>
-    <!-- <div class="header-titles">
-      <h1>PNDA-SE — Programme National de Développement Agricole</h1>
-      <span>Secrétariat Exécutif · Suivi des Missions · Trimestriel</span>
-    </div> -->
+<!-- ══════════════ LOGOS BAR ══════════════ -->
+<div class="logos-bar">
+  <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <img src="logo_ministere.png" alt="Ministère" style="height:70px">
+    <img src="logo_programme.png" alt="Programme" style="height:78px">
+    <img src="logo_pnda.png" alt="PNDA" style="height:78px">
   </div>
-  <div class="header-nav">
-    <span>⊞ Suivi Missions</span>
-    <span class="nav-separator">|</span>
-    <span>Trimestre T4 2025</span>
-    <span class="nav-separator">|</span>
-    <span id="header-province-label">—</span>
-    <span class="nav-separator">|</span>
-    <div class="header-userbox">
-      <div id="display-user" class="header-user">—</div>
-      <div id="display-province" class="header-user-province">—</div>
-    </div>
-    <div class="nav-spacer"></div>
-    <button id="admin-shortcut" class="nav-action" onclick="goToAdmin()" hidden>Tableau Admin</button>
-    <button id="switch-account" class="nav-action" onclick="changeAccount()">Changer de compte</button>
-    <span id="header-date" class="header-date"></span>
-  </div>
-</header>
+</div>
 
-<!-- ══════════════ MAIN ══════════════ -->
-<main>
-
-  <div class="page-title">
-    <h2>Saisie du Budget des Missions</h2>
-    <span class="trimestre-badge">T4 2025</span>
-  </div>
-  <p class="page-subtitle">
-    Remplissez les informations ci-dessous. Le formulaire génère un fichier JSON standardisé pour la saisie, le suivi et la consolidation du budget des missions.
-  </p>
-
-  <!-- ÉTAPE 1 : IDENTIFICATION -->
-  <div class="card">
-    <div class="card-head">
-      <div class="step-num">1</div>
-      <h3>Identification — Contexte budgétaire</h3>
+<!-- ══════════════ NAVBAR ══════════════ -->
+<nav class="navbar navbar-expand navbar-pnda sticky-top">
+  <div class="container">
+    <div class="navbar-brand">
+      PNDA-SE · Suivi Missions
+      <small>Formulaire de saisie trimestriel</small>
     </div>
-    <div class="card-body">
-      <div class="grid-2">
-        <div class="field">
-          <label>Province <span class="req">*</span></label>
-          <select id="f-province" title="Province concernée" onchange="updateProvinceLabel()">
-            <option value="">— Chargement des provinces —</option>
-          </select>
-          <span class="field-help">Les missions proposées dépendent strictement de la province sélectionnée.</span>
-        </div>
-        <div class="field">
-          <label>Trimestre <span class="req">*</span></label>
-          <select id="f-trimestre" title="Trimestre budgétaire">
-            <option value="T1">T1 — Janvier à Mars</option>
-            <option value="T2">T2 — Avril à Juin</option>
-            <option value="T3">T3 — Juillet à Septembre</option>
-            <option value="T4" selected>T4 — Octobre à Décembre</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Année <span class="req">*</span></label>
-          <input type="number" id="f-annee" title="Année budgétaire" placeholder="2025" value="2025" min="2020" max="2030">
-        </div>
-        <div class="field">
-          <label>Rapporteur <span class="req">*</span></label>
-          <input type="text" id="f-rapporteur" placeholder="Nom & prénom">
-        </div>
-        <div class="field">
-          <label>Rôle / Poste</label>
-          <input type="text" id="f-role" placeholder="ex : Coordinateur RNSE">
-        </div>
-        <div class="field">
-          <label>Date de génération</label>
-          <input type="date" id="f-date" title="Date de génération du rapport" placeholder="jj/mm/aaaa">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ÉTAPE 2 : MISSIONS -->
-  <div class="card">
-    <div class="card-head">
-      <div class="step-num">2</div>
-      <h3>Missions réalisées au cours du trimestre</h3>
-    </div>
-    <div class="card-body">
-      <div id="missions-container"></div>
-      <button class="btn-add" onclick="addMission()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-        Ajouter une mission
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <span class="badge bg-warning text-dark" id="header-province-label">—</span>
+      <button class="btn btn-sm position-relative p-1" id="btn-notif" onclick="document.getElementById('archive-section').scrollIntoView({behavior:'smooth'})" title="Missions enregistrées">
+        <i class="bi bi-bell-fill text-white fs-5"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notif-badge" style="display:none;font-size:.6rem">0</span>
       </button>
+      <div class="nav-user d-none d-sm-block">
+        <strong id="display-user">—</strong>
+        <span id="display-province">—</span>
+      </div>
+      <button id="admin-shortcut" class="btn btn-outline-secondary btn-sm" onclick="goToAdmin()" hidden>
+        <i class="bi bi-speedometer2 me-1"></i>Admin
+      </button>
+      <button id="switch-account" class="btn btn-outline-secondary btn-sm" onclick="changeAccount()">
+        <i class="bi bi-arrow-left-right me-1"></i>Changer
+      </button>
+      <small class="text-muted" id="header-date"></small>
     </div>
   </div>
+</nav>
 
-  <!-- ÉTAPE 3 : ACTIONS -->
-  <div class="card">
-    <div class="card-head">
-      <div class="step-num">3</div>
-      <h3>Générer &amp; Exporter le fichier JSON</h3>
-    </div>
-    <div class="card-body">
-      <p class="card-note">
-        Vérifiez les données saisies, puis générez le fichier JSON. Vous pourrez le télécharger ou copier son contenu pour l'envoyer par e-mail à l'équipe RNSE GLOBAL.
+<!-- ══════════════ MAIN CONTENT ══════════════ -->
+<main class="flex-grow-1">
+  <div class="container" style="max-width:960px">
+    <div class="py-4">
+      <div class="d-flex align-items-baseline gap-3 mb-2 flex-wrap">
+        <h2 class="page-title mb-0">Saisie du Budget des Missions</h2>
+        <span class="badge bg-warning text-dark fw-bold" style="letter-spacing:1px">T4 2025</span>
+      </div>
+      <p class="text-muted small border-bottom pb-3 mb-4">
+        Remplissez les informations ci-dessous. Le formulaire génère un fichier JSON standardisé pour la saisie, le suivi et la consolidation du budget des missions.
       </p>
-      <div class="actions">
-        <button class="btn-export" onclick="generateJSON()">
-          <span class="material-symbols-rounded" aria-hidden="true">preview</span>
-          Prévisualiser JSON
-        </button>
-        <button class="btn-export gold" onclick="downloadJSON()">
-          <span class="material-symbols-rounded" aria-hidden="true">download</span>
-          Télécharger .json
-        </button>
-        <button class="btn-export btn-copy" onclick="copyJSON()">
-          <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
-          Copier JSON
-        </button>
-      </div>
-    </div>
-  </div>
 
-  <div class="card" id="selected-missions-section">
-    <div class="card-head">
-      <div class="step-num">4</div>
-      <h3>Tableau récapitulatif des missions sélectionnées</h3>
-    </div>
-    <div class="card-body">
-      <div class="summary-header">
-        <div class="summary-copy">
-          <h4>Récapitulatif prêt à imprimer et à exporter</h4>
-          <p>Le tableau se met à jour automatiquement selon les missions et montants saisis dans le formulaire.</p>
+      <!-- ════ VUE MISSIONNAIRE (province) ════ -->
+      <div id="main-form-section">
+
+      <!-- ── ÉTAPE 1 : IDENTIFICATION ── -->
+      <div class="card mb-4">
+        <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
+          <span class="step-num">1</span>
+          <h5>Identification — Contexte budgétaire</h5>
         </div>
-        <div class="summary-actions">
-          <button class="btn-export sky" onclick="exportSelectedMissionsExcel()">
-            <span class="material-symbols-rounded" aria-hidden="true">table_view</span>
-            Exporter Excel
-          </button>
-          <button class="btn-export print" onclick="printSelectedMissions()">
-            <span class="material-symbols-rounded" aria-hidden="true">print</span>
-            Imprimer le tableau
-          </button>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label form-label-sm">Province <span class="req">*</span></label>
+              <select class="form-select form-select-sm" id="f-province" onchange="updateProvinceLabel()">
+                <option value="">— Chargement des provinces —</option>
+              </select>
+              <small class="text-muted">Les missions proposées dépendent de la province sélectionnée.</small>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label form-label-sm">Trimestre <span class="req">*</span></label>
+              <select class="form-select form-select-sm" id="f-trimestre">
+                <option value="T1">T1 — Janvier à Mars</option>
+                <option value="T2">T2 — Avril à Juin</option>
+                <option value="T3">T3 — Juillet à Septembre</option>
+                <option value="T4" selected>T4 — Octobre à Décembre</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label form-label-sm">Année <span class="req">*</span></label>
+              <input type="number" class="form-control form-control-sm" id="f-annee" value="2025" min="2020" max="2030">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label form-label-sm">Rapporteur <span class="req">*</span></label>
+              <input type="text" class="form-control form-control-sm" id="f-rapporteur" placeholder="Nom & prénom">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label form-label-sm">Rôle / Poste</label>
+              <input type="text" class="form-control form-control-sm" id="f-role" placeholder="ex : Coordinateur RNSE">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label form-label-sm">Date de génération</label>
+              <input type="date" class="form-control form-control-sm" id="f-date">
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="summary-metrics" id="selected-missions-metrics"></div>
-      <div class="table-wrap">
-        <table class="summary-table">
-          <thead>
-            <tr>
-              <th>N°</th>
-              <th>Province</th>
-              <th>Mission</th>
-              <th>Objectif</th>
-              <th>Date</th>
-              <th>Section</th>
-              <th>Hors projet</th>
-              <th>Projet</th>
-              <th>Montant USD</th>
-              <th>Avance USD</th>
-              <th>Solde USD</th>
-            </tr>
-          </thead>
-          <tbody id="selected-missions-body">
-            <tr>
-              <td colspan="11" class="summary-empty">Aucune mission sélectionnée pour le moment.</td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- ── ÉTAPE 2 : MISSIONS ── -->
+      <div class="card mb-4">
+        <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
+          <span class="step-num">2</span>
+          <h5>Missions réalisées au cours du trimestre</h5>
+        </div>
+        <div class="card-body">
+          <div id="missions-container"></div>
+          <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-outline-success flex-fill d-flex align-items-center justify-content-center gap-2" onclick="addMission()">
+              <i class="bi bi-plus-circle-fill"></i> Ajouter une mission
+            </button>
+            <button class="btn btn-pnda flex-fill d-flex align-items-center justify-content-center gap-2" id="btn-enregistrer" onclick="enregistrerMissions()">
+              <i class="bi bi-cloud-arrow-up-fill"></i> Enregistrer
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- JSON PREVIEW -->
-  <div class="card" id="json-preview-section">
-    <div class="card-head">
-      <div class="step-num step-num-complete">✓</div>
-      <h3>Aperçu du fichier JSON généré</h3>
-    </div>
-    <div class="card-body">
-      <pre id="json-output"></pre>
-    </div>
-  </div>
+      <!-- ── ÉTAPE 3 : TABLEAU RÉCAPITULATIF ── -->
+      <div class="card mb-4" id="selected-missions-section">
+        <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
+          <span class="step-num">3</span>
+          <h5>Tableau récapitulatif des missions sélectionnées</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start gap-3 mb-3 flex-wrap">
+            <div>
+              <h6 class="page-title mb-1" style="font-size:1.05rem">Récapitulatif prêt à imprimer et à exporter</h6>
+              <p class="text-muted small mb-0">Le tableau se met à jour automatiquement.</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-info btn-sm text-white" onclick="exportSelectedMissionsExcel()">
+                <i class="bi bi-file-earmark-excel me-1"></i>Excel
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="printSelectedMissions()">
+                <i class="bi bi-printer me-1"></i>Imprimer
+              </button>
+            </div>
+          </div>
 
+          <div class="row g-2 mb-3" id="selected-missions-metrics"></div>
+
+          <div class="table-responsive">
+            <table class="table table-hover table-sm summary-table mb-0">
+              <thead>
+                <tr>
+                  <th>N°</th><th>Province</th><th>Mission</th><th>Objectif</th>
+                  <th>Prov. dest.</th><th>Territoire</th><th>Secteur</th><th>Début</th><th>Fin prévue</th><th>Nuitées</th>
+                  <th>Taux/nuit</th><th>Section</th><th>Hors projet</th><th>Projet</th>
+                  <th>Montant USD</th><th>Autres frais</th><th>Total USD</th><th>Avance USD</th><th>Solde USD</th><th>Observation</th>
+                </tr>
+              </thead>
+              <tbody id="selected-missions-body">
+                <tr><td colspan="20" class="text-center text-muted py-4">Aucune mission sélectionnée pour le moment.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      </div><!-- /#main-form-section -->
+
+      <!-- ════ VUE COMPTABLE ════ -->
+      <!-- ── Missions en attente (liste) ── -->
+      <div id="comptable-pending-section" style="display:none" class="mb-4">
+        <div class="card">
+          <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
+            <span class="step-num step-num-gold"><i class="bi bi-hourglass-split" style="font-size:.85rem"></i></span>
+            <div>
+              <h5 class="mb-0">Missions en attente — Complétion financière</h5>
+              <small class="text-muted ms-1" id="comptable-province-label"></small>
+            </div>
+            <button class="btn btn-pnda btn-sm ms-auto" onclick="loadPendingMissions()" title="Actualiser">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <p class="text-muted small mb-3">Missions soumises par les missionnaires et en attente de validation financière. Cliquez sur <strong>Compléter</strong> pour saisir la partie budgétaire.</p>
+            <div class="table-responsive">
+              <table class="table table-hover table-sm summary-table mb-0">
+                <thead>
+                  <tr><th>Date</th><th>Rapporteur</th><th>Période</th><th>Missions</th><th>Action</th></tr>
+                </thead>
+                <tbody id="pending-tbody">
+                  <tr><td colspan="5" class="text-center text-muted py-4">Chargement…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Complétion financière (formulaire) ── -->
+      <div id="comptable-completion-section" style="display:none" class="mb-4">
+        <div class="card">
+          <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
+            <span class="step-num step-num-gold"><i class="bi bi-cash-coin" style="font-size:.85rem"></i></span>
+            <div>
+              <h5 class="mb-0">Complétion financière</h5>
+              <small class="text-muted" id="completion-report-info">—</small>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm ms-auto" onclick="closeFinancialCompletion()">
+              <i class="bi bi-x-lg me-1"></i>Annuler
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info small py-2 mb-3">
+              <i class="bi bi-info-circle-fill me-1"></i>
+              Les champs <strong>Nature, Objectif, Destination et Dates</strong> sont en lecture seule (saisis par le missionnaire).
+              Remplissez les champs financiers surlignés, puis cliquez sur <strong>Activer la mission</strong>.
+            </div>
+            <div id="completion-missions-list"></div>
+            <div class="d-flex gap-2 mt-3 flex-wrap">
+              <button class="btn btn-success" onclick="saveFinancialCompletion()">
+                <i class="bi bi-lightning-charge-fill me-1"></i>Activer la mission
+              </button>
+              <button class="btn btn-outline-secondary" onclick="closeFinancialCompletion()">Annuler</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ARCHIVE ── -->
+      <div class="card mb-4" id="archive-section" style="display:none">
+        <div class="card-header card-header-pnda py-3 d-flex align-items-center gap-3">
+          <span class="step-num step-num-gold"><i class="bi bi-archive-fill" style="font-size:.85rem"></i></span>
+          <h5>Mes rapports précédents</h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted small mb-3">Retrouvez, consultez et gérez vos rapports enregistrés.</p>
+          <div class="table-responsive">
+            <table class="table table-hover table-sm summary-table mb-0">
+              <thead>
+                <tr><th>N° Seq.</th><th>Date</th><th>Période</th><th>Missions</th><th>Montant total</th><th>Statut</th><th>Action</th></tr>
+              </thead>
+              <tbody id="archive-tbody">
+                <tr><td colspan="7" class="text-center text-muted py-4">Chargement…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.py-4 -->
+  </div><!-- /.container -->
 </main>
 
-<footer>
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="footer-pnda text-center py-3">
   <strong>PNDA-SE</strong> — Programme National de Développement Agricole · Secrétariat Exécutif &nbsp;|&nbsp;
   Formulaire de Suivi des Missions Trimestriel &nbsp;|&nbsp; République Démocratique du Congo
 </footer>
 
-<div id="toast"></div>
+<!-- ══════════════ TOAST ══════════════ -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="toast" class="toast align-items-center text-bg-dark border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body fw-semibold" id="toast-body">—</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- ══════════════ SCRIPTS ══════════════ -->
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="node_modules/@supabase/supabase-js/dist/umd/supabase.js"></script>
 <script src="supabase_config.js"></script>
+
 <script>
 // ─── CLIENT SUPABASE ──────────────────────────────────────────────────────────
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ─── DONNÉES DE RÉFÉRENCE (chargées depuis Supabase) ─────────────────────────
+// ─── BOOTSTRAP COMPONENTS ─────────────────────────────────────────────────────
+const _authModal = new bootstrap.Modal(document.getElementById('authModal'));
+const _toastEl   = document.getElementById('toast');
+const _bsToast   = new bootstrap.Toast(_toastEl, { delay: 3500 });
+
+function showToast(msg) {
+  document.getElementById('toast-body').textContent = msg;
+  _bsToast.show();
+}
+
+// ─── DONNÉES DE RÉFÉRENCE ─────────────────────────────────────────────────────
 let REFERENCE = { provinces: [] };
+let TERRITOIRES = [];   // { id, province_name, name, label }
+let SECTEURS    = [];   // { id, territoire_id, name, label }
 let DATA_READY = false;
 
 const SECTIONS_PNDA = [
@@ -905,320 +555,323 @@ const SECTIONS_PNDA = [
   { val: "6", label: "6 — Administration & Finance" }
 ];
 
-// ─── AUTH ────────────────────────────────────────────────────────────────────
+const NATURE_CATEGORIES = [
+  { val: 'implementation', label: "Mission d'implémentation" },
+  { val: 'activite',       label: "Mission d'activité" },
+  { val: 'atelier',        label: 'Atelier' },
+  { val: 'autre',          label: 'Autre (à préciser)' }
+];
+
+// ─── AUTH STATE ───────────────────────────────────────────────────────────────
 let USERS = {};
+let USER_SESSION = null;
+let USER_MISSIONS_CACHE = [];
+let CURRENT_USER_ROLE = 'province'; // 'province' | 'comptable'
+let CURRENT_COMPLETION_REPORT_ID = null;
+let PENDING_REPORTS_CACHE = [];
 
-function encodePassword(password) {
-  try {
-    return window.btoa(password);
-  } catch {
-    return password;
-  }
+function encodePassword(pw) { try { return window.btoa(pw); } catch { return pw; } }
+function isPasswordMatch(account, pw) {
+  if (!account) return false;
+  const enc = encodePassword(pw);
+  return account.password === pw || account.password === enc;
 }
 
-function isPasswordMatch(account, password) {
-  if (!account) {
-    return false;
-  }
-
-  const encodedPassword = encodePassword(password);
-  return account.password === password || account.password === encodedPassword;
-}
-
+// ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   await loadReferenceData();
-  if (DATA_READY) {
-    hydrateSession();
-  }
+  if (DATA_READY) hydrateSession();
 });
 
 function getSession() {
-  try {
-    return JSON.parse(localStorage.getItem('PNDA_SESSION') || 'null');
-  } catch {
-    return null;
-  }
+  try { return JSON.parse(localStorage.getItem('PNDA_SESSION') || 'null'); } catch { return null; }
 }
-
-function clearSession() {
-  localStorage.removeItem('PNDA_SESSION');
-}
-
-function isManualLoginRequested() {
-  return new URLSearchParams(window.location.search).get('manual-login') === '1';
-}
+function clearSession() { localStorage.removeItem('PNDA_SESSION'); }
+function isManualLoginRequested() { return new URLSearchParams(window.location.search).get('manual-login') === '1'; }
 
 function applyDefaultDesktopSession() {
-  const desktopDefault = window.PNDA_DESKTOP?.defaultSession;
-  if (!desktopDefault || isManualLoginRequested()) {
-    return false;
-  }
-
-  const account = USERS[desktopDefault.user];
-  if (!account || account.role !== desktopDefault.role || !account.provinces.includes(desktopDefault.province)) {
-    return false;
-  }
-
-  localStorage.setItem('PNDA_SESSION', JSON.stringify({
-    user: desktopDefault.user,
-    role: desktopDefault.role,
-    province: desktopDefault.province,
-    authenticatedAt: new Date().toISOString()
-  }));
+  const d = window.PNDA_DESKTOP?.defaultSession;
+  if (!d || isManualLoginRequested()) return false;
+  const a = USERS[d.user];
+  if (!a || a.role !== d.role || !a.provinces.includes(d.province)) return false;
+  localStorage.setItem('PNDA_SESSION', JSON.stringify({ user: d.user, role: d.role, province: d.province, authenticatedAt: new Date().toISOString() }));
   return true;
 }
 
 function hydrateSession() {
   let session = getSession();
-  if (!session && applyDefaultDesktopSession()) {
-    session = getSession();
-  }
-
-  if (!session?.user) {
-    return;
-  }
-
+  if (!session && applyDefaultDesktopSession()) session = getSession();
+  if (!session?.user) { _authModal.show(); return; }
   const account = USERS[session.user];
-  if (!account) {
-    clearSession();
-    return;
-  }
-
-  if (account.role === 'admin') {
-    window.location.href = 'admin.html';
-    return;
-  }
-
-  if (!session.province || account.provinces === '*' || !account.provinces.includes(session.province)) {
-    clearSession();
-    return;
-  }
-
+  if (!account) { clearSession(); _authModal.show(); return; }
+  if (account.role === 'super_admin') { window.location.href = 'superadmin.html'; return; }
+  if (account.role === 'admin')       { window.location.href = 'admin.html'; return; }
+  if (!session.province || (account.provinces !== '*' && !account.provinces.includes(session.province))) { clearSession(); _authModal.show(); return; }
   openProvinceSession(session.user, session.province);
 }
 
 async function loadReferenceData() {
   try {
     const [
-      { data: provinces, error: provError },
-      { data: missions,  error: misError  },
-      { data: users,     error: usrError  }
+      { data: provinces, error: e1 },
+      { data: missions,  error: e2 },
+      { data: users,     error: e3 },
+      { data: territoires, error: e4 },
+      { data: secteurs,    error: e5 }
     ] = await Promise.all([
       db.from('provinces').select('*').order('code'),
       db.from('missions_ref').select('*').order('ordre'),
-      db.from('users').select('*')
+      db.from('users').select('*'),
+      db.from('territoires').select('*').order('name'),
+      db.from('secteurs').select('*').order('name')
     ]);
+    if (e1) throw e1; if (e2) throw e2; if (e3) throw e3;
 
-    if (provError) throw provError;
-    if (misError)  throw misError;
-    if (usrError)  throw usrError;
+    TERRITOIRES = territoires || [];
+    SECTEURS    = secteurs    || [];
 
     REFERENCE = {
       provinces: (provinces || []).map((prov) => ({
-        name:     prov.name,
-        label:    prov.label,
-        code:     prov.code,
-        missions: (missions || [])
-          .filter((m) => m.province_name === prov.name)
-          .map((m) => ({ id: m.ref_id, nature: m.nature, objectif: m.objectif || '' }))
+        name: prov.name, label: prov.label, code: prov.code,
+        missions: (missions || []).filter((m) => m.province_name === prov.name)
+          .map((m) => ({ id: m.ref_id, nature: m.nature, objectif: m.objectif || '', category: m.category || 'implementation' }))
       }))
     };
-
     USERS = {};
     (users || []).forEach((u) => {
-      USERS[u.email] = {
-        password:  u.password_b64,
-        provinces: u.provinces === null ? '*' : u.provinces,
-        role:      u.role
-      };
+      USERS[u.email] = { password: u.password_b64, provinces: u.provinces === null ? '*' : u.provinces, role: u.role };
     });
-
     DATA_READY = true;
     populateProvinceSelects();
-  } catch (error) {
-    console.error(error);
-    document.getElementById('auth-error').textContent = "Erreur de connexion à la base de données. Vérifiez supabase_config.js.";
-    document.getElementById('auth-error').style.display = 'block';
+  } catch (err) {
+    console.error(err);
+    document.getElementById('auth-error').textContent = "Erreur de connexion à la base de données.";
+    document.getElementById('auth-error').style.display = '';
     showToast("Erreur de chargement des données.");
   }
 }
 
 function populateProvinceSelects() {
-  const authSelect = document.getElementById('auth-province');
-  const formSelect = document.getElementById('f-province');
-
-  authSelect.innerHTML = '<option value="">— Sélectionner une province —</option>';
-  formSelect.innerHTML = '<option value="">— Sélectionner —</option>';
-
-  REFERENCE.provinces.forEach((province) => {
-    authSelect.appendChild(new Option(province.label, province.name));
-    formSelect.appendChild(new Option(province.label, province.name));
+  const authSel = document.getElementById('auth-province');
+  const formSel = document.getElementById('f-province');
+  authSel.innerHTML = '<option value="">— Sélectionner une province —</option>';
+  formSel.innerHTML = '<option value="">— Sélectionner —</option>';
+  REFERENCE.provinces.forEach((p) => {
+    authSel.appendChild(new Option(p.label, p.name));
+    formSel.appendChild(new Option(p.label, p.name));
   });
 }
 
-function getProvinceData(provinceName) {
-  return REFERENCE.provinces.find((province) => province.name === provinceName) || null;
+function getProvinceData(name) { return REFERENCE.provinces.find((p) => p.name === name) || null; }
+function getMissionById(prov, id) { const p = getProvinceData(prov); return p ? p.missions.find((m) => m.id === id) || null : null; }
+
+function getTerritoiresByProvince(provinceName) { return TERRITOIRES.filter((t) => t.province_name === provinceName); }
+function getSecteursByTerritoire(territoireId) { return SECTEURS.filter((s) => s.territoire_id === territoireId); }
+
+function fillTerritoireOptions(sel, provinceName) {
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Territoire —</option>';
+  getTerritoiresByProvince(provinceName).forEach((t) => {
+    const o = new Option(t.label, t.id);
+    if (t.id === cur) o.selected = true;
+    sel.appendChild(o);
+  });
 }
 
-function getMissionById(provinceName, missionId) {
-  const province = getProvinceData(provinceName);
-  if (!province) return null;
-  return province.missions.find((mission) => mission.id === missionId) || null;
+function fillSecteurOptions(sel, territoireId) {
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Secteur —</option>';
+  getSecteursByTerritoire(territoireId).forEach((s) => {
+    const o = new Option(s.label, s.id);
+    if (s.id === cur) o.selected = true;
+    sel.appendChild(o);
+  });
 }
 
-function getObjectifsForProvince(provinceName) {
-  const province = getProvinceData(provinceName);
-  if (!province) return [];
-  return [...new Set(province.missions.map((mission) => mission.objectif).filter(Boolean))];
+// ─── CALCUL NUITÉES & TAUX ───────────────────────────────────────────────────
+function calcNuitees(dateDebut, dateFin) {
+  if (!dateDebut || !dateFin) return 0;
+  const d1 = new Date(dateDebut), d2 = new Date(dateFin);
+  if (isNaN(d1) || isNaN(d2) || d2 <= d1) return 0;
+  return Math.round((d2 - d1) / 86400000); // nombre de nuits
+}
+
+/**
+ * Taux per diem selon le trajet :
+ * - UN (Kinshasa) → Kwilu         : 120 $/nuit
+ * - UN (Kinshasa) → Kasaï / Kasaï Central : 90 $/nuit
+ * - Province → Province (intérieur) : 50 $/nuit
+ * - Province → UN (Kinshasa)       : 200 $/nuit
+ */
+function getTauxByDestination(provinceOrigine, provinceDest) {
+  const orig = (provinceOrigine || '').trim();
+  const dest = (provinceDest || '').trim();
+  if (!dest) return { taux: 0, info: 'Sélectionnez la province de destination' };
+
+  // Kinshasa (UN) → provinces
+  if (orig === 'UN') {
+    if (dest === 'Kwilu') return { taux: 120, info: 'Kinshasa → Kwilu : 120 $/nuit' };
+    if (dest === 'Kasaï' || dest === 'Kasaï Central') return { taux: 90, info: 'Kinshasa → Kasaï : 90 $/nuit' };
+    if (dest === 'UN') return { taux: 0, info: 'Même province (Kinshasa)' };
+    return { taux: 50, info: `Kinshasa → ${dest} : 50 $/nuit` };
+  }
+  // Province → Kinshasa
+  if (dest === 'UN') return { taux: 200, info: `${orig} → Kinshasa : 200 $/nuit` };
+  // Province → Province (intérieur ou autre)
+  return { taux: 50, info: `${orig} → ${dest} : 50 $/nuit` };
+}
+
+function recalcMissionFinancials(row) {
+  const dateDebut  = row.querySelector('.inp-date-debut')?.value || '';
+  const dateFin    = row.querySelector('.inp-date-fin')?.value || '';
+  const origProv   = document.getElementById('f-province').value;
+  const destProv   = row.querySelector('.sel-dest-province')?.value || '';
+  const nuitees    = calcNuitees(dateDebut, dateFin);
+
+  row.querySelector('.inp-nuitees').value = nuitees;
+
+  const { taux, info } = getTauxByDestination(origProv, destProv);
+  row.querySelector('.inp-taux').value = taux;
+  row.querySelector('.inp-taux-info').textContent = info;
+
+  const montantMission = nuitees * taux;
+  row.querySelector('.inp-montant').value = montantMission;
+
+  const autresFrais = parseFloat(row.querySelector('.inp-autres-frais')?.value) || 0;
+  row.querySelector('.inp-total').value = (montantMission + autresFrais).toFixed(2);
 }
 
 function doLogin() {
   if (!DATA_READY) return;
   const province = document.getElementById('auth-province').value;
-  const user     = document.getElementById('auth-user').value.trim();
+  const user     = document.getElementById('auth-user').value.trim().toLowerCase();
   const pass     = document.getElementById('auth-pass').value;
-  const err      = document.getElementById('auth-error');
-  const normalizedUser = user.toLowerCase();
-  const account  = USERS[normalizedUser];
+  const errEl    = document.getElementById('auth-error');
+  const account  = USERS[user];
 
-  if (!isPasswordMatch(account, pass)) {
-    err.textContent = "Identifiants incorrects. Veuillez réessayer.";
-    err.style.display = 'block'; return;
-  }
-  if (account.role !== 'admin' && !province) { err.textContent = "Veuillez sélectionner une province."; err.style.display = 'block'; return; }
-  if (account.provinces !== '*' && !account.provinces.includes(province)) {
-    err.textContent = "Ce compte n'est pas autorisé pour la province sélectionnée.";
-    err.style.display = 'block'; return;
-  }
+  if (!isPasswordMatch(account, pass)) { errEl.textContent = "Identifiants incorrects."; errEl.style.display = ''; return; }
+  const isAdmin = ['admin','super_admin'].includes(account.role);
+  if (!isAdmin && !province) { errEl.textContent = "Veuillez sélectionner une province."; errEl.style.display = ''; return; }
+  if (account.provinces !== '*' && !account.provinces.includes(province)) { errEl.textContent = "Compte non autorisé pour cette province."; errEl.style.display = ''; return; }
 
-  localStorage.setItem('PNDA_SESSION', JSON.stringify({
-    user: normalizedUser,
-    role: account.role,
-    province,
-    authenticatedAt: new Date().toISOString()
-  }));
-
-  if (isManualLoginRequested()) {
-    window.history.replaceState({}, '', window.location.pathname);
-  }
-
-  if (account.role === 'admin') {
-    window.location.href = 'admin.html';
-    return;
-  }
-
-  openProvinceSession(normalizedUser, province);
+  localStorage.setItem('PNDA_SESSION', JSON.stringify({ user, role: account.role, province, authenticatedAt: new Date().toISOString() }));
+  if (isManualLoginRequested()) window.history.replaceState({}, '', window.location.pathname);
+  if (account.role === 'super_admin') { window.location.href = 'superadmin.html'; return; }
+  if (account.role === 'admin')       { window.location.href = 'admin.html'; return; }
+  document.activeElement?.blur();
+  _authModal.hide();
+  openProvinceSession(user, province);
 }
 
 function openProvinceSession(user, province) {
   const account = USERS[user];
-  document.getElementById('auth-screen').style.display = 'none';
+  CURRENT_USER_ROLE = account?.role || 'province';
+
   document.getElementById('display-user').textContent     = user.toUpperCase();
   document.getElementById('display-province').textContent  = (getProvinceData(province)?.label || province).toUpperCase();
   document.getElementById('header-province-label').textContent = getProvinceData(province)?.label || province;
-  document.getElementById('f-rapporteur').value = user;
-  document.getElementById('f-province').value   = province;
-  document.getElementById('f-province').disabled = true;
-  document.getElementById('admin-shortcut').hidden = account?.role !== 'admin';
+  document.getElementById('admin-shortcut').hidden = !['admin','super_admin'].includes(account?.role);
 
-  initPage();
+  if (CURRENT_USER_ROLE === 'comptable') {
+    // ── Mode comptable ──
+    document.getElementById('main-form-section').style.display = 'none';
+    document.getElementById('selected-missions-section').style.display = 'none';
+    document.getElementById('comptable-pending-section').style.display = '';
+    const lbl = document.getElementById('comptable-province-label');
+    if (lbl) lbl.textContent = getProvinceData(province)?.label || province;
+    loadPendingMissions(province);
+    loadUserArchive(user, province);
+  } else {
+    // ── Mode missionnaire ──
+    document.body.classList.add('mode-missionnaire');
+    document.getElementById('f-rapporteur').value = user;
+    document.getElementById('f-province').value   = province;
+    document.getElementById('f-province').disabled = true;
+    initPage();
+    loadUserArchive(user, province);
+  }
 }
 
-function changeAccount() {
-  clearSession();
-  window.location.href = 'index.html?manual-login=1';
-}
+function changeAccount() { clearSession(); window.location.href = 'index.html?manual-login=1'; }
+function goToAdmin() { window.location.href = 'admin.html'; }
 
-function goToAdmin() {
-  window.location.href = 'admin.html';
-}
+document.getElementById('auth-pass').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
 
-document.getElementById('auth-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-
-// ─── INIT ────────────────────────────────────────────────────────────────────
+// ─── PAGE INIT ────────────────────────────────────────────────────────────────
 function initPage() {
   const today = new Date();
   document.getElementById('f-date').value = today.toISOString().split('T')[0];
-  document.getElementById('header-date').textContent = today.toLocaleDateString('fr-FR', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('header-date').textContent = today.toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   updateProvinceLabel();
   addMission();
+  bindAutoSave();
 }
 
 function updateProvinceLabel() {
   const p = document.getElementById('f-province').value;
   document.getElementById('header-province-label').textContent = getProvinceData(p)?.label || '—';
-  // update all mission selects
-  document.querySelectorAll('.sel-mission').forEach(s => fillMissionOptions(s, p));
-  document.querySelectorAll('.sel-objet').forEach(s => fillObjetOptions(s, p));
-  document.querySelectorAll('.mission-row').forEach(row => syncMissionRow(row));
+  document.querySelectorAll('.mission-row').forEach((row) => {
+    const catSel = row.querySelector('.sel-nature-cat');
+    fillMissionOptions(row.querySelector('.sel-mission'), p, catSel?.value);
+    recalcMissionFinancials(row);
+    syncMissionRow(row);
+  });
   renderSelectedMissionsTable();
 }
 
-function fillMissionOptions(sel, province) {
+function fillMissionOptions(sel, province, category) {
+  if (!sel) return;
   const cur = sel.value;
   sel.innerHTML = '<option value="">— Sélectionner —</option>';
-  const opts = getProvinceData(province)?.missions || [];
-  opts.forEach((mission) => {
-    const option = new Option(`${mission.id} — ${mission.nature}`, mission.id);
-    if (mission.id === cur) option.selected = true;
-    sel.appendChild(option);
+  let opts = getProvinceData(province)?.missions || [];
+  if (category && category !== 'autre') opts = opts.filter((m) => (m.category || 'implementation') === category);
+  opts.forEach((m) => {
+    const o = new Option(m.objectif || m.id, m.id);
+    if (m.id === cur) o.selected = true;
+    sel.appendChild(o);
   });
-}
-function fillObjetOptions(sel, province) {
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">— Sélectionner —</option>';
-  const opts = getObjectifsForProvince(province);
-  opts.forEach((objectif) => {
-    const option = new Option(objectif, objectif);
-    if (objectif === cur) option.selected = true;
-    sel.appendChild(option);
-  });
-}
-
-function ensureObjectifOption(select, objectif) {
-  if (!objectif) {
-    return;
-  }
-
-  const hasOption = Array.from(select.options).some((option) => option.value === objectif);
-  if (!hasOption) {
-    select.appendChild(new Option(objectif, objectif));
-  }
 }
 
 function syncMissionRow(row) {
-  const province = document.getElementById('f-province').value;
-  const missionSelect = row.querySelector('.sel-mission');
-  const objectifSelect = row.querySelector('.sel-objet');
-  const natureInput = row.querySelector('.inp-nature');
-  const objectifInput = row.querySelector('.inp-objectif-txt');
-  const missionInfo = row.querySelector('.mission-meta');
-  const mission = getMissionById(province, missionSelect.value);
+  const province  = document.getElementById('f-province').value;
+  const catSelect = row.querySelector('.sel-nature-cat');
+  const misSelect = row.querySelector('.sel-mission');
+  const misWrap   = row.querySelector('.sel-mission-wrap');
+  const autreWrap = row.querySelector('.inp-nature-autre-wrap');
+  const objInput  = row.querySelector('.inp-objectif-txt');
+  const info      = row.querySelector('.mission-meta');
+  const category  = catSelect?.value || '';
 
-  if (!mission) {
-    objectifSelect.value = '';
-    natureInput.value = '';
-    objectifInput.value = '';
-    missionInfo.textContent = 'Sélectionnez une mission de la province choisie pour afficher son objectif de référence.';
+  if (!category) {
+    if (misWrap) misWrap.style.display = 'none';
+    if (autreWrap) autreWrap.style.display = 'none';
+    info.textContent = 'Sélectionnez d\'abord la catégorie de nature.';
     return;
   }
-
-  natureInput.value = mission.nature || '';
-
-  if (mission.objectif) {
-    ensureObjectifOption(objectifSelect, mission.objectif);
-    objectifSelect.value = mission.objectif;
-    objectifInput.value = mission.objectif;
-  } else {
-    objectifSelect.value = '';
-    objectifInput.value = '';
+  if (category === 'autre') {
+    if (misWrap) misWrap.style.display = 'none';
+    if (autreWrap) autreWrap.style.display = '';
+    objInput.placeholder = 'Décrivez l\'objectif de cette mission…';
+    info.textContent = 'Saisissez librement la nature et l\'objectif.';
+    renderSelectedMissionsTable();
+    return;
   }
-
-  missionInfo.textContent = `Mission de référence: ${mission.id} | Objectif conseillé: ${mission.objectif || 'Non renseigné'}`;
+  if (misWrap) misWrap.style.display = '';
+  if (autreWrap) autreWrap.style.display = 'none';
+  fillMissionOptions(misSelect, province, category);
+  const mission = getMissionById(province, misSelect?.value || '');
+  if (mission) {
+    if (objInput && !objInput.value) objInput.value = mission.objectif || '';
+    info.textContent = `Réf : ${mission.id} · Objectif conseillé : ${mission.objectif || 'Non renseigné'}`;
+  } else {
+    info.textContent = 'Sélectionnez la mission de référence correspondante.';
+  }
   renderSelectedMissionsTable();
 }
 
-// ─── MISSIONS ────────────────────────────────────────────────────────────────
+// ─── MISSIONS ─────────────────────────────────────────────────────────────────
 let missionCount = 0;
 
 function addMission() {
@@ -1226,440 +879,843 @@ function addMission() {
   const prov = document.getElementById('f-province').value;
   const container = document.getElementById('missions-container');
   const id = `mission-${missionCount}`;
-
   const div = document.createElement('div');
   div.className = 'mission-row';
   div.id = id;
 
   div.innerHTML = `
-    <div class="mission-row-header">
-      <div class="mission-num">${missionCount}</div>
-      <span class="mission-num-label">Mission n° ${missionCount}</span>
-      <button class="btn-remove" onclick="removeMission('${id}')">✕ Retirer</button>
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <span class="step-num" style="width:26px;height:26px;font-size:.72rem">${missionCount}</span>
+      <strong class="mission-num-label small text-uppercase" style="color:var(--pnda-green);flex:1">Mission n° ${missionCount}</strong>
+      <button class="btn btn-outline-danger btn-sm" onclick="removeMission('${id}')"><i class="bi bi-x-lg"></i> Retirer</button>
     </div>
-    <div class="grid-2">
-      <div class="field col-full">
-        <label>Nature de la mission <span class="req">*</span></label>
-        <select class="sel-mission">
-          <option value="">— Sélectionner ou saisir ci-dessous —</option>
+    <div class="row g-2">
+      <div class="col-12">
+        <label class="form-label form-label-sm">Catégorie de nature <span class="req">*</span></label>
+        <select class="form-select form-select-sm sel-nature-cat">
+          <option value="">— Sélectionner une catégorie —</option>
+          ${NATURE_CATEGORIES.map((c) => `<option value="${c.val}">${c.label}</option>`).join('')}
         </select>
       </div>
-      <div class="field col-full">
-        <label>Nature (précision / autre)</label>
-        <input type="text" class="inp-nature" placeholder="Précisez si 'Autre' ou complétez…">
+      <div class="col-12 sel-mission-wrap" style="display:none">
+        <label class="form-label form-label-sm">Mission de référence</label>
+        <select class="form-select form-select-sm sel-mission"><option value="">— Choisir la catégorie d'abord —</option></select>
       </div>
-      <div class="field col-full">
-        <label>Objectif de la mission <span class="req">*</span></label>
-        <select class="sel-objet">
-          <option value="">— Sélectionner ou saisir ci-dessous —</option>
+      <div class="col-12 inp-nature-autre-wrap" style="display:none">
+        <label class="form-label form-label-sm">Nature précisée <span class="req">*</span></label>
+        <input type="text" class="form-control form-control-sm inp-nature-autre" placeholder="Décrivez la nature…">
+      </div>
+      <div class="col-12">
+        <label class="form-label form-label-sm">Objectif <span class="req">*</span></label>
+        <input type="text" class="form-control form-control-sm inp-objectif-txt" placeholder="Objectif de la mission…">
+      </div>
+      <div class="col-12">
+        <label class="form-label form-label-sm">Lieu de la mission <span class="req">*</span></label>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label form-label-sm">Province de destination</label>
+        <select class="form-select form-select-sm sel-dest-province">
+          <option value="">— Province —</option>
+          ${REFERENCE.provinces.map((p) => '<option value="'+escapeHtml(p.name)+'">'+escapeHtml(p.label)+'</option>').join('')}
         </select>
       </div>
-      <div class="field col-full">
-        <label>Objectif (précision / autre)</label>
-        <input type="text" class="inp-objectif-txt" placeholder="Précisez si 'Autre'…">
+      <div class="col-md-4">
+        <label class="form-label form-label-sm">Territoire</label>
+        <select class="form-select form-select-sm sel-territoire">
+          <option value="">— Territoire —</option>
+        </select>
       </div>
-      <div class="field">
-        <label>Section PNDA</label>
-        <select class="sel-section">
+      <div class="col-md-4">
+        <label class="form-label form-label-sm">Secteur</label>
+        <select class="form-select form-select-sm sel-secteur">
+          <option value="">— Secteur —</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label form-label-sm">Début de mission <span class="req">*</span></label>
+        <input type="date" class="form-control form-control-sm inp-date-debut">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label form-label-sm">Fin prévue <span class="req">*</span></label>
+        <input type="date" class="form-control form-control-sm inp-date-fin">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label form-label-sm">Nuitées</label>
+        <input type="number" class="form-control form-control-sm inp-nuitees" value="0" min="0" readonly style="background:#f0ede0;font-weight:600">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label form-label-sm">Taux / nuit USD</label>
+        <input type="number" class="form-control form-control-sm inp-taux" value="0" min="0" step="0.01" readonly style="background:#f0ede0;font-weight:600">
+        <small class="text-muted inp-taux-info"></small>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label form-label-sm">Montant mission USD</label>
+        <input type="number" class="form-control form-control-sm inp-montant" value="0" min="0" step="0.01" readonly style="background:#f0ede0;font-weight:600">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label form-label-sm">Total USD</label>
+        <input type="number" class="form-control form-control-sm inp-total" value="0" min="0" step="0.01" readonly style="background:#e8f5e9;font-weight:700">
+      </div>
+      <div class="col-md-3 comptable-field">
+        <label class="form-label form-label-sm">Section PNDA</label>
+        <select class="form-select form-select-sm sel-section">
           <option value="">—</option>
-          ${SECTIONS_PNDA.map(s=>`<option value="${s.val}">${s.label}</option>`).join('')}
+          ${SECTIONS_PNDA.map((s) => `<option value="${s.val}">${s.label}</option>`).join('')}
         </select>
       </div>
-      <div class="field">
-        <label>Date de mission <span class="req">*</span></label>
-        <input type="date" class="inp-date">
+      <div class="col-md-3 comptable-field">
+        <label class="form-label form-label-sm">Hors projet</label>
+        <input type="number" class="form-control form-control-sm inp-hors-projet" value="0" min="0">
       </div>
-      <div class="field">
-        <label>Nbre participants hors projet</label>
-        <input type="number" class="inp-hors-projet" value="0" min="0">
+      <div class="col-md-3 comptable-field">
+        <label class="form-label form-label-sm">Projet</label>
+        <input type="number" class="form-control form-control-sm inp-projet" value="1" min="0">
       </div>
-      <div class="field">
-        <label>Nbre participants projet</label>
-        <input type="number" class="inp-projet" value="1" min="0">
+      <div class="col-md-3 comptable-field">
+        <label class="form-label form-label-sm">Avance USD</label>
+        <input type="number" class="form-control form-control-sm inp-avance" value="0" min="0" step="0.01">
       </div>
-      <div class="field">
-        <label>Montant (USD) <span class="req">*</span></label>
-        <input type="number" class="inp-montant" value="0" min="0" step="0.01">
+      <div class="col-md-3 comptable-field">
+        <label class="form-label form-label-sm">Autres frais USD</label>
+        <input type="number" class="form-control form-control-sm inp-autres-frais" value="0" min="0" step="0.01">
+        <small class="text-muted">100 % — à justifier</small>
       </div>
-      <div class="field">
-        <label>Avance versée (USD)</label>
-        <input type="number" class="inp-avance" value="0" min="0" step="0.01">
+      <div class="col-12">
+        <label class="form-label form-label-sm">Observation</label>
+        <textarea class="form-control form-control-sm inp-observation" rows="2" placeholder="Observations éventuelles…"></textarea>
       </div>
     </div>
-    <div class="mission-meta">Sélectionnez une mission de la province choisie pour afficher son objectif de référence.</div>
+    <div class="mission-meta mt-2">Sélectionnez d'abord la catégorie de nature.</div>
   `;
 
   container.appendChild(div);
-
-  const selMission = div.querySelector('.sel-mission');
-  const selObjet   = div.querySelector('.sel-objet');
-  fillMissionOptions(selMission, prov);
-  fillObjetOptions(selObjet, prov);
-  selMission.addEventListener('change', () => syncMissionRow(div));
+  const catSel  = div.querySelector('.sel-nature-cat');
+  const misSel  = div.querySelector('.sel-mission');
+  const destProvSel = div.querySelector('.sel-dest-province');
+  const terrSel = div.querySelector('.sel-territoire');
+  const sectSel = div.querySelector('.sel-secteur');
+  catSel.addEventListener('change', () => syncMissionRow(div));
+  misSel.addEventListener('change', () => {
+    const obj = div.querySelector('.inp-objectif-txt');
+    const m = getMissionById(document.getElementById('f-province').value, misSel.value);
+    if (m && obj && !obj.value) obj.value = m.objectif || '';
+    renderSelectedMissionsTable();
+  });
+  destProvSel.addEventListener('change', () => {
+    const destProv = destProvSel.value;
+    fillTerritoireOptions(terrSel, destProv);
+    sectSel.innerHTML = '<option value="">— Secteur —</option>';
+    recalcMissionFinancials(div);
+    renderSelectedMissionsTable();
+  });
+  terrSel.addEventListener('change', () => {
+    fillSecteurOptions(sectSel, terrSel.value);
+    recalcMissionFinancials(div);
+    renderSelectedMissionsTable();
+  });
+  sectSel.addEventListener('change', renderSelectedMissionsTable);
+  div.querySelector('.inp-date-debut').addEventListener('change', () => { recalcMissionFinancials(div); renderSelectedMissionsTable(); });
+  div.querySelector('.inp-date-fin').addEventListener('change', () => { recalcMissionFinancials(div); renderSelectedMissionsTable(); });
+  div.querySelector('.inp-autres-frais').addEventListener('input', () => { recalcMissionFinancials(div); renderSelectedMissionsTable(); });
+  // Default destination province = user's province
+  destProvSel.value = prov;
+  fillTerritoireOptions(terrSel, prov);
   bindMissionRowListeners(div);
   syncMissionRow(div);
+  // Lock financial fields for missionnaire role
+  if (CURRENT_USER_ROLE !== 'comptable') {
+    div.querySelectorAll('.comptable-field input, .comptable-field select').forEach((el) => {
+      el.disabled = true;
+      el.tabIndex = -1;
+    });
+  }
   renumberMissions();
   renderSelectedMissionsTable();
 }
 
-function removeMission(id) {
-  const el = document.getElementById(id);
-  if (el) el.remove();
-  renumberMissions();
-  renderSelectedMissionsTable();
-}
+function removeMission(id) { const el = document.getElementById(id); if (el) el.remove(); renumberMissions(); renderSelectedMissionsTable(); }
 
 function renumberMissions() {
   document.querySelectorAll('.mission-row').forEach((row, i) => {
-    row.querySelector('.mission-num').textContent = i + 1;
-    row.querySelector('.mission-num-label').textContent = `Mission n° ${i + 1}`;
+    const num = row.querySelector('.step-num'); if (num) num.textContent = i + 1;
+    const lbl = row.querySelector('.mission-num-label'); if (lbl) lbl.textContent = `Mission n° ${i + 1}`;
   });
 }
 
 function bindMissionRowListeners(row) {
-  row.querySelectorAll('input, select, textarea').forEach((field) => {
-    const eventName = field.tagName === 'SELECT' ? 'change' : 'input';
-    field.addEventListener(eventName, renderSelectedMissionsTable);
+  row.querySelectorAll('input, select, textarea').forEach((f) => {
+    const ev = f.tagName === 'SELECT' ? 'change' : 'input';
+    f.addEventListener(ev, renderSelectedMissionsTable);
+    f.addEventListener(ev, scheduleAutoSave);
   });
 }
 
-// ─── SECTION numéro auto ────────────────────────────────────────────────────
 function getMissionNum(prov, idx) {
   const sec = getProvinceData(prov)?.code || "1";
   return `${sec}.${idx + 1}`;
 }
 
-// ─── JSON ─────────────────────────────────────────────────────────────────────
+// ─── BUILD DATA ────────────────────────────────────────────────────────────────
 function buildData() {
   const province = document.getElementById('f-province').value;
   const provinceData = getProvinceData(province);
   const rows = document.querySelectorAll('.mission-row');
   const missions = [];
+  const CAT_LABELS = { implementation: "Mission d'implémentation", activite: "Mission d'activité", atelier: "Atelier" };
 
   rows.forEach((row, i) => {
-    const selMissionId = row.querySelector('.sel-mission').value;
-    const inpNature   = row.querySelector('.inp-nature').value.trim();
-    const selObjet    = row.querySelector('.sel-objet').value;
-    const inpObj      = row.querySelector('.inp-objectif-txt').value.trim();
-    const missionRef  = getMissionById(province, selMissionId);
-    const nature      = inpNature || missionRef?.nature || "";
-    const objectif    = inpObj || selObjet || missionRef?.objectif || "";
+    const category = row.querySelector('.sel-nature-cat')?.value || '';
+    const isAutre  = category === 'autre';
+    const selId    = isAutre ? '' : (row.querySelector('.sel-mission')?.value || '');
+    const nature   = isAutre ? (row.querySelector('.inp-nature-autre')?.value.trim() || 'Autre') : (CAT_LABELS[category] || '');
+    const objectif = row.querySelector('.inp-objectif-txt')?.value.trim() || (!isAutre && getMissionById(province, selId)?.objectif) || '';
+    const montant  = parseFloat(row.querySelector('.inp-montant').value) || 0;
+    const avance   = parseFloat(row.querySelector('.inp-avance').value)  || 0;
+    const nuitees  = parseInt(row.querySelector('.inp-nuitees').value) || 0;
+    const taux     = parseFloat(row.querySelector('.inp-taux').value) || 0;
+    const autresFrais = parseFloat(row.querySelector('.inp-autres-frais').value) || 0;
+    const total    = montant + autresFrais;
 
-    const montant = parseFloat(row.querySelector('.inp-montant').value) || 0;
-    const avance  = parseFloat(row.querySelector('.inp-avance').value) || 0;
+    const terrId   = row.querySelector('.sel-territoire')?.value || '';
+    const sectId   = row.querySelector('.sel-secteur')?.value || '';
+    const terrObj  = TERRITOIRES.find((t) => t.id === terrId);
+    const sectObj  = SECTEURS.find((s) => s.id === sectId);
+    const destProv = row.querySelector('.sel-dest-province')?.value || '';
+    const destProvData = getProvinceData(destProv);
 
     missions.push({
-      numero:        getMissionNum(province, i),
-      mission_reference_id: selMissionId || "",
-      section:       row.querySelector('.sel-section').value || "",
-      nature:        nature,
-      objectif:      objectif,
-      date:          row.querySelector('.inp-date').value || "",
-      hors_projet:   parseInt(row.querySelector('.inp-hors-projet').value) || 0,
-      projet:        parseInt(row.querySelector('.inp-projet').value) || 0,
-      montant_usd: montant,
-      avance_usd: avance,
-      solde_usd: montant - avance
+      numero: getMissionNum(province, i), mission_reference_id: selId, category, section: row.querySelector('.sel-section').value || '',
+      nature, objectif,
+      date_debut: row.querySelector('.inp-date-debut').value || '',
+      date_fin:   row.querySelector('.inp-date-fin').value   || '',
+      destination_province: destProv, destination_province_label: destProvData?.label || destProv,
+      territoire_id: terrId, territoire_label: terrObj?.label || '',
+      secteur_id: sectId, secteur_label: sectObj?.label || '',
+      observation: row.querySelector('.inp-observation')?.value.trim() || '',
+      hors_projet: parseInt(row.querySelector('.inp-hors-projet').value) || 0,
+      projet: parseInt(row.querySelector('.inp-projet').value) || 0,
+      nuitees, taux_per_diem: taux, montant_usd: montant, autres_frais_usd: autresFrais,
+      total_usd: total, avance_usd: avance, solde_usd: total - avance
     });
   });
 
   return {
     meta: {
-      systeme:   "PNDA-SE",
-      titre:     `Suivi des Missions ${document.getElementById('f-trimestre').value} ${document.getElementById('f-annee').value}`,
-      province:  province,
-      province_label: provinceData?.label || province,
-      province_code: provinceData?.code || '',
+      systeme: "PNDA-SE",
+      titre: `Suivi des Missions ${document.getElementById('f-trimestre').value} ${document.getElementById('f-annee').value}`,
+      province, province_label: provinceData?.label || province, province_code: provinceData?.code || '',
       trimestre: document.getElementById('f-trimestre').value,
-      annee:     parseInt(document.getElementById('f-annee').value),
-      rapporteur:document.getElementById('f-rapporteur').value.trim(),
-      role:      document.getElementById('f-role').value.trim(),
+      annee: parseInt(document.getElementById('f-annee').value),
+      rapporteur: document.getElementById('f-rapporteur').value.trim(),
+      role: document.getElementById('f-role').value.trim(),
       date_generation: document.getElementById('f-date').value,
       total_missions: missions.length,
       total_montant_usd: missions.reduce((s, m) => s + m.montant_usd, 0).toFixed(2),
+      total_autres_frais_usd: missions.reduce((s, m) => s + m.autres_frais_usd, 0).toFixed(2),
+      total_general_usd: missions.reduce((s, m) => s + m.total_usd, 0).toFixed(2),
       total_avance_usd:  missions.reduce((s, m) => s + m.avance_usd, 0).toFixed(2),
       total_solde_usd:   missions.reduce((s, m) => s + parseFloat(m.solde_usd), 0).toFixed(2)
     },
-    missions: missions
+    missions
   };
 }
 
-function formatCurrencyDisplay(value) {
-  return new Intl.NumberFormat('fr-FR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(Number(value || 0));
-}
-
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+// ─── RENDER TABLE ──────────────────────────────────────────────────────────────
+function formatCurrencyDisplay(v) { return new Intl.NumberFormat('fr-FR', { minimumFractionDigits:2, maximumFractionDigits:2 }).format(Number(v||0)); }
+function escapeHtml(v) { return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 function renderSelectedMissionsTable() {
   const data = buildData();
   const body = document.getElementById('selected-missions-body');
   const metrics = document.getElementById('selected-missions-metrics');
-  const provinceLabel = getProvinceData(data.meta.province)?.label || data.meta.province || '—';
-  const totalMontant = data.missions.reduce((sum, mission) => sum + Number(mission.montant_usd || 0), 0);
-  const totalAvance = data.missions.reduce((sum, mission) => sum + Number(mission.avance_usd || 0), 0);
-  const totalSolde = data.missions.reduce((sum, mission) => sum + Number(mission.solde_usd || 0), 0);
+  const pLabel = getProvinceData(data.meta.province)?.label || data.meta.province || '—';
+  const totM = data.missions.reduce((s, m) => s + Number(m.montant_usd||0), 0);
+  const totAF = data.missions.reduce((s, m) => s + Number(m.autres_frais_usd||0), 0);
+  const totT = data.missions.reduce((s, m) => s + Number(m.total_usd||0), 0);
+  const totA = data.missions.reduce((s, m) => s + Number(m.avance_usd||0), 0);
+  const totS = data.missions.reduce((s, m) => s + Number(m.solde_usd||0), 0);
 
   metrics.innerHTML = [
-    { label: 'Province', value: provinceLabel },
-    { label: 'Missions', value: String(data.missions.length) },
-    { label: 'Montant total USD', value: formatCurrencyDisplay(totalMontant) },
-    { label: 'Solde total USD', value: formatCurrencyDisplay(totalSolde) }
+    { label: 'Province', value: pLabel, icon: 'bi-geo-alt' },
+    { label: 'Missions', value: String(data.missions.length), icon: 'bi-list-check' },
+    { label: 'Total général USD', value: formatCurrencyDisplay(totT), icon: 'bi-cash-stack' },
+    { label: 'Solde total USD', value: formatCurrencyDisplay(totS), icon: 'bi-wallet2' }
   ].map((item) => `
-    <div class="summary-metric">
-      <span>${escapeHtml(item.label)}</span>
-      <strong>${escapeHtml(item.value)}</strong>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body py-2 px-3">
+          <div class="text-muted small fw-semibold text-uppercase" style="font-size:.68rem;letter-spacing:.8px">${escapeHtml(item.label)}</div>
+          <span class="stat-value">${escapeHtml(item.value)}</span>
+        </div>
+      </div>
     </div>
   `).join('');
 
   if (!data.missions.length) {
-    body.innerHTML = '<tr><td colspan="11" class="summary-empty">Aucune mission sélectionnée pour le moment.</td></tr>';
+    body.innerHTML = '<tr><td colspan="20" class="text-center text-muted py-4">Aucune mission sélectionnée.</td></tr>';
     return;
   }
-
-  body.innerHTML = data.missions.map((mission) => `
+  body.innerHTML = data.missions.map((m) => `
     <tr>
-      <td>${escapeHtml(mission.numero || '—')}</td>
-      <td>${escapeHtml(provinceLabel)}</td>
-      <td>${escapeHtml(mission.nature || '—')}</td>
-      <td>${escapeHtml(mission.objectif || '—')}</td>
-      <td>${escapeHtml(mission.date || '—')}</td>
-      <td>${escapeHtml(mission.section || '—')}</td>
-      <td class="numeric">${escapeHtml(String(mission.hors_projet || 0))}</td>
-      <td class="numeric">${escapeHtml(String(mission.projet || 0))}</td>
-      <td class="numeric">${escapeHtml(formatCurrencyDisplay(mission.montant_usd))}</td>
-      <td class="numeric">${escapeHtml(formatCurrencyDisplay(mission.avance_usd))}</td>
-      <td class="numeric">${escapeHtml(formatCurrencyDisplay(mission.solde_usd))}</td>
+      <td>${escapeHtml(m.numero||'—')}</td><td>${escapeHtml(pLabel)}</td>
+      <td>${escapeHtml(m.nature||'—')}</td><td>${escapeHtml(m.objectif||'—')}</td>
+      <td>${escapeHtml(m.destination_province_label||'—')}</td><td>${escapeHtml(m.territoire_label||'—')}</td><td>${escapeHtml(m.secteur_label||'—')}</td>
+      <td>${escapeHtml(m.date_debut||'—')}</td><td>${escapeHtml(m.date_fin||'—')}</td>
+      <td class="text-end">${m.nuitees||0}</td>
+      <td class="text-end">${escapeHtml(formatCurrencyDisplay(m.taux_per_diem))}</td>
+      <td>${escapeHtml(m.section||'—')}</td>
+      <td class="text-end">${m.hors_projet||0}</td><td class="text-end">${m.projet||0}</td>
+      <td class="text-end">${escapeHtml(formatCurrencyDisplay(m.montant_usd))}</td>
+      <td class="text-end">${escapeHtml(formatCurrencyDisplay(m.autres_frais_usd))}</td>
+      <td class="text-end fw-bold">${escapeHtml(formatCurrencyDisplay(m.total_usd))}</td>
+      <td class="text-end">${escapeHtml(formatCurrencyDisplay(m.avance_usd))}</td>
+      <td class="text-end">${escapeHtml(formatCurrencyDisplay(m.solde_usd))}</td>
+      <td class="small">${escapeHtml(m.observation||'')}</td>
     </tr>
   `).join('');
 }
 
-function buildSelectedMissionsWorkbookXml(data) {
-  const provinceLabel = getProvinceData(data.meta.province)?.label || data.meta.province || '—';
-  const rows = [
-    [{ value: 'PNDA-SE - Budget des missions', style: 'title', mergeAcross: 10 }],
-    [{ value: 'Province', style: 'header' }, { value: provinceLabel, style: 'text' }],
-    [{ value: 'Trimestre', style: 'header' }, { value: `${data.meta.trimestre || '—'} ${data.meta.annee || ''}`.trim(), style: 'text' }],
-    [{ value: 'Rapporteur', style: 'header' }, { value: data.meta.rapporteur || '—', style: 'text' }],
-    [{ value: 'Date génération', style: 'header' }, { value: data.meta.date_generation || '—', style: 'text' }],
-    [],
-    [
-      { value: 'N°', style: 'header' },
-      { value: 'Province', style: 'header' },
-      { value: 'Mission', style: 'header' },
-      { value: 'Objectif', style: 'header' },
-      { value: 'Date', style: 'header' },
-      { value: 'Section', style: 'header' },
-      { value: 'Hors projet', style: 'header' },
-      { value: 'Projet', style: 'header' },
-      { value: 'Montant USD', style: 'header' },
-      { value: 'Avance USD', style: 'header' },
-      { value: 'Solde USD', style: 'header' }
-    ],
-    ...data.missions.map((mission) => [
-      { value: mission.numero || '—', style: 'text' },
-      { value: provinceLabel, style: 'text' },
-      { value: mission.nature || '—', style: 'text' },
-      { value: mission.objectif || '—', style: 'text' },
-      { value: mission.date || '—', style: 'text' },
-      { value: mission.section || '—', style: 'text' },
-      { value: Number(mission.hors_projet || 0), type: 'Number', style: 'integer' },
-      { value: Number(mission.projet || 0), type: 'Number', style: 'integer' },
-      { value: Number(mission.montant_usd || 0), type: 'Number', style: 'currency' },
-      { value: Number(mission.avance_usd || 0), type: 'Number', style: 'currency' },
-      { value: Number(mission.solde_usd || 0), type: 'Number', style: 'currency' }
-    ])
-  ];
-
-  return [
-    '<?xml version="1.0" encoding="UTF-8"?>',
-    '<?mso-application progid="Excel.Sheet"?>',
-    '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"',
-    ' xmlns:o="urn:schemas-microsoft-com:office:office"',
-    ' xmlns:x="urn:schemas-microsoft-com:office:excel"',
-    ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"',
-    ' xmlns:html="http://www.w3.org/TR/REC-html40">',
-    '<Styles>',
-    '<Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="11"/></Style>',
-    '<Style ss:ID="title"><Alignment ss:Vertical="Center" ss:WrapText="1"/><Font ss:Bold="1" ss:Size="14" ss:Color="#123524"/><Interior ss:Color="#DCEEE2" ss:Pattern="Solid"/></Style>',
-    '<Style ss:ID="header"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:Bold="1" ss:Color="#123524"/><Interior ss:Color="#B8D7C1" ss:Pattern="Solid"/></Style>',
-    '<Style ss:ID="text"><Alignment ss:Vertical="Top" ss:WrapText="1"/></Style>',
-    '<Style ss:ID="integer"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><NumberFormat ss:Format="0"/></Style>',
-    '<Style ss:ID="currency"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><NumberFormat ss:Format="# ##0,00"/></Style>',
-    '</Styles>',
-    '<Worksheet ss:Name="Budget_Missions">',
-    '<WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><PageSetup><Layout x:Orientation="Landscape"/></PageSetup><FitToPage/><Print><ValidPrinterInfo/><PaperSizeIndex>9</PaperSizeIndex><FitWidth>1</FitWidth><FitHeight>0</FitHeight></Print></WorksheetOptions>',
-    '<Table>',
-    '<Column ss:AutoFitWidth="0" ss:Width="90"/><Column ss:AutoFitWidth="0" ss:Width="130"/><Column ss:AutoFitWidth="0" ss:Width="220"/><Column ss:AutoFitWidth="0" ss:Width="220"/><Column ss:AutoFitWidth="0" ss:Width="90"/><Column ss:AutoFitWidth="0" ss:Width="90"/><Column ss:AutoFitWidth="0" ss:Width="90"/><Column ss:AutoFitWidth="0" ss:Width="90"/><Column ss:AutoFitWidth="0" ss:Width="95"/><Column ss:AutoFitWidth="0" ss:Width="95"/><Column ss:AutoFitWidth="0" ss:Width="95"/>',
-    rows.map((row) => `<Row>${row.map((cell) => buildWorkbookCellXml(cell)).join('')}</Row>`).join(''),
-    '</Table>',
-    '</Worksheet>',
-    '</Workbook>'
-  ].join('');
-}
-
+// ─── EXCEL EXPORT ──────────────────────────────────────────────────────────────
 function buildWorkbookCellXml(cell) {
-  if (!cell) {
-    return '<Cell><Data ss:Type="String"></Data></Cell>';
-  }
-
+  if (!cell) return '<Cell><Data ss:Type="String"></Data></Cell>';
   const type = cell.type || (typeof cell.value === 'number' ? 'Number' : 'String');
   const style = cell.style ? ` ss:StyleID="${cell.style}"` : '';
-  const mergeAcross = Number.isInteger(cell.mergeAcross) && cell.mergeAcross > 0 ? ` ss:MergeAcross="${cell.mergeAcross}"` : '';
-  return `<Cell${style}${mergeAcross}><Data ss:Type="${type}">${escapeHtml(cell.value)}</Data></Cell>`;
+  const merge = Number.isInteger(cell.mergeAcross) && cell.mergeAcross > 0 ? ` ss:MergeAcross="${cell.mergeAcross}"` : '';
+  return `<Cell${style}${merge}><Data ss:Type="${type}">${escapeHtml(cell.value)}</Data></Cell>`;
+}
+
+function buildSelectedMissionsWorkbookXml(data) {
+  const pLabel = getProvinceData(data.meta.province)?.label || data.meta.province || '—';
+  const rows = [
+    [{ value: 'PNDA-SE - Budget des missions', style: 'title', mergeAcross: 19 }],
+    [{ value: 'Province', style: 'header' }, { value: pLabel, style: 'text' }],
+    [{ value: 'Trimestre', style: 'header' }, { value: `${data.meta.trimestre||''} ${data.meta.annee||''}`.trim(), style: 'text' }],
+    [{ value: 'Rapporteur', style: 'header' }, { value: data.meta.rapporteur||'—', style: 'text' }],
+    [{ value: 'Date', style: 'header' }, { value: data.meta.date_generation||'—', style: 'text' }],
+    [],
+    [{ value:'N°',style:'header' },{ value:'Province',style:'header' },{ value:'Mission',style:'header' },{ value:'Objectif',style:'header' },
+     { value:'Prov. dest.',style:'header' },{ value:'Territoire',style:'header' },{ value:'Secteur',style:'header' },
+     { value:'Début',style:'header' },{ value:'Fin prévue',style:'header' },{ value:'Nuitées',style:'header' },
+     { value:'Taux/nuit',style:'header' },
+     { value:'Section',style:'header' },{ value:'Hors projet',style:'header' },{ value:'Projet',style:'header' },
+     { value:'Montant USD',style:'header' },{ value:'Autres frais',style:'header' },{ value:'Total USD',style:'header' },
+     { value:'Avance USD',style:'header' },{ value:'Solde USD',style:'header' },
+     { value:'Observation',style:'header' }],
+    ...data.missions.map((m) => [
+      { value:m.numero||'—',style:'text' },{ value:pLabel,style:'text' },{ value:m.nature||'—',style:'text' },
+      { value:m.objectif||'—',style:'text' },
+      { value:m.destination_province_label||'—',style:'text' },{ value:m.territoire_label||'—',style:'text' },{ value:m.secteur_label||'—',style:'text' },
+      { value:m.date_debut||'—',style:'text' },{ value:m.date_fin||'—',style:'text' },
+      { value:Number(m.nuitees||0),type:'Number',style:'integer' },
+      { value:Number(m.taux_per_diem||0),type:'Number',style:'currency' },
+      { value:m.section||'—',style:'text' },
+      { value:Number(m.hors_projet||0),type:'Number',style:'integer' },{ value:Number(m.projet||0),type:'Number',style:'integer' },
+      { value:Number(m.montant_usd||0),type:'Number',style:'currency' },
+      { value:Number(m.autres_frais_usd||0),type:'Number',style:'currency' },
+      { value:Number(m.total_usd||0),type:'Number',style:'currency' },
+      { value:Number(m.avance_usd||0),type:'Number',style:'currency' },
+      { value:Number(m.solde_usd||0),type:'Number',style:'currency' },
+      { value:m.observation||'',style:'text' }
+    ])
+  ];
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>','<?mso-application progid="Excel.Sheet"?>',
+    '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"',
+    ' xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:html="http://www.w3.org/TR/REC-html40">',
+    '<Styles>',
+    '<Style ss:ID="Default"><Font ss:FontName="Calibri" ss:Size="11"/></Style>',
+    '<Style ss:ID="title"><Font ss:Bold="1" ss:Size="14" ss:Color="#123524"/><Interior ss:Color="#DCEEE2" ss:Pattern="Solid"/></Style>',
+    '<Style ss:ID="header"><Alignment ss:Horizontal="Center" ss:WrapText="1"/><Font ss:Bold="1" ss:Color="#123524"/><Interior ss:Color="#B8D7C1" ss:Pattern="Solid"/></Style>',
+    '<Style ss:ID="text"><Alignment ss:WrapText="1"/></Style>',
+    '<Style ss:ID="integer"><Alignment ss:Horizontal="Right"/><NumberFormat ss:Format="0"/></Style>',
+    '<Style ss:ID="currency"><Alignment ss:Horizontal="Right"/><NumberFormat ss:Format="# ##0,00"/></Style>',
+    '</Styles>',
+    '<Worksheet ss:Name="Budget_Missions"><Table>',
+    rows.map((r) => `<Row>${r.map((c) => buildWorkbookCellXml(c)).join('')}</Row>`).join(''),
+    '</Table></Worksheet></Workbook>'
+  ].join('');
 }
 
 async function exportSelectedMissionsExcel() {
   const data = buildData();
-  const provinceKey = (data.meta.province || 'province').replace(/\s/g, '_');
+  const pk = (data.meta.province||'province').replace(/\s/g,'_');
   const content = buildSelectedMissionsWorkbookXml(data);
-  const fileName = `PNDA_budget_missions_${data.meta.trimestre}_${data.meta.annee}_${provinceKey}.xls`;
-
+  const fname = `PNDA_budget_missions_${data.meta.trimestre}_${data.meta.annee}_${pk}.xls`;
   if (window.PNDA_DESKTOP?.saveFile) {
-    const result = await saveFileDesktop({
-      title: 'Enregistrer le tableau des missions',
-      defaultPath: fileName,
-      filters: [{ name: 'Fichiers Excel', extensions: ['xls'] }],
-      content
-    });
-
-    if (!result.canceled) {
-      showToast(`✓ Tableau Excel enregistré : ${result.filePath}`);
-    }
+    const r = await window.PNDA_DESKTOP.saveFile({ title:'Enregistrer Excel', defaultPath:fname, filters:[{name:'Excel',extensions:['xls']}], content });
+    if (!r.canceled) showToast(`✓ Excel enregistré : ${r.filePath}`);
     return;
   }
-
-  const blob = new Blob([content], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+  const blob = new Blob([content], { type:'application/vnd.ms-excel;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = fileName;
-  link.click();
+  const a = document.createElement('a'); a.href = url; a.download = fname; a.click();
   URL.revokeObjectURL(url);
   showToast('✓ Tableau Excel téléchargé.');
 }
 
-function printSelectedMissions() {
-  renderSelectedMissionsTable();
-  window.print();
-}
+function printSelectedMissions() { renderSelectedMissionsTable(); window.print(); }
 
-function stableStringify(value) {
-  if (Array.isArray(value)) {
-    return `[${value.map((item) => stableStringify(item)).join(',')}]`;
-  }
-
-  if (value && typeof value === 'object') {
-    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(',')}}`;
-  }
-
-  return JSON.stringify(value);
+// ─── JSON OPERATIONS ──────────────────────────────────────────────────────────
+function stableStringify(v) {
+  if (Array.isArray(v)) return `[${v.map(stableStringify).join(',')}]`;
+  if (v && typeof v === 'object') return `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${stableStringify(v[k])}`).join(',')}}`;
+  return JSON.stringify(v);
 }
 
 async function persistReport(data) {
-  const fingerprintKey = 'PNDA_LAST_REPORT_FINGERPRINT';
-  const fingerprint = stableStringify(data);
-  if (sessionStorage.getItem(fingerprintKey) === fingerprint) return;
-
-  const reportId = `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+  const fpKey = 'PNDA_LAST_REPORT_FINGERPRINT';
+  const fp = stableStringify(data);
+  if (sessionStorage.getItem(fpKey) === fp) return;
+  const rid = `${Date.now()}-${Math.random().toString(16).slice(2,8)}`;
   try {
+    const seq = await getNextSeqNumber(data.meta.province, data.meta.trimestre, data.meta.annee);
     const { error } = await db.from('reports').insert({
-      id:              reportId,
-      saved_at:        new Date().toISOString(),
-      source:          'formulaire-html',
-      province:        data.meta.province,
-      province_label:  data.meta.province_label,
-      province_code:   data.meta.province_code,
-      trimestre:       data.meta.trimestre,
-      annee:           data.meta.annee,
-      rapporteur:      data.meta.rapporteur,
-      rapporteur_role: data.meta.role,
-      date_generation: data.meta.date_generation || null,
-      missions:        data.missions,
-      meta:            data.meta
+      id: rid, saved_at: new Date().toISOString(), source: 'formulaire-html',
+      province: data.meta.province, province_label: data.meta.province_label,
+      province_code: data.meta.province_code, trimestre: data.meta.trimestre,
+      annee: data.meta.annee, rapporteur: data.meta.rapporteur,
+      rapporteur_role: data.meta.role, date_generation: data.meta.date_generation || null,
+      missions: data.missions, meta: { ...data.meta, seq_number: seq }, seq_number: seq,
+      statut: 'en_attente'
     });
-    if (error) throw error;
-    sessionStorage.setItem(fingerprintKey, fingerprint);
-    window.dispatchEvent(new Event('PNDA_DATA_UPDATED'));
-  } catch (error) {
-    console.error('Erreur enregistrement Supabase:', error);
-    showToast('Erreur de sauvegarde en base de données.');
-  }
-}
-
-async function storeReport(data) {
-  await persistReport(data);
-}
-
-async function saveFileDesktop(options) {
-  if (!window.PNDA_DESKTOP?.saveFile) {
-    return { canceled: true, unsupported: true };
-  }
-
-  return window.PNDA_DESKTOP.saveFile(options);
-}
-
-async function generateJSON() {
-  const data = buildData();
-  await storeReport(data);
-  const json = JSON.stringify(data, null, 2);
-  document.getElementById('json-output').textContent = json;
-  const sec = document.getElementById('json-preview-section');
-  sec.style.display = 'block';
-  sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  showToast("✓ JSON généré avec succès !");
-}
-
-async function downloadJSON() {
-  const data = buildData();
-  await storeReport(data);
-  const json = JSON.stringify(data, null, 2);
-  const prov = (data.meta.province || 'province').replace(/\s/g, '_');
-  const fname = `PNDA_missions_${data.meta.trimestre}_${data.meta.annee}_${prov}.json`;
-
-  if (window.PNDA_DESKTOP?.saveFile) {
-    const result = await saveFileDesktop({
-      title: 'Enregistrer le rapport JSON',
-      defaultPath: fname,
-      filters: [{ name: 'Fichiers JSON', extensions: ['json'] }],
-      content: json
-    });
-
-    if (!result.canceled) {
-      showToast(`✓ Fichier enregistré : ${result.filePath}`);
+    if (error) {
+      // If statut column doesn't exist yet (migration not run), retry without it
+      if (error.code === 'PGRST204' || (error.message && error.message.includes('statut'))) {
+        const { error: e2 } = await db.from('reports').insert({
+          id: rid, saved_at: new Date().toISOString(), source: 'formulaire-html',
+          province: data.meta.province, province_label: data.meta.province_label,
+          province_code: data.meta.province_code, trimestre: data.meta.trimestre,
+          annee: data.meta.annee, rapporteur: data.meta.rapporteur,
+          rapporteur_role: data.meta.role, date_generation: data.meta.date_generation || null,
+          missions: data.missions, meta: { ...data.meta, seq_number: seq }, seq_number: seq
+        });
+        if (e2) throw e2;
+      } else { throw error; }
     }
-    return;
+    sessionStorage.setItem(fpKey, fp);
+    window.dispatchEvent(new Event('PNDA_DATA_UPDATED'));
+    return true;
+  } catch (e) { console.error(e); showToast('Erreur de sauvegarde.'); return false; }
+}
+
+async function enregistrerMissions() {
+  const data = buildData();
+  if (!data.missions.length) { showToast('Ajoutez au moins une mission.'); return; }
+  const btn = document.getElementById('btn-enregistrer');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enregistrement…';
+  try {
+    const ok = await persistReport(data);
+    if (ok) {
+      showToast('✓ Mission soumise en attente de validation financière !');
+      const user = document.getElementById('f-rapporteur').value;
+      await loadUserArchive(user, data.meta.province);
+      updateNotifBadge();
+      // Reset form for next mission entry
+      sessionStorage.removeItem('PNDA_LAST_REPORT_FINGERPRINT');
+    }
+  } finally {
+    btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-arrow-up-fill"></i> Enregistrer';
+  }
+}
+
+function updateNotifBadge() {
+  const count = USER_MISSIONS_CACHE?.length || 0;
+  const badge = document.getElementById('notif-badge');
+  if (!badge) return;
+  if (count > 0) { badge.style.display = ''; badge.textContent = count; }
+  else { badge.style.display = 'none'; }
+}
+
+// ─── SEQ NUMBER ────────────────────────────────────────────────────────────────
+async function getNextSeqNumber(province, trimestre, annee) {
+  try {
+    const { data, error } = await db.from('reports').select('seq_number')
+      .eq('province', province).eq('trimestre', trimestre).eq('annee', annee)
+      .order('seq_number', { ascending: false }).limit(1);
+    if (error) return 1;
+    return ((data?.[0]?.seq_number) || 0) + 1;
+  } catch { return 1; }
+}
+
+// ─── ARCHIVE ──────────────────────────────────────────────────────────────────
+async function loadUserArchive(rapporteur, province) {
+  const section = document.getElementById('archive-section');
+  const tbody   = document.getElementById('archive-tbody');
+  if (!section || !tbody) return;
+  const prov = province || document.getElementById('f-province')?.value;
+  tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Chargement…</td></tr>';
+  section.style.display = '';
+  try {
+    let query = db.from('reports')
+      .select('id, saved_at, trimestre, annee, seq_number, meta, missions, statut, rapporteur')
+      .eq('province', prov)
+      .order('saved_at', { ascending: false }).limit(50);
+    // For missionnaire: show their own reports. For comptable: show activee/realisee they handled.
+    if (CURRENT_USER_ROLE !== 'comptable') {
+      query = query.eq('rapporteur', rapporteur);
+    }
+    let { data, error } = await query;
+    // Fallback: if statut column doesn't exist yet (migration pending), retry without it
+    if (error) {
+      const fallback = await db.from('reports')
+        .select('id, saved_at, trimestre, annee, seq_number, meta, missions, rapporteur')
+        .eq('province', prov)
+        .order('saved_at', { ascending: false }).limit(50);
+      if (fallback.error) throw fallback.error;
+      data = fallback.data;
+    }
+    if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Aucune mission enregistrée.</td></tr>'; return; }
+
+    const STATUT_BADGE = {
+      en_attente: '<span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>En attente</span>',
+      activee:    '<span class="badge bg-success"><i class="bi bi-lightning-charge-fill me-1"></i>Activée</span>',
+      realisee:   '<span class="badge bg-secondary"><i class="bi bi-check2-all me-1"></i>Réalisée</span>'
+    };
+
+    tbody.innerHTML = data.map((r) => {
+      const nb = r.missions?.length || r.meta?.total_missions || 0;
+      const tot = r.meta?.total_montant_usd || '0.00';
+      const st = r.statut || 'activee';
+      const badge = STATUT_BADGE[st] || STATUT_BADGE.activee;
+      const rid = escapeHtml(r.id);
+      let actions = '';
+      if (CURRENT_USER_ROLE !== 'comptable') {
+        if (st === 'en_attente') {
+          actions = `<button class="btn btn-pnda btn-sm me-1" onclick="restoreReport('${rid}')"><i class="bi bi-pencil-fill me-1"></i>Modifier</button>`;
+        } else if (st === 'activee') {
+          actions = `<button class="btn btn-outline-secondary btn-sm me-1" onclick="marquerRealisee('${rid}')"><i class="bi bi-flag-fill me-1"></i>Réalisée</button>`;
+        } else {
+          actions = `<span class="text-muted small">Mission terminée</span>`;
+        }
+      } else {
+        actions = `<span class="text-muted small">${st === 'activee' ? 'Budget validé' : st === 'realisee' ? 'Réalisée' : '—'}</span>`;
+      }
+      return `<tr>
+        <td>${escapeHtml(r.seq_number ? '#'+r.seq_number : '—')}</td>
+        <td>${escapeHtml(new Date(r.saved_at).toLocaleDateString('fr-FR'))}</td>
+        <td>${escapeHtml(`${r.trimestre||''} ${r.annee||''}`.trim())}</td>
+        <td><span class="badge bg-secondary">${nb}</span></td>
+        <td class="text-end">${escapeHtml(formatCurrencyDisplay(Number(tot)))} USD</td>
+        <td>${badge}</td>
+        <td>${actions}</td>
+      </tr>`;
+    }).join('');
+    USER_MISSIONS_CACHE = data;
+    updateNotifBadge();
+  } catch (e) { console.error(e); tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Erreur de chargement.</td></tr>'; }
+}
+
+async function restoreReport(reportId) {
+  const report = USER_MISSIONS_CACHE.find((r) => r.id === reportId);
+  if (!report?.missions?.length) { showToast('Rapport introuvable ou vide.'); return; }
+  document.getElementById('missions-container').innerHTML = '';
+  missionCount = 0;
+
+  for (const m of report.missions) {
+    addMission();
+    await new Promise((r) => setTimeout(r, 0));
+    const row = document.querySelector('#missions-container .mission-row:last-child');
+    if (!row) continue;
+    const catSel = row.querySelector('.sel-nature-cat');
+    if (catSel) { catSel.value = m.category || 'implementation'; catSel.dispatchEvent(new Event('change')); }
+    await new Promise((r) => setTimeout(r, 0));
+    if ((m.category || 'implementation') !== 'autre') {
+      const misSel = row.querySelector('.sel-mission');
+      if (misSel && m.mission_reference_id) { misSel.value = m.mission_reference_id; misSel.dispatchEvent(new Event('change')); }
+    } else {
+      const inp = row.querySelector('.inp-nature-autre'); if (inp) inp.value = m.nature || '';
+    }
+    const set = (cls, val) => { const el = row.querySelector(cls); if (el) el.value = val ?? ''; };
+    set('.inp-objectif-txt', m.objectif); set('.sel-section', m.section);
+    set('.inp-date-debut', m.date_debut || m.date || '');
+    set('.inp-date-fin',   m.date_fin || '');
+    set('.inp-hors-projet', m.hors_projet ?? 0); set('.inp-projet', m.projet ?? 1);
+    set('.inp-montant', m.montant_usd ?? 0); set('.inp-avance',  m.avance_usd ?? 0);
+    set('.inp-autres-frais', m.autres_frais_usd ?? 0);
+    set('.inp-nuitees', m.nuitees ?? 0); set('.inp-taux', m.taux_per_diem ?? 0);
+    set('.inp-total', m.total_usd ?? m.montant_usd ?? 0);
+    set('.inp-observation', m.observation || '');
+    // Restore destination province → territoire → secteur
+    if (m.destination_province) {
+      const dpSel = row.querySelector('.sel-dest-province');
+      if (dpSel) { dpSel.value = m.destination_province; dpSel.dispatchEvent(new Event('change')); }
+      await new Promise((r) => setTimeout(r, 0));
+    }
+    if (m.territoire_id) {
+      const tSel = row.querySelector('.sel-territoire');
+      if (tSel) { tSel.value = m.territoire_id; tSel.dispatchEvent(new Event('change')); }
+      await new Promise((r) => setTimeout(r, 0));
+      if (m.secteur_id) { const sSel = row.querySelector('.sel-secteur'); if (sSel) sSel.value = m.secteur_id; }
+    }
+    recalcMissionFinancials(row);
+  }
+  const meta = report.meta || {};
+  const sId = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+  sId('f-trimestre', meta.trimestre || report.trimestre);
+  sId('f-annee', meta.annee || report.annee);
+  sId('f-role', meta.role);
+  sId('f-date', meta.date_generation);
+  renderSelectedMissionsTable();
+  showToast('✓ Rapport restauré.');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── MARQUER RÉALISÉE (missionnaire) ─────────────────────────────────────────
+async function marquerRealisee(reportId) {
+  if (!confirm('Marquer cette mission comme réalisée ? Elle ne pourra plus être modifiée.')) return;
+  try {
+    const session = getSession();
+    const { error } = await db.from('reports').update({
+      statut: 'realisee',
+      completed_by: session?.user || null,
+      completed_at: new Date().toISOString()
+    }).eq('id', reportId);
+    if (error) throw error;
+    showToast('✓ Mission marquée comme réalisée.');
+    await loadUserArchive(session?.user, session?.province);
+  } catch (e) { console.error(e); showToast('Erreur lors de la mise à jour.'); }
+}
+
+// ─── COMPTABLE — MISSIONS EN ATTENTE ─────────────────────────────────────────
+async function loadPendingMissions(province) {
+  const tbody = document.getElementById('pending-tbody');
+  if (!tbody) return;
+  const prov = province || getSession()?.province;
+  tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Chargement…</td></tr>';
+  try {
+    const { data, error } = await db.from('reports')
+      .select('id, saved_at, trimestre, annee, seq_number, meta, missions, rapporteur, statut')
+      .eq('province', prov)
+      .eq('statut', 'en_attente')
+      .order('saved_at', { ascending: true })
+      .limit(100);
+    if (error) {
+      // Migration not yet applied — statut column missing
+      console.warn('statut column not found (migration pending):', error.message);
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-warning py-4"><i class="bi bi-exclamation-triangle me-1"></i>Migration V5 non appliquée. Exécutez migration_v5_statut_roles.sql dans Supabase.</td></tr>';
+      return;
+    }
+    PENDING_REPORTS_CACHE = data || [];
+    if (!PENDING_REPORTS_CACHE.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4"><i class="bi bi-check2-circle me-1 text-success"></i>Aucune mission en attente.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = PENDING_REPORTS_CACHE.map((r) => {
+      const nb = r.missions?.length || 0;
+      const rid = escapeHtml(r.id);
+      return `<tr>
+        <td>${escapeHtml(new Date(r.saved_at).toLocaleDateString('fr-FR'))}</td>
+        <td>${escapeHtml(r.rapporteur || r.meta?.rapporteur || '—')}</td>
+        <td>${escapeHtml(`${r.trimestre||r.meta?.trimestre||''} ${r.annee||r.meta?.annee||''}`.trim())}</td>
+        <td><span class="badge bg-secondary">${nb}</span></td>
+        <td>
+          <button class="btn btn-gold btn-sm" onclick="openFinancialCompletion('${rid}')">
+            <i class="bi bi-cash-coin me-1"></i>Compléter
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+    // Update notification badge
+    const badge = document.getElementById('notif-badge');
+    if (badge) {
+      const n = PENDING_REPORTS_CACHE.length;
+      badge.style.display = n > 0 ? '' : 'none';
+      badge.textContent = n;
+    }
+  } catch (e) { console.error(e); tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Erreur de chargement.</td></tr>'; }
+}
+
+// ─── COMPTABLE — COMPLÉTION FINANCIÈRE ───────────────────────────────────────
+function openFinancialCompletion(reportId) {
+  const report = PENDING_REPORTS_CACHE.find((r) => r.id === reportId);
+  if (!report) { showToast('Rapport introuvable.'); return; }
+  CURRENT_COMPLETION_REPORT_ID = reportId;
+
+  const infoEl = document.getElementById('completion-report-info');
+  if (infoEl) {
+    const prov = report.meta?.province_label || report.province || '—';
+    const per  = `${report.trimestre||report.meta?.trimestre||''} ${report.annee||report.meta?.annee||''}`.trim();
+    const rap  = report.rapporteur || report.meta?.rapporteur || '—';
+    infoEl.textContent = `Province : ${prov} · Période : ${per} · Missionnaire : ${rap}`;
   }
 
-  const blob = new Blob([json], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.download = fname; a.click();
-  URL.revokeObjectURL(url);
-  showToast(`✓ Fichier "${fname}" téléchargé !`);
+  const listEl = document.getElementById('completion-missions-list');
+  if (!listEl) return;
+  listEl.innerHTML = '';
+
+  (report.missions || []).forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'completion-mission-card';
+    div.dataset.missionIdx = i;
+    const tauxVal  = Number(m.taux_per_diem || 0).toFixed(2);
+    const montant  = Number(m.montant_usd || 0).toFixed(2);
+    const section  = escapeHtml(m.section || '');
+    const horsProj = Number(m.hors_projet || 0);
+    const projet   = Number(m.projet ?? 1);
+    const avance   = Number(m.avance_usd || 0).toFixed(2);
+    const autres   = Number(m.autres_frais_usd || 0).toFixed(2);
+    div.innerHTML = `
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="step-num" style="width:24px;height:24px;font-size:.7rem">${i+1}</span>
+        <strong class="text-uppercase" style="color:var(--pnda-green);font-size:.88rem">Mission n° ${i+1}</strong>
+      </div>
+      <div class="readonly-section mb-2">
+        <strong>${escapeHtml(m.nature || '—')}</strong>
+        <div class="row g-2 mt-1">
+          <div class="col-md-6"><span class="form-label-sm">Objectif :</span> ${escapeHtml(m.objectif || '—')}</div>
+          <div class="col-md-6"><span class="form-label-sm">Destination :</span> ${escapeHtml(m.destination_province_label || '—')} ${m.territoire_label ? '/ '+escapeHtml(m.territoire_label) : ''}</div>
+          <div class="col-md-3"><span class="form-label-sm">Début :</span> ${escapeHtml(m.date_debut || '—')}</div>
+          <div class="col-md-3"><span class="form-label-sm">Fin prévue :</span> ${escapeHtml(m.date_fin || '—')}</div>
+          <div class="col-md-3"><span class="form-label-sm">Nuitées :</span> <strong>${m.nuitees || 0}</strong></div>
+          <div class="col-md-3"><span class="form-label-sm">Taux/nuit estimé :</span> <strong>${escapeHtml(formatCurrencyDisplay(Number(tauxVal)))}</strong> USD</div>
+        </div>
+      </div>
+      <div class="completion-financial-section">
+        <p class="form-label-sm mb-2"><i class="bi bi-cash-coin me-1" style="color:var(--pnda-gold)"></i>Données financières à renseigner par le comptable</p>
+        <div class="row g-2">
+          <div class="col-md-3">
+            <label class="form-label form-label-sm">Taux/nuit USD <span style="color:var(--pnda-gold)">*</span></label>
+            <input type="number" class="form-control form-control-sm cf-taux" value="${tauxVal}" min="0" step="0.01" data-auto-montant="${m.nuitees||0}">
+            <small class="text-muted">Valeur calculée : modifiable si besoin</small>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label form-label-sm">Montant mission USD</label>
+            <input type="number" class="form-control form-control-sm cf-montant" value="${montant}" min="0" step="0.01" readonly style="background:#f0ede0;font-weight:600">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label form-label-sm">Autres frais USD</label>
+            <input type="number" class="form-control form-control-sm cf-autres-frais" value="${autres}" min="0" step="0.01">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label form-label-sm">Total USD</label>
+            <input type="number" class="form-control form-control-sm cf-total" value="${(Number(montant)+Number(autres)).toFixed(2)}" readonly style="background:#e8f5e9;font-weight:700">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label form-label-sm">Avance USD <span style="color:var(--pnda-gold)">*</span></label>
+            <input type="number" class="form-control form-control-sm cf-avance" value="${avance}" min="0" step="0.01">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label form-label-sm">Solde USD</label>
+            <input type="number" class="form-control form-control-sm cf-solde" value="${(Number(montant)+Number(autres)-Number(avance)).toFixed(2)}" readonly style="background:#fff3cd;font-weight:600">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label form-label-sm">Section PNDA <span style="color:var(--pnda-gold)">*</span></label>
+            <select class="form-select form-select-sm cf-section">
+              <option value="">—</option>
+              ${SECTIONS_PNDA.map((s) => `<option value="${s.val}" ${section===s.val?'selected':''}>${s.label}</option>`).join('')}
+            </select>
+          </div>
+          <div class="col-md-1">
+            <label class="form-label form-label-sm">Hors proj.</label>
+            <input type="number" class="form-control form-control-sm cf-hors-projet" value="${horsProj}" min="0">
+          </div>
+          <div class="col-md-1">
+            <label class="form-label form-label-sm">Projet</label>
+            <input type="number" class="form-control form-control-sm cf-projet" value="${projet}" min="0">
+          </div>
+        </div>
+      </div>
+    `;
+    // Auto-recalc when taux changes
+    const tauxInp   = div.querySelector('.cf-taux');
+    const montantInp = div.querySelector('.cf-montant');
+    const autresInp  = div.querySelector('.cf-autres-frais');
+    const totalInp   = div.querySelector('.cf-total');
+    const avanceInp  = div.querySelector('.cf-avance');
+    const soldeInp   = div.querySelector('.cf-solde');
+    const recalc = () => {
+      const nuits  = Number(tauxInp.dataset.autoMontant || 0);
+      const taux   = parseFloat(tauxInp.value) || 0;
+      const mont   = +(nuits * taux).toFixed(2);
+      montantInp.value = mont;
+      const autres = parseFloat(autresInp.value) || 0;
+      const total  = +(mont + autres).toFixed(2);
+      totalInp.value = total;
+      const av  = parseFloat(avanceInp.value) || 0;
+      soldeInp.value = +(total - av).toFixed(2);
+    };
+    tauxInp.addEventListener('input', recalc);
+    autresInp.addEventListener('input', recalc);
+    avanceInp.addEventListener('input', () => {
+      const total = parseFloat(totalInp.value) || 0;
+      const av    = parseFloat(avanceInp.value) || 0;
+      soldeInp.value = +(total - av).toFixed(2);
+    });
+    listEl.appendChild(div);
+  });
+
+  // Show completion section, scroll to it
+  const sect = document.getElementById('comptable-completion-section');
+  if (sect) { sect.style.display = ''; sect.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
 
-async function copyJSON() {
-  const data = buildData();
-  await storeReport(data);
-  const json = JSON.stringify(data, null, 2);
-  navigator.clipboard.writeText(json).then(() => showToast("✓ JSON copié dans le presse-papiers !"));
+function closeFinancialCompletion() {
+  CURRENT_COMPLETION_REPORT_ID = null;
+  const sect = document.getElementById('comptable-completion-section');
+  if (sect) sect.style.display = 'none';
 }
 
-// ─── TOAST ────────────────────────────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.display = 'block';
-  setTimeout(() => { t.style.display = 'none'; }, 3500);
+async function saveFinancialCompletion() {
+  if (!CURRENT_COMPLETION_REPORT_ID) { showToast('Aucun rapport sélectionné.'); return; }
+  const report = PENDING_REPORTS_CACHE.find((r) => r.id === CURRENT_COMPLETION_REPORT_ID);
+  if (!report) { showToast('Rapport introuvable.'); return; }
+
+  // Collect financial data from the form
+  const cards = document.querySelectorAll('#completion-missions-list .completion-mission-card');
+  const updatedMissions = (report.missions || []).map((m, i) => {
+    const card = cards[i];
+    if (!card) return m;
+    const taux       = parseFloat(card.querySelector('.cf-taux')?.value) || 0;
+    const montant    = parseFloat(card.querySelector('.cf-montant')?.value) || 0;
+    const autres     = parseFloat(card.querySelector('.cf-autres-frais')?.value) || 0;
+    const total      = +(montant + autres).toFixed(2);
+    const avance     = parseFloat(card.querySelector('.cf-avance')?.value) || 0;
+    const solde      = +(total - avance).toFixed(2);
+    const section    = card.querySelector('.cf-section')?.value || '';
+    const horsProjet = parseInt(card.querySelector('.cf-hors-projet')?.value) || 0;
+    const projet     = parseInt(card.querySelector('.cf-projet')?.value) || 0;
+    return { ...m, taux_per_diem: taux, montant_usd: montant, autres_frais_usd: autres,
+             total_usd: total, avance_usd: avance, solde_usd: solde,
+             section, hors_projet: horsProjet, projet };
+  });
+
+  const session = getSession();
+  const totalMontant = updatedMissions.reduce((s, m) => s + Number(m.montant_usd || 0), 0);
+  const totalGeneral = updatedMissions.reduce((s, m) => s + Number(m.total_usd || 0), 0);
+  const updatedMeta  = {
+    ...(report.meta || {}),
+    total_montant_usd: totalMontant.toFixed(2),
+    total_general_usd: totalGeneral.toFixed(2)
+  };
+
+  try {
+    const { error } = await db.from('reports').update({
+      missions: updatedMissions, meta: updatedMeta,
+      statut: 'activee',
+      activated_by: session?.user || null,
+      activated_at: new Date().toISOString()
+    }).eq('id', CURRENT_COMPLETION_REPORT_ID);
+    if (error) throw error;
+    showToast('✓ Mission activée ! Le budget a été validé.');
+    closeFinancialCompletion();
+    await loadPendingMissions(session?.province);
+    await loadUserArchive(session?.user, session?.province);
+  } catch (e) { console.error(e); showToast('Erreur lors de l\'activation.'); }
+}
+
+// ─── AUTO-SAVE ────────────────────────────────────────────────────────────────
+let _autoSaveTimer = null;
+function scheduleAutoSave() {
+  clearTimeout(_autoSaveTimer);
+  _autoSaveTimer = setTimeout(() => { try { sessionStorage.setItem('PNDA_DRAFT', JSON.stringify(buildData())); } catch {} }, 1500);
+}
+function bindAutoSave() {
+  document.getElementById('missions-container').addEventListener('input', scheduleAutoSave);
+  document.getElementById('missions-container').addEventListener('change', scheduleAutoSave);
+  ['f-trimestre','f-annee','f-role','f-date','f-rapporteur'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) { el.addEventListener('change', scheduleAutoSave); el.addEventListener('input', scheduleAutoSave); }
+  });
 }
 
 renderSelectedMissionsTable();

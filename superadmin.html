@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PNDA-SE — Super Administrateur</title>
+
+<!-- Bootstrap 5 CSS -->
+<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --pnda-green:    #123524;
+    --pnda-green-md: #1d4c34;
+    --pnda-green-lt: #2f6a48;
+    --pnda-gold:     #d3a52c;
+    --pnda-gold-lt:  #f1c85b;
+    --pnda-cream:    #f6f1df;
+    --pnda-paper:    #fffdf7;
+  }
+  body { background: #f0f2f5; font-family: 'Source Sans 3', sans-serif; }
+
+  /* ── TOP NAVBAR ─────────────────────────────────────────── */
+  .top-navbar {
+    background: var(--pnda-green);
+    border-bottom: 3px solid var(--pnda-gold);
+    height: 66px;
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1040;
+    display: flex; align-items: center;
+    padding: 0 20px; gap: 14px;
+  }
+  .top-navbar img { height: 46px; }
+  .top-navbar .brand-text h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; color: #fff; margin: 0; line-height: 1.2;
+  }
+  .top-navbar .brand-text p {
+    font-size: 0.68rem; color: rgba(255,255,255,0.55);
+    margin: 0; text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .top-navbar .session-user { font-weight: 700; color: var(--pnda-gold-lt); font-size: 0.9rem; display: block; }
+  .top-navbar .session-date { font-size: 0.72rem; color: rgba(255,255,255,0.5); }
+
+  /* ── LAYOUT WRAPPER ─────────────────────────────────────── */
+  #layout-wrapper {
+    display: flex; min-height: 100vh; padding-top: 66px;
+  }
+
+  /* ── SIDEBAR ────────────────────────────────────────────── */
+  #sidebar {
+    width: 250px; flex-shrink: 0;
+    background: var(--pnda-green);
+    min-height: calc(100vh - 66px);
+    position: sticky; top: 66px; height: calc(100vh - 66px);
+    overflow-y: auto; padding: 16px 0 24px;
+  }
+  .sidebar-badge {
+    margin: 0 16px 16px; text-align: center;
+    background: var(--pnda-gold); color: var(--pnda-green);
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; border-radius: 4px; padding: 5px 10px;
+  }
+  .sidebar-label {
+    padding: 10px 18px 4px; font-size: 0.62rem;
+    text-transform: uppercase; letter-spacing: 1.8px;
+    color: rgba(255,255,255,0.35);
+  }
+  #sidebar .nav-link {
+    color: rgba(255,255,255,0.75); padding: 9px 18px;
+    border-radius: 0; font-size: 0.875rem;
+    display: flex; align-items: center; gap: 10px;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, color 0.15s;
+  }
+  #sidebar .nav-link:hover,
+  #sidebar .nav-link.active {
+    background: rgba(255,255,255,0.1); color: #fff;
+    border-left-color: var(--pnda-gold);
+  }
+  #sidebar .nav-link.danger { color: rgba(255,130,130,0.85); }
+  #sidebar .nav-link.danger:hover { color: #ffaaaa; }
+  .sidebar-sep { border-top: 1px solid rgba(255,255,255,0.07); margin: 6px 16px; }
+
+  /* ── CONTENT ─────────────────────────────────────────────── */
+  #content { flex: 1; padding: 28px 28px 60px; min-width: 0; }
+
+  /* ── VIEWS ───────────────────────────────────────────────── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── PAGE TITLE ──────────────────────────────────────────── */
+  .page-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--pnda-green); margin: 0; }
+
+  /* ── STAT CARDS ──────────────────────────────────────────── */
+  .stat-value {
+    font-family: 'Playfair Display', serif; font-size: 2rem;
+    font-weight: 700; color: var(--pnda-green); display: block;
+  }
+  .stat-icon { font-size: 2rem; opacity: 0.15; }
+
+  /* ── CARDS ───────────────────────────────────────────────── */
+  .card { border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .card-header {
+    background: linear-gradient(180deg, #f5f0e0 0%, #ede7cc 100%);
+    border-bottom: 1px solid rgba(0,0,0,0.08); font-weight: 600;
+    color: var(--pnda-green); display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  .card-header h5, .card-header h6 { margin: 0; font-family: 'Playfair Display', serif; }
+
+  /* ── BUTTONS ──────────────────────────────────────────────── */
+  .btn-pnda { background: var(--pnda-green); color: #fff; border: none; }
+  .btn-pnda:hover { background: var(--pnda-green-lt); color: #fff; }
+  .btn-gold { background: var(--pnda-gold); color: var(--pnda-green); border: none; font-weight: 600; }
+  .btn-gold:hover { background: var(--pnda-gold-lt); color: var(--pnda-green); }
+
+  /* ── TABLES ──────────────────────────────────────────────── */
+  .table th {
+    font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 0.7px; color: #6c757d;
+    background: rgba(237,231,204,0.35); white-space: nowrap;
+  }
+
+  /* ── TOAST ───────────────────────────────────────────────── */
+  .toast-container { z-index: 9999; }
+
+  /* ── PRINT ───────────────────────────────────────────────── */
+  @media print {
+    body { background: #fff !important; }
+    .top-navbar, #sidebar, .toast-container { display: none !important; }
+    #layout-wrapper { padding-top: 0; }
+    #content { padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ░░ TOP NAVBAR ░░ -->
+<div class="top-navbar">
+  <img src="logo_pnda.png" alt="PNDA">
+  <div class="brand-text">
+    <h1>PNDA-SE · Super Administration</h1>
+    <p>Plateforme nationale de gestion des missions</p>
+  </div>
+  <div class="ms-auto text-end">
+    <span class="session-user" id="session-user">—</span>
+    <span class="session-date" id="session-date">—</span>
+  </div>
+</div>
+
+<!-- ░░ LAYOUT ░░ -->
+<div id="layout-wrapper">
+
+  <!-- ────── SIDEBAR ────── -->
+  <nav id="sidebar">
+    <div class="sidebar-badge"><i class="bi bi-shield-lock-fill me-1"></i>Super Admin</div>
+
+    <div class="sidebar-label">Navigation</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="#" class="nav-link active" onclick="showView('dashboard'); return false;">
+          <i class="bi bi-speedometer2"></i> Tableau de bord
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-sep"></div>
+    <div class="sidebar-label">Gestion</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showView('users'); return false;">
+          <i class="bi bi-people-fill"></i> Utilisateurs
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showView('provinces'); return false;">
+          <i class="bi bi-map-fill"></i> Provinces
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showView('missions-ref'); return false;">
+          <i class="bi bi-journal-bookmark-fill"></i> Missions réf.
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showView('territoires'); return false;">
+          <i class="bi bi-pin-map-fill"></i> Territoires
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showView('secteurs'); return false;">
+          <i class="bi bi-geo-fill"></i> Secteurs
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-sep"></div>
+    <div class="sidebar-label">Consultation</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="#" class="nav-link" onclick="showView('reports'); return false;">
+          <i class="bi bi-folder2-open"></i> Rapports
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-sep"></div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="admin.html" class="nav-link">
+          <i class="bi bi-person-badge"></i> Vue admin
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="index.html?manual-login=1" class="nav-link">
+          <i class="bi bi-file-earmark-text"></i> Formulaire
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link danger" onclick="logout(); return false;">
+          <i class="bi bi-box-arrow-right"></i> Déconnexion
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ────── CONTENU ────── -->
+  <main id="content">
+
+    <!-- ░░ VUE : DASHBOARD ░░ -->
+    <div id="view-dashboard" class="view active">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h2 class="page-title">Tableau de bord</h2>
+          <p class="text-muted mb-0 small">Vue d'ensemble de la plateforme PNDA-SE</p>
+        </div>
+        <button class="btn btn-pnda btn-sm" onclick="loadDashboard()">
+          <i class="bi bi-arrow-clockwise me-1"></i>Actualiser
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:.7rem;letter-spacing:.8px">Utilisateurs</div>
+                <span class="stat-value" id="stat-users">—</span>
+              </div>
+              <i class="bi bi-people stat-icon" style="color:var(--pnda-green)"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:.7rem;letter-spacing:.8px">Provinces</div>
+                <span class="stat-value" id="stat-provinces">—</span>
+              </div>
+              <i class="bi bi-map stat-icon" style="color:#2563a8"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:.7rem;letter-spacing:.8px">Rapports</div>
+                <span class="stat-value" id="stat-reports">—</span>
+              </div>
+              <i class="bi bi-folder2-open stat-icon" style="color:var(--pnda-gold)"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:.7rem;letter-spacing:.8px">Missions enreg.</div>
+                <span class="stat-value" id="stat-missions">—</span>
+              </div>
+              <i class="bi bi-check2-circle stat-icon" style="color:#198754"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Derniers rapports -->
+      <div class="card">
+        <div class="card-header py-3">
+          <h5><i class="bi bi-clock-history me-2"></i>Derniers rapports soumis</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+              <thead>
+                <tr><th>N°</th><th>Date</th><th>Province</th><th>Rapporteur</th><th>Missions</th><th>Montant USD</th></tr>
+              </thead>
+              <tbody id="tbl-recent-reports">
+                <tr><td colspan="6" class="text-center text-muted py-4">Chargement…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░ VUE : UTILISATEURS ░░ -->
+    <div id="view-users" class="view">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h2 class="page-title">Gestion des utilisateurs</h2>
+          <p class="text-muted mb-0 small">Créer, modifier et désactiver les comptes.</p>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="openUserModal()">
+          <i class="bi bi-person-plus-fill me-1"></i>Nouvel utilisateur
+        </button>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header py-3">
+          <h5><i class="bi bi-people me-2"></i>Comptes enregistrés</h5>
+          <button class="btn btn-pnda btn-sm" onclick="loadUsers()"><i class="bi bi-arrow-clockwise"></i></button>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+              <thead><tr><th>Email</th><th>Nom affiché</th><th>Rôle</th><th>Provinces</th><th>Actions</th></tr></thead>
+              <tbody id="tbl-users">
+                <tr><td colspan="5" class="text-center text-muted py-4">Chargement…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulaire utilisateur -->
+      <div class="card" id="user-form-card" style="display:none">
+        <div class="card-header py-3">
+          <h5 id="user-form-title"><i class="bi bi-person-gear me-2"></i>Nouvel utilisateur</h5>
+          <button class="btn btn-outline-danger btn-sm" onclick="closeUserForm()"><i class="bi bi-x-lg"></i> Fermer</button>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-danger py-2 small" id="user-form-error" style="display:none"></div>
+          <input type="hidden" id="uid-edit">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Email *</label>
+              <input type="email" class="form-control form-control-sm" id="u-email" placeholder="utilisateur@pnda.cd">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Nom affiché</label>
+              <input type="text" class="form-control form-control-sm" id="u-display" placeholder="Prénom NOM">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Mot de passe <small class="text-muted fw-normal text-lowercase">(vide = inchangé)</small></label>
+              <input type="password" class="form-control form-control-sm" id="u-password" placeholder="Nouveau mot de passe">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Rôle *</label>
+              <select class="form-select form-select-sm" id="u-role" onchange="onRoleChange()">
+                <option value="province">Missionnaire (Province)</option>
+                <option value="comptable">Comptable (Entité)</option>
+                <option value="admin">Admin / RAF</option>
+                <option value="super_admin">Super Admin / RNSE</option>
+              </select>
+            </div>
+            <div class="col-12" id="u-provinces-wrap">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Provinces accessibles</label>
+              <div id="u-provinces-checkboxes" class="d-flex flex-wrap gap-3 mt-1"></div>
+            </div>
+          </div>
+          <hr>
+          <button class="btn btn-pnda" onclick="saveUser()"><i class="bi bi-floppy2-fill me-1"></i>Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░ VUE : PROVINCES ░░ -->
+    <div id="view-provinces" class="view">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h2 class="page-title">Gestion des provinces</h2>
+          <p class="text-muted mb-0 small">Ajouter et maintenir les provinces opérationnelles.</p>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="openProvinceModal()">
+          <i class="bi bi-plus-circle-fill me-1"></i>Ajouter une province
+        </button>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header py-3">
+          <h5><i class="bi bi-map me-2"></i>Provinces enregistrées</h5>
+          <button class="btn btn-pnda btn-sm" onclick="loadProvinces()"><i class="bi bi-arrow-clockwise"></i></button>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+              <thead><tr><th>Nom interne</th><th>Label affiché</th><th>Code</th><th>Actions</th></tr></thead>
+              <tbody id="tbl-provinces">
+                <tr><td colspan="4" class="text-center text-muted py-4">Chargement…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulaire province -->
+      <div class="card" id="province-form-card" style="display:none">
+        <div class="card-header py-3">
+          <h5 id="province-form-title"><i class="bi bi-plus-circle me-2"></i>Nouvelle province</h5>
+          <button class="btn btn-outline-danger btn-sm" onclick="document.getElementById('province-form-card').style.display='none'"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="card-body">
+          <input type="hidden" id="prov-edit-name">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Nom (clé unique) *</label>
+              <input class="form-control form-control-sm" id="prov-name" placeholder="Ex. Kongo_Central">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Label affiché *</label>
+              <input class="form-control form-control-sm" id="prov-label" placeholder="Ex. Kongo Central">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Code numérique *</label>
+              <input class="form-control form-control-sm" id="prov-code" placeholder="Ex. 5">
+            </div>
+          </div>
+          <hr>
+          <button class="btn btn-pnda" onclick="saveProvince()"><i class="bi bi-floppy2-fill me-1"></i>Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░ VUE : MISSIONS DE RÉFÉRENCE ░░ -->
+    <div id="view-missions-ref" class="view">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h2 class="page-title">Missions de référence</h2>
+          <p class="text-muted mb-0 small">Catalogue des missions par province et catégorie.</p>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="openMissionRefModal()">
+          <i class="bi bi-plus-circle-fill me-1"></i>Ajouter une mission
+        </button>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header py-3">
+          <h5><i class="bi bi-journal-bookmark me-2"></i>Catalogue missions</h5>
+          <div class="d-flex gap-2 align-items-center flex-wrap">
+            <select class="form-select form-select-sm" id="mr-filter-province" onchange="loadMissionsRef()" style="width:auto">
+              <option value="">Toutes provinces</option>
+            </select>
+            <button class="btn btn-pnda btn-sm" onclick="loadMissionsRef()"><i class="bi bi-arrow-clockwise"></i></button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+              <thead><tr><th>Province</th><th>Réf. ID</th><th>Catégorie</th><th>Nature</th><th>Objectif</th><th>Actions</th></tr></thead>
+              <tbody id="tbl-missions-ref">
+                <tr><td colspan="6" class="text-center text-muted py-4">Chargement…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulaire mission ref -->
+      <div class="card" id="mr-form-card" style="display:none">
+        <div class="card-header py-3">
+          <h5 id="mr-form-title"><i class="bi bi-plus-circle me-2"></i>Nouvelle mission de référence</h5>
+          <button class="btn btn-outline-danger btn-sm" onclick="document.getElementById('mr-form-card').style.display='none'"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="card-body">
+          <input type="hidden" id="mr-edit-id">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Province *</label>
+              <select class="form-select form-select-sm" id="mr-province"><option value="">— Choisir —</option></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Catégorie *</label>
+              <select class="form-select form-select-sm" id="mr-category">
+                <option value="implementation">Mission d'implémentation</option>
+                <option value="activite">Mission d'activité</option>
+                <option value="atelier">Atelier</option>
+                <option value="autre">Autre</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Ordre d'affichage</label>
+              <input class="form-control form-control-sm" id="mr-ordre" type="number" value="99">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Nature *</label>
+              <input class="form-control form-control-sm" id="mr-nature" placeholder="Nature de la mission…">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Ref ID <span class="fw-normal text-muted text-lowercase">(optionnel)</span></label>
+              <input class="form-control form-control-sm" id="mr-ref-id" placeholder="Auto-généré si vide">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Objectif</label>
+              <input class="form-control form-control-sm" id="mr-objectif" placeholder="Objectif conseillé…">
+            </div>
+          </div>
+          <hr>
+          <button class="btn btn-pnda" onclick="saveMissionRef()"><i class="bi bi-floppy2-fill me-1"></i>Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░ VUE : TERRITOIRES ░░ -->
+    <div id="view-territoires" class="view">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h2 class="page-title">Gestion des territoires</h2>
+          <p class="text-muted mb-0 small">Territoires rattachés aux provinces.</p>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="openTerritoireModal()">
+          <i class="bi bi-plus-circle-fill me-1"></i>Ajouter un territoire
+        </button>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header py-3">
+          <h5><i class="bi bi-pin-map me-2"></i>Territoires enregistrés</h5>
+          <div class="d-flex gap-2 align-items-center flex-wrap">
+            <select class="form-select form-select-sm" id="terr-filter-province" onchange="loadTerritoires()" style="width:auto">
+              <option value="">Toutes provinces</option>
+            </select>
+            <button class="btn btn-pnda btn-sm" onclick="loadTerritoires()"><i class="bi bi-arrow-clockwise"></i></button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+              <thead><tr><th>Province</th><th>Nom interne</th><th>Label affiché</th><th>Actions</th></tr></thead>
+              <tbody id="tbl-territoires">
+                <tr><td colspan="4" class="text-center text-muted py-4">Chargement…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="terr-form-card" style="display:none">
+        <div class="card-header py-3">
+          <h5 id="terr-form-title"><i class="bi bi-plus-circle me-2"></i>Nouveau territoire</h5>
+          <button class="btn btn-outline-danger btn-sm" onclick="document.getElementById('terr-form-card').style.display='none'"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="card-body">
+          <input type="hidden" id="terr-edit-id">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Province *</label>
+              <select class="form-select form-select-sm" id="terr-province"><option value="">— Choisir —</option></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Nom interne *</label>
+              <input class="form-control form-control-sm" id="terr-name" placeholder="Ex. BULUNGU">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Label affiché *</label>
+              <input class="form-control form-control-sm" id="terr-label" placeholder="Ex. Bulungu">
+            </div>
+          </div>
+          <hr>
+          <button class="btn btn-pnda" onclick="saveTerritoire()"><i class="bi bi-floppy2-fill me-1"></i>Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░ VUE : SECTEURS ░░ -->
+    <div id="view-secteurs" class="view">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h2 class="page-title">Gestion des secteurs</h2>
+          <p class="text-muted mb-0 small">Secteurs rattachés aux territoires.</p>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="openSecteurModal()">
+          <i class="bi bi-plus-circle-fill me-1"></i>Ajouter un secteur
+        </button>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header py-3">
+          <h5><i class="bi bi-geo me-2"></i>Secteurs enregistrés</h5>
+          <div class="d-flex gap-2 align-items-center flex-wrap">
+            <select class="form-select form-select-sm" id="sect-filter-province" onchange="onSectFilterProvinceChange()" style="width:auto">
+              <option value="">Toutes provinces</option>
+            </select>
+            <select class="form-select form-select-sm" id="sect-filter-territoire" onchange="loadSecteurs()" style="width:auto">
+              <option value="">Tous territoires</option>
+            </select>
+            <button class="btn btn-pnda btn-sm" onclick="loadSecteurs()"><i class="bi bi-arrow-clockwise"></i></button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+              <thead><tr><th>Province</th><th>Territoire</th><th>Nom interne</th><th>Label affiché</th><th>Actions</th></tr></thead>
+              <tbody id="tbl-secteurs">
+                <tr><td colspan="5" class="text-center text-muted py-4">Chargement…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="sect-form-card" style="display:none">
+        <div class="card-header py-3">
+          <h5 id="sect-form-title"><i class="bi bi-plus-circle me-2"></i>Nouveau secteur</h5>
+          <button class="btn btn-outline-danger btn-sm" onclick="document.getElementById('sect-form-card').style.display='none'"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="card-body">
+          <input type="hidden" id="sect-edit-id">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Province *</label>
+              <select class="form-select form-select-sm" id="sect-province" onchange="onSectFormProvinceChange()"><option value="">— Choisir —</option></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Territoire *</label>
+              <select class="form-select form-select-sm" id="sect-territoire"><option value="">— Choisir —</option></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Nom interne *</label>
+              <input class="form-control form-control-sm" id="sect-name" placeholder="Ex. Imbongo">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-uppercase" style="letter-spacing:.6px">Label affiché *</label>
+              <input class="form-control form-control-sm" id="sect-label" placeholder="Ex. Imbongo">
+            </div>
+          </div>
+          <hr>
+          <button class="btn btn-pnda" onclick="saveSecteur()"><i class="bi bi-floppy2-fill me-1"></i>Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ░░ VUE : RAPPORTS ░░ -->
+    <div id="view-reports" class="view">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h2 class="page-title">Tous les rapports</h2>
+          <p class="text-muted mb-0 small">Consultation et suppression des rapports soumis.</p>
+        </div>
+        <button class="btn btn-pnda btn-sm" onclick="loadAllReports()">
+          <i class="bi bi-arrow-clockwise me-1"></i>Actualiser
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-header py-3">
+          <h5><i class="bi bi-folder2-open me-2"></i>Rapports soumis</h5>
+          <div class="d-flex gap-2 flex-wrap align-items-center">
+            <select class="form-select form-select-sm" id="rp-filter-province" onchange="loadAllReports()" style="width:auto">
+              <option value="">Toutes provinces</option>
+            </select>
+            <input class="form-control form-control-sm" id="rp-filter-rapporteur" type="text" placeholder="Rapporteur…" oninput="loadAllReports()" style="width:160px">
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+              <thead>
+                <tr><th>N°</th><th>Date</th><th>Province</th><th>Rapporteur</th><th>Trimestre</th><th>Missions</th><th>Montant USD</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="tbl-all-reports">
+                <tr><td colspan="8" class="text-center text-muted py-4">Chargement…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ░░ TOAST ░░ -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="toast" class="toast align-items-center text-bg-dark border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body fw-semibold" id="toast-body">—</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ░░ SCRIPTS ░░ -->
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="node_modules/@supabase/supabase-js/dist/umd/supabase.js"></script>
+<script src="supabase_config.js"></script>
+
+<script>
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let USERS_CACHE        = [];
+let PROVINCES_CACHE    = [];
+let TERRITOIRES_CACHE  = [];
+let SECTEURS_CACHE     = [];
+
+// ─── BOOTSTRAP TOAST ────────────────────────────────────────────────────────
+const _toastEl = document.getElementById('toast');
+const _bsToast = new bootstrap.Toast(_toastEl, { delay: 3500 });
+function showToast(msg) {
+  document.getElementById('toast-body').textContent = msg;
+  _bsToast.show();
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+(async function init() {
+  const session = getSession();
+  if (session?.role !== 'super_admin') {
+    localStorage.removeItem('PNDA_SESSION');
+    window.location.href = 'index.html?manual-login=1';
+    return;
+  }
+  document.getElementById('session-user').textContent = session.user.toUpperCase();
+  document.getElementById('session-date').textContent = new Date().toLocaleDateString('fr-FR', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+  await Promise.all([loadProvinces(), loadUsers()]);
+  await loadDashboard();
+})();
+
+function getSession() {
+  try { return JSON.parse(localStorage.getItem('PNDA_SESSION') || 'null'); } catch { return null; }
+}
+function logout() {
+  localStorage.removeItem('PNDA_SESSION');
+  window.location.href = 'index.html?manual-login=1';
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function showView(name) {
+  document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+  const el = document.getElementById(`view-${name}`);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('#sidebar .nav-link').forEach((b) => b.classList.remove('active'));
+  const map = { dashboard: 'bord', users: 'utilisateurs', provinces: 'provinces',
+                'missions-ref': 'missions', territoires: 'territoire', secteurs: 'secteur',
+                reports: 'rapports' };
+  document.querySelectorAll('#sidebar .nav-link').forEach((b) => {
+    if (b.textContent.toLowerCase().includes(map[name] || name)) b.classList.add('active');
+  });
+  if (name === 'missions-ref') loadMissionsRef();
+  if (name === 'territoires')  loadTerritoires();
+  if (name === 'secteurs')     loadSecteurs();
+  if (name === 'reports')      loadAllReports();
+}
+
+// ─── DASHBOARD ───────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [
+      { count: nbUsers },
+      { count: nbProvs },
+      { data: reports },
+      { count: nbReports }
+    ] = await Promise.all([
+      db.from('users').select('*',    { count: 'exact', head: true }),
+      db.from('provinces').select('*',{ count: 'exact', head: true }),
+      db.from('reports').select('id,saved_at,province_label,rapporteur,seq_number,meta,missions').order('saved_at',{ascending:false}).limit(10),
+      db.from('reports').select('*',  { count: 'exact', head: true })
+    ]);
+    const nbMissions = (reports || []).reduce((s, r) => s + (r.missions?.length || 0), 0);
+    document.getElementById('stat-users').textContent     = nbUsers     ?? '—';
+    document.getElementById('stat-provinces').textContent = nbProvs     ?? '—';
+    document.getElementById('stat-reports').textContent   = nbReports   ?? '—';
+    document.getElementById('stat-missions').textContent  = nbMissions;
+
+    document.getElementById('tbl-recent-reports').innerHTML = (reports || []).map((r) => `
+      <tr>
+        <td>${esc(r.seq_number ? '#'+r.seq_number : '—')}</td>
+        <td>${esc(new Date(r.saved_at).toLocaleDateString('fr-FR'))}</td>
+        <td>${esc(r.province_label || '—')}</td>
+        <td>${esc(r.rapporteur || '—')}</td>
+        <td><span class="badge bg-secondary">${esc(String(r.missions?.length||0))}</span></td>
+        <td>${esc(fmtCur(Number(r.meta?.total_montant_usd||0)))}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="6" class="text-center text-muted py-4">Aucun rapport.</td></tr>';
+  } catch (e) {
+    console.error(e);
+    showToast('Erreur de chargement du dashboard.');
+  }
+}
+
+// ─── HELPER: encodage base64 UTF-8 safe ──────────────────────────────────────
+function safeB64(str) {
+  try { return window.btoa(unescape(encodeURIComponent(str))); }
+  catch { return window.btoa(String(str)); }
+}
+
+// ─── UTILISATEURS ────────────────────────────────────────────────────────────
+async function loadUsers() {
+  const tbody = document.getElementById('tbl-users');
+  tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Chargement…</td></tr>';
+  const { data, error } = await db.from('users').select('*').order('role').order('email');
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-3"><i class="bi bi-exclamation-triangle me-1"></i>Erreur : ${esc(error.message)}</td></tr>`;
+    showToast('Erreur chargement utilisateurs : ' + error.message);
+    return;
+  }
+  USERS_CACHE = data || [];
+  const ROLE_LABELS = { super_admin: 'Super Admin / RNSE', admin: 'Admin / RAF', province: 'Missionnaire', comptable: 'Comptable' };
+  const ROLE_BG = { super_admin: 'warning text-dark', admin: 'success', province: 'primary', comptable: 'info text-dark' };
+  tbody.innerHTML = USERS_CACHE.map((u) => `
+    <tr>
+      <td>${esc(u.email)}</td>
+      <td>${esc(u.display_name || '—')}</td>
+      <td><span class="badge bg-${ROLE_BG[u.role]||'secondary'}">${esc(ROLE_LABELS[u.role]||u.role)}</span></td>
+      <td class="small text-muted">${u.provinces ? esc(u.provinces.join(', ')) : '<em>Toutes</em>'}</td>
+      <td class="text-nowrap">
+        <button class="btn btn-pnda btn-sm me-1" onclick="editUser('${esc(u.id)}')"><i class="bi bi-pencil-fill"></i></button>
+        <button class="btn btn-outline-danger btn-sm" onclick="deleteUser('${esc(u.id)}','${esc(u.email)}')"><i class="bi bi-trash3-fill"></i></button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" class="text-center text-muted py-4">Aucun utilisateur.</td></tr>';
+}
+
+function openUserModal(user) {
+  document.getElementById('user-form-card').style.display = '';
+  document.getElementById('user-form-title').innerHTML = '<i class="bi bi-person-gear me-2"></i>'+(user ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur');
+  const errEl = document.getElementById('user-form-error');
+  errEl.style.display = 'none'; errEl.textContent = '';
+  document.getElementById('uid-edit').value   = user?.id || '';
+  document.getElementById('u-email').value    = user?.email || '';
+  document.getElementById('u-display').value  = user?.display_name || '';
+  document.getElementById('u-password').value = '';
+  document.getElementById('u-role').value     = user?.role || 'province';
+  buildProvinceCheckboxes(user?.provinces || []);
+  onRoleChange();
+  document.getElementById('user-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function closeUserForm() { document.getElementById('user-form-card').style.display = 'none'; }
+function editUser(id) { const u = USERS_CACHE.find((u) => u.id === id); if (u) openUserModal(u); }
+
+function buildProvinceCheckboxes(selected) {
+  document.getElementById('u-provinces-checkboxes').innerHTML = PROVINCES_CACHE.map((p) => `
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" value="${esc(p.name)}" id="ck-${esc(p.name)}" ${(selected||[]).includes(p.name)?'checked':''}>
+      <label class="form-check-label small" for="ck-${esc(p.name)}">${esc(p.label)}</label>
+    </div>
+  `).join('');
+}
+
+function onRoleChange() {
+  const role = document.getElementById('u-role').value;
+  document.getElementById('u-provinces-wrap').style.display = ['province','comptable'].includes(role) ? '' : 'none';
+}
+
+async function saveUser() {
+  const id       = document.getElementById('uid-edit').value;
+  const email    = document.getElementById('u-email').value.trim().toLowerCase();
+  const display  = document.getElementById('u-display').value.trim();
+  const password = document.getElementById('u-password').value;
+  const role     = document.getElementById('u-role').value;
+  const errEl    = document.getElementById('user-form-error');
+  const provinces = ['province','comptable'].includes(role)
+    ? Array.from(document.querySelectorAll('#u-provinces-checkboxes input:checked')).map((c) => c.value) : null;
+
+  errEl.style.display = 'none'; errEl.textContent = '';
+
+  if (!email) { errEl.textContent = 'L\'email est obligatoire.'; errEl.style.display = ''; errEl.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
+  if (!id && !password) { errEl.textContent = 'Le mot de passe est obligatoire pour un nouveau compte.'; errEl.style.display = ''; errEl.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
+  if (['province','comptable'].includes(role) && (!provinces||!provinces.length)) { errEl.textContent = 'Sélectionnez au moins une province.'; errEl.style.display = ''; errEl.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
+
+  const payload = { email, display_name: display||null, role, provinces };
+  if (password) {
+    try { payload.password_b64 = safeB64(password); }
+    catch (e) { errEl.textContent = 'Erreur d\'encodage du mot de passe.'; errEl.style.display = ''; return; }
+  }
+
+  const btn = document.querySelector('#user-form-card button[onclick="saveUser()"]');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enregistrement…'; }
+
+  try {
+    const { error } = id
+      ? await db.from('users').update(payload).eq('id', id)
+      : await db.from('users').insert({ ...payload, password_b64: payload.password_b64 || '' });
+    if (error) throw error;
+    showToast(id ? '✓ Utilisateur mis à jour.' : '✓ Utilisateur créé avec succès.');
+    closeUserForm();
+    await loadUsers();
+  } catch (e) {
+    console.error('saveUser error:', e);
+    const msg = e?.message || 'Erreur d\'enregistrement. Vérifiez les politiques RLS dans Supabase.';
+    errEl.textContent = msg;
+    errEl.style.display = '';
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showToast('Erreur : ' + msg);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-floppy2-fill me-1"></i>Enregistrer'; }
+  }
+}
+
+async function deleteUser(id, email) {
+  if (!confirm('Supprimer le compte "'+email+'" ? Action irréversible.')) return;
+  try {
+    const { error } = await db.from('users').delete().eq('id', id);
+    if (error) throw error;
+    showToast('✓ Utilisateur supprimé.');
+    await loadUsers();
+  } catch (e) {
+    console.error('deleteUser error:', e);
+    showToast('Erreur de suppression : ' + (e?.message || 'Vérifiez les politiques RLS dans Supabase.'));
+  }
+}
+
+// ─── PROVINCES ───────────────────────────────────────────────────────────────
+async function loadProvinces() {
+  const { data, error } = await db.from('provinces').select('*').order('code');
+  if (error) { showToast('Erreur chargement provinces.'); return; }
+  PROVINCES_CACHE = data || [];
+  ['mr-filter-province','mr-province','rp-filter-province',
+   'terr-filter-province','terr-province','sect-filter-province','sect-province'].forEach((selId) => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    const cur = sel.value;
+    const first = ['mr-province','terr-province','sect-province'].includes(selId) ? '<option value="">— Choisir —</option>' : '<option value="">Toutes provinces</option>';
+    sel.innerHTML = first + PROVINCES_CACHE.map((p) =>
+      '<option value="'+esc(p.name)+'" '+(p.name===cur?'selected':'')+'>'+esc(p.label)+'</option>'
+    ).join('');
+  });
+  const tbody = document.getElementById('tbl-provinces');
+  if (!tbody) return;
+  tbody.innerHTML = PROVINCES_CACHE.map((p) => `
+    <tr>
+      <td><code class="text-muted">${esc(p.name)}</code></td>
+      <td>${esc(p.label)}</td>
+      <td><span class="badge bg-secondary">${esc(p.code)}</span></td>
+      <td><button class="btn btn-pnda btn-sm" onclick="editProvince('${esc(p.name)}')"><i class="bi bi-pencil-fill"></i></button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" class="text-center text-muted py-4">Aucune province.</td></tr>';
+  buildProvinceCheckboxes(Array.from(document.querySelectorAll('#u-provinces-checkboxes input:checked')).map((c)=>c.value));
+}
+
+function openProvinceModal(prov) {
+  document.getElementById('province-form-card').style.display = '';
+  document.getElementById('province-form-title').innerHTML = '<i class="bi bi-plus-circle me-2"></i>'+(prov ? 'Modifier la province' : 'Nouvelle province');
+  document.getElementById('prov-edit-name').value = prov?.name  || '';
+  document.getElementById('prov-name').value      = prov?.name  || '';
+  document.getElementById('prov-label').value     = prov?.label || '';
+  document.getElementById('prov-code').value      = prov?.code  || '';
+  document.getElementById('prov-name').disabled   = !!prov;
+  document.getElementById('province-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function editProvince(name) { const p = PROVINCES_CACHE.find((p)=>p.name===name); if (p) openProvinceModal(p); }
+
+async function saveProvince() {
+  const origName = document.getElementById('prov-edit-name').value;
+  const name  = document.getElementById('prov-name').value.trim();
+  const label = document.getElementById('prov-label').value.trim();
+  const code  = document.getElementById('prov-code').value.trim();
+  if (!name||!label||!code) { showToast('Tous les champs sont obligatoires.'); return; }
+  try {
+    const { error } = origName
+      ? await db.from('provinces').update({ label, code }).eq('name', origName)
+      : await db.from('provinces').insert({ name, label, code });
+    if (error) throw error;
+    showToast(origName ? '✓ Province mise à jour.' : '✓ Province créée.');
+    document.getElementById('province-form-card').style.display = 'none';
+    await loadProvinces();
+  } catch (e) { console.error(e); showToast('Erreur : ' + (e?.message || 'Vérifiez les politiques RLS Supabase.')); }
+}
+
+// ─── MISSIONS DE RÉFÉRENCE ────────────────────────────────────────────────────
+let MR_CACHE = [];
+async function loadMissionsRef() {
+  const province = document.getElementById('mr-filter-province')?.value || '';
+  let query = db.from('missions_ref').select('*').order('province_name').order('ordre');
+  if (province) query = query.eq('province_name', province);
+  const { data, error } = await query;
+  if (error) { showToast('Erreur chargement missions ref.'); return; }
+  MR_CACHE = data || [];
+  const CAT = { implementation:'Implémentation', activite:'Activité', atelier:'Atelier', autre:'Autre' };
+  const CBG = { implementation:'success', activite:'primary', atelier:'info text-dark', autre:'secondary' };
+  document.getElementById('tbl-missions-ref').innerHTML = MR_CACHE.map((m) => `
+    <tr>
+      <td class="small">${esc(m.province_name)}</td>
+      <td><code class="small text-muted">${esc(m.ref_id)}</code></td>
+      <td><span class="badge bg-${CBG[m.category]||'secondary'}">${esc(CAT[m.category]||m.category)}</span></td>
+      <td class="small">${esc(m.nature)}</td>
+      <td class="small text-muted">${esc(m.objectif||'—')}</td>
+      <td class="text-nowrap">
+        <button class="btn btn-pnda btn-sm me-1" onclick="editMissionRef('${esc(m.id)}')"><i class="bi bi-pencil-fill"></i></button>
+        <button class="btn btn-outline-danger btn-sm" onclick="deleteMissionRef('${esc(m.id)}')"><i class="bi bi-trash3-fill"></i></button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="6" class="text-center text-muted py-4">Aucune mission.</td></tr>';
+}
+
+function openMissionRefModal(m) {
+  const card = document.getElementById('mr-form-card');
+  card.style.display = '';
+  document.getElementById('mr-form-title').innerHTML = '<i class="bi bi-plus-circle me-2"></i>'+(m ? 'Modifier la mission' : 'Nouvelle mission de référence');
+  document.getElementById('mr-edit-id').value   = m?.id            || '';
+  document.getElementById('mr-province').value  = m?.province_name || '';
+  document.getElementById('mr-category').value  = m?.category      || 'implementation';
+  document.getElementById('mr-nature').value    = m?.nature        || '';
+  document.getElementById('mr-objectif').value  = m?.objectif      || '';
+  document.getElementById('mr-ref-id').value    = m?.ref_id        || '';
+  document.getElementById('mr-ordre').value     = m?.ordre         || 99;
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function editMissionRef(id) { const m = MR_CACHE.find((m)=>m.id===id); if (m) openMissionRefModal(m); }
+
+async function deleteMissionRef(id) {
+  if (!confirm('Supprimer cette mission de référence ?')) return;
+  try {
+    const { error } = await db.from('missions_ref').delete().eq('id', id);
+    if (error) throw error;
+    showToast('✓ Mission supprimée.');
+    await loadMissionsRef();
+  } catch (e) { console.error(e); showToast('Erreur suppression : ' + (e?.message || '')); }
+}
+
+async function saveMissionRef() {
+  const editId   = document.getElementById('mr-edit-id').value;
+  const province = document.getElementById('mr-province').value;
+  const category = document.getElementById('mr-category').value;
+  const nature   = document.getElementById('mr-nature').value.trim();
+  const objectif = document.getElementById('mr-objectif').value.trim();
+  const refIdRaw = document.getElementById('mr-ref-id').value.trim();
+  const ordre    = parseInt(document.getElementById('mr-ordre').value)||99;
+  if (!province||!nature) { showToast('Province et Nature sont obligatoires.'); return; }
+  const ref_id = refIdRaw || category.slice(0,3)+'_'+Date.now();
+  const payload = { province_name: province, category, nature, objectif, ordre, ref_id };
+  try {
+    const { error } = editId
+      ? await db.from('missions_ref').update(payload).eq('id', editId)
+      : await db.from('missions_ref').insert(payload);
+    if (error) throw error;
+    showToast(editId ? '✓ Mission mise à jour.' : '✓ Mission créée.');
+    document.getElementById('mr-form-card').style.display = 'none';
+    await loadMissionsRef();
+  } catch (e) { console.error(e); showToast('Erreur : ' + (e?.message || 'Vérifiez les politiques RLS Supabase.')); }
+}
+
+// ─── TERRITOIRES ─────────────────────────────────────────────────────────────
+async function loadTerritoires() {
+  const province = document.getElementById('terr-filter-province')?.value || '';
+  let query = db.from('territoires').select('*').order('province_name').order('name');
+  if (province) query = query.eq('province_name', province);
+  const { data, error } = await query;
+  if (error) { showToast('Erreur chargement territoires.'); return; }
+  TERRITOIRES_CACHE = data || [];
+  document.getElementById('tbl-territoires').innerHTML = TERRITOIRES_CACHE.map((t) => `
+    <tr>
+      <td class="small">${esc(t.province_name)}</td>
+      <td><code class="small text-muted">${esc(t.name)}</code></td>
+      <td>${esc(t.label)}</td>
+      <td class="text-nowrap">
+        <button class="btn btn-pnda btn-sm me-1" onclick="editTerritoire('${esc(t.id)}')"><i class="bi bi-pencil-fill"></i></button>
+        <button class="btn btn-outline-danger btn-sm" onclick="deleteTerritoire('${esc(t.id)}','${esc(t.label)}')"><i class="bi bi-trash3-fill"></i></button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" class="text-center text-muted py-4">Aucun territoire.</td></tr>';
+}
+
+function openTerritoireModal(t) {
+  const card = document.getElementById('terr-form-card');
+  card.style.display = '';
+  document.getElementById('terr-form-title').innerHTML = '<i class="bi bi-plus-circle me-2"></i>'+(t ? 'Modifier le territoire' : 'Nouveau territoire');
+  document.getElementById('terr-edit-id').value  = t?.id            || '';
+  document.getElementById('terr-province').value = t?.province_name || '';
+  document.getElementById('terr-name').value     = t?.name          || '';
+  document.getElementById('terr-label').value    = t?.label         || '';
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function closeTerritoireForm() { document.getElementById('terr-form-card').style.display = 'none'; }
+function editTerritoire(id) { const t = TERRITOIRES_CACHE.find((t) => String(t.id) === String(id)); if (t) openTerritoireModal(t); }
+
+async function saveTerritoire() {
+  const editId   = document.getElementById('terr-edit-id').value;
+  const province = document.getElementById('terr-province').value;
+  const name     = document.getElementById('terr-name').value.trim().toUpperCase();
+  const label    = document.getElementById('terr-label').value.trim();
+  if (!province || !name || !label) { showToast('Tous les champs sont obligatoires.'); return; }
+  const payload = { province_name: province, name, label };
+  try {
+    const { error } = editId
+      ? await db.from('territoires').update(payload).eq('id', editId)
+      : await db.from('territoires').insert(payload);
+    if (error) throw error;
+    showToast(editId ? '✓ Territoire mis à jour.' : '✓ Territoire créé.');
+    closeTerritoireForm();
+    await loadTerritoires();
+  } catch (e) { console.error(e); showToast('Erreur : ' + (e?.message || 'Vérifiez les politiques RLS Supabase.')); }
+}
+
+async function deleteTerritoire(id, label) {
+  if (!confirm('Supprimer le territoire "'+label+'" ? Les secteurs liés seront aussi supprimés.')) return;
+  try {
+    const { error } = await db.from('territoires').delete().eq('id', id);
+    if (error) throw error;
+    showToast('✓ Territoire supprimé.');
+    await loadTerritoires();
+  } catch (e) { console.error(e); showToast('Erreur suppression : ' + (e?.message || '')); }
+}
+
+// ─── SECTEURS ────────────────────────────────────────────────────────────────
+async function loadSecteurs() {
+  const terrId = document.getElementById('sect-filter-territoire')?.value || '';
+  const provFilter = document.getElementById('sect-filter-province')?.value || '';
+  let query = db.from('secteurs').select('*, territoires(province_name, name, label)').order('name');
+  if (terrId)     query = query.eq('territoire_id', terrId);
+  if (provFilter && !terrId) query = query.eq('territoires.province_name', provFilter);
+  const { data, error } = await query;
+  if (error) { showToast('Erreur chargement secteurs.'); return; }
+  // When filtering via nested table, Supabase may return rows with null join — filter them out
+  const filtered = provFilter && !terrId ? (data || []).filter((s) => s.territoires) : (data || []);
+  SECTEURS_CACHE = filtered;
+  document.getElementById('tbl-secteurs').innerHTML = SECTEURS_CACHE.map((s) => `
+    <tr>
+      <td class="small">${esc(s.territoires?.province_name || '—')}</td>
+      <td class="small">${esc(s.territoires?.label || '—')}</td>
+      <td><code class="small text-muted">${esc(s.name)}</code></td>
+      <td>${esc(s.label)}</td>
+      <td class="text-nowrap">
+        <button class="btn btn-pnda btn-sm me-1" onclick="editSecteur('${esc(s.id)}')"><i class="bi bi-pencil-fill"></i></button>
+        <button class="btn btn-outline-danger btn-sm" onclick="deleteSecteur('${esc(s.id)}','${esc(s.label)}')"><i class="bi bi-trash3-fill"></i></button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" class="text-center text-muted py-4">Aucun secteur.</td></tr>';
+}
+
+async function onSectFilterProvinceChange() {
+  const prov = document.getElementById('sect-filter-province').value;
+  const sel  = document.getElementById('sect-filter-territoire');
+  sel.innerHTML = '<option value="">Tous territoires</option>';
+  if (prov) {
+    const { data } = await db.from('territoires').select('*').eq('province_name', prov).order('name');
+    (data || []).forEach((t) => {
+      sel.innerHTML += '<option value="'+esc(t.id)+'">'+esc(t.label)+'</option>';
+    });
+  }
+  await loadSecteurs();
+}
+
+async function onSectFormProvinceChange() {
+  const prov = document.getElementById('sect-province').value;
+  const sel  = document.getElementById('sect-territoire');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  if (prov) {
+    const { data } = await db.from('territoires').select('*').eq('province_name', prov).order('name');
+    (data || []).forEach((t) => {
+      sel.innerHTML += '<option value="'+esc(t.id)+'">'+esc(t.label)+'</option>';
+    });
+  }
+}
+
+function openSecteurModal(s) {
+  const card = document.getElementById('sect-form-card');
+  card.style.display = '';
+  document.getElementById('sect-form-title').innerHTML = '<i class="bi bi-plus-circle me-2"></i>'+(s ? 'Modifier le secteur' : 'Nouveau secteur');
+  document.getElementById('sect-edit-id').value = s?.id || '';
+  // Pre-fill province and territoire
+  if (s && s.territoires) {
+    document.getElementById('sect-province').value = s.territoires.province_name || '';
+    onSectFormProvinceChange().then(() => {
+      document.getElementById('sect-territoire').value = s.territoire_id || '';
+    });
+  } else {
+    document.getElementById('sect-province').value    = '';
+    document.getElementById('sect-territoire').innerHTML = '<option value="">— Choisir —</option>';
+  }
+  document.getElementById('sect-name').value  = s?.name  || '';
+  document.getElementById('sect-label').value = s?.label || '';
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function closeSecteurForm() { document.getElementById('sect-form-card').style.display = 'none'; }
+function editSecteur(id) { const s = SECTEURS_CACHE.find((s) => String(s.id) === String(id)); if (s) openSecteurModal(s); }
+
+async function saveSecteur() {
+  const editId      = document.getElementById('sect-edit-id').value;
+  const territoireId = document.getElementById('sect-territoire').value;
+  const name        = document.getElementById('sect-name').value.trim();
+  const label       = document.getElementById('sect-label').value.trim();
+  if (!territoireId || !name || !label) { showToast('Territoire, nom et label sont obligatoires.'); return; }
+  const payload = { territoire_id: territoireId, name, label };
+  try {
+    const { error } = editId
+      ? await db.from('secteurs').update(payload).eq('id', editId)
+      : await db.from('secteurs').insert(payload);
+    if (error) throw error;
+    showToast(editId ? '✓ Secteur mis à jour.' : '✓ Secteur créé.');
+    closeSecteurForm();
+    await loadSecteurs();
+  } catch (e) { console.error(e); showToast('Erreur : ' + (e?.message || 'Vérifiez les politiques RLS Supabase.')); }
+}
+
+async function deleteSecteur(id, label) {
+  if (!confirm('Supprimer le secteur "'+label+'" ?')) return;
+  try {
+    const { error } = await db.from('secteurs').delete().eq('id', id);
+    if (error) throw error;
+    showToast('✓ Secteur supprimé.');
+    await loadSecteurs();
+  } catch (e) { console.error(e); showToast('Erreur suppression : ' + (e?.message || '')); }
+}
+
+// ─── RAPPORTS ────────────────────────────────────────────────────────────────
+async function loadAllReports() {
+  const province   = document.getElementById('rp-filter-province')?.value || '';
+  const rapporteur = document.getElementById('rp-filter-rapporteur')?.value.trim().toLowerCase() || '';
+  let query = db.from('reports')
+    .select('id,saved_at,province_label,province,rapporteur,trimestre,annee,seq_number,meta,missions')
+    .order('saved_at', { ascending: false }).limit(200);
+  if (province)   query = query.eq('province', province);
+  if (rapporteur) query = query.ilike('rapporteur', '%'+rapporteur+'%');
+  const { data, error } = await query;
+  if (error) { showToast('Erreur chargement rapports.'); return; }
+  document.getElementById('tbl-all-reports').innerHTML = (data||[]).map((r) => `
+    <tr>
+      <td>${esc(r.seq_number ? '#'+r.seq_number : '—')}</td>
+      <td class="text-nowrap small">${esc(new Date(r.saved_at).toLocaleDateString('fr-FR'))}</td>
+      <td>${esc(r.province_label||r.province||'—')}</td>
+      <td class="small">${esc(r.rapporteur||'—')}</td>
+      <td class="small text-muted">${esc(((r.trimestre||'')+' '+(r.annee||'')).trim()||'—')}</td>
+      <td><span class="badge bg-secondary">${esc(String(r.missions?.length||0))}</span></td>
+      <td class="small">${esc(fmtCur(Number(r.meta?.total_montant_usd||0)))}</td>
+      <td><button class="btn btn-outline-danger btn-sm" onclick="deleteReport('${esc(r.id)}')"><i class="bi bi-trash3-fill"></i></button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="8" class="text-center text-muted py-4">Aucun rapport.</td></tr>';
+}
+
+async function deleteReport(id) {
+  if (!confirm('Supprimer définitivement ce rapport ?')) return;
+  const { error } = await db.from('reports').delete().eq('id', id);
+  if (error) { showToast('Erreur de suppression.'); return; }
+  showToast('✓ Rapport supprimé.');
+  await loadAllReports();
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function esc(v) {
+  return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function fmtCur(v) {
+  return new Intl.NumberFormat('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v||0));
+}
+</script>
+</body>
+</html>
