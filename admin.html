@@ -245,6 +245,11 @@
 
     <div class="sidebar-sep"></div>
     <ul class="nav flex-column">
+      <li class="nav-item" id="nav-back-superadmin" style="display:none">
+        <a href="superadmin.html" class="nav-link">
+          <i class="bi bi-shield-lock-fill"></i> Retour espace RNSE
+        </a>
+      </li>
       <li class="nav-item">
         <a href="index.html?manual-login=1" class="nav-link">
           <i class="bi bi-file-earmark-text"></i> Formulaire
@@ -610,10 +615,13 @@ function redirectToLogin() {
 }
 
 function openDashboard(user) {
+  const session = getSession();
   document.getElementById('session-user').textContent = user.toUpperCase();
   document.getElementById('session-date').textContent = new Date().toLocaleDateString('fr-FR', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
+  const backLink = document.getElementById('nav-back-superadmin');
+  if (backLink) backLink.style.display = session?.role === 'super_admin' ? '' : 'none';
   importedReports = getPersistedImportedReports();
   hydrateSignatory();
 }
