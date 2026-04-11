@@ -314,6 +314,11 @@
   .feedback-comment {
     white-space: pre-line;
   }
+
+  .sel-mission:has(option[value=""]:only-child) {
+  border-color: #ffc107;
+  background-color: #fff9e6;
+}
 </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -1107,13 +1112,23 @@ function fillMissionOptions(sel, province, category) {
   if (!sel) return;
   const cur = sel.value;
   sel.innerHTML = '<option value="">— Sélectionner —</option>';
+  
   let opts = getProvinceData(province)?.missions || [];
-  if (category && category !== 'autre') opts = opts.filter((m) => (m.category || 'implementation') === category);
+  if (category && category !== 'autre') {
+    opts = opts.filter((m) => (m.category || 'implementation') === category);
+  }
+  
+  // Ajouter les missions de référence trouvées
   opts.forEach((m) => {
     const o = new Option(m.objectif || m.id, m.id);
     if (m.id === cur) o.selected = true;
     sel.appendChild(o);
   });
+  
+  // Toujours ajouter l'option "Autre (à préciser)" à la fin
+  const autreOption = new Option('Autre (à préciser)', 'autre');
+  if (cur === 'autre') autreOption.selected = true;
+  sel.appendChild(autreOption);
 }
 
 function syncMissionRow(row) {
@@ -1149,26 +1164,23 @@ function syncMissionRow(row) {
     return;
   }
   
-  // Charger les missions de référence pour cette catégorie
+  // Afficher le select des missions
   if (misWrap) misWrap.style.display = '';
+  
+  // Charger les missions de référence pour cette catégorie
   fillMissionOptions(misSelect, province, category);
   
-  // Ajouter l'option "Autre" dans le select des missions
-  const currentValue = misSelect.value;
-  const hasAutreOption = Array.from(misSelect.options).some(opt => opt.value === 'autre');
-  if (!hasAutreOption) {
-    const autreOption = new Option('Autre (à préciser)', 'autre');
-    misSelect.appendChild(autreOption);
-  }
+  // Vérifier si des missions existent pour cette catégorie
+  const hasMissions = misSelect.options.length > 2; // >2 car il y a l'option vide et "Autre"
   
-  // Vérifier si "autre" est sélectionné
+  // Mettre à jour le message d'information
   const selectedMission = misSelect.value;
   
   if (selectedMission === 'autre') {
     if (autreWrap) autreWrap.style.display = '';
     objInput.placeholder = 'Décrivez l\'objectif de cette mission…';
     info.textContent = 'Saisissez librement la nature et l\'objectif.';
-  } else {
+  } else if (selectedMission && hasMissions) {
     if (autreWrap) autreWrap.style.display = 'none';
     const mission = getMissionById(province, selectedMission);
     if (mission) {
@@ -1176,6 +1188,13 @@ function syncMissionRow(row) {
       info.textContent = `Réf : ${mission.id} · Objectif conseillé : ${mission.objectif || 'Non renseigné'}`;
     } else {
       info.textContent = 'Sélectionnez la mission de référence correspondante.';
+    }
+  } else {
+    if (autreWrap) autreWrap.style.display = 'none';
+    if (!hasMissions) {
+      info.textContent = `Aucune mission de référence pour cette catégorie. Utilisez "Autre (à préciser)" pour saisir une mission personnalisée.`;
+    } else {
+      info.textContent = 'Sélectionnez la mission de référence correspondante ou "Autre (à préciser)".';
     }
   }
   
