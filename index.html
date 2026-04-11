@@ -677,6 +677,11 @@ const _authModal = new bootstrap.Modal(document.getElementById('authModal'));
 const _toastEl   = document.getElementById('toast');
 const _bsToast   = new bootstrap.Toast(_toastEl, { delay: 3500 });
 
+// ─── UTILITIES ────────────────────────────────────────────────────────────────
+function esc(v) {
+  return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 function showToast(msg) {
   document.getElementById('toast-body').textContent = msg;
   _bsToast.show();
@@ -2099,6 +2104,9 @@ async function loadUserArchive(rapporteur, province) {
   tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Chargement…</td></tr>';
   section.style.display = '';
   
+  // Fonction d'échappement locale
+  const escapeHtml = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  
   try {
     let query = db.from('reports')
       .select('id, saved_at, trimestre, annee, seq_number, liquidation_seq_number, liquidation_number, liquidation_printed_at, liquidation_printed_by, meta, missions, statut, rapporteur')
@@ -2106,14 +2114,12 @@ async function loadUserArchive(rapporteur, province) {
       .order('saved_at', { ascending: false })
       .limit(50);
     
-    // Pour missionnaire: montrer ses propres rapports
     if (CURRENT_USER_ROLE !== 'comptable') {
       query = query.eq('rapporteur', rapporteur);
     }
     
     let { data, error } = await query;
     
-    // Fallback si la colonne statut n'existe pas
     if (error && error.message && error.message.includes('statut')) {
       console.warn('Colonne statut manquante, utilisation du fallback');
       const fallbackQuery = db.from('reports')
@@ -2133,7 +2139,6 @@ async function loadUserArchive(rapporteur, province) {
       throw error;
     }
     
-    // Filtrer pour le comptable : ne pas montrer les "en_attente"
     if (CURRENT_USER_ROLE === 'comptable') {
       data = (data || []).filter((report) => {
         const statut = report.statut || WORKFLOW_STATUS.ACTIVEE;
@@ -2159,10 +2164,10 @@ async function loadUserArchive(rapporteur, province) {
       const tot = r.meta?.total_general_usd || r.meta?.total_montant_usd || '0.00';
       const st = r.statut || WORKFLOW_STATUS.ACTIVEE;
       const badge = STATUT_BADGE[st] || STATUT_BADGE.activee;
-      const rid = esc(r.id);
-      const workflowComment = esc(r.meta?.workflow_comment || '');
+      const rid = escapeHtml(r.id);
+      const workflowComment = escapeHtml(r.meta?.workflow_comment || '');
       const litige = calculateReportLitige(r);
-      const periode = `${r.trimestre || r.meta?.trimestre || ''} ${r.annee || r.meta?.annee || ''}`.trim();
+      const periode = escapeHtml(`${r.trimestre || r.meta?.trimestre || ''} ${r.annee || r.meta?.annee || ''}`.trim());
       
       let actions = '';
       if (CURRENT_USER_ROLE !== 'comptable') {
@@ -2172,14 +2177,13 @@ async function loadUserArchive(rapporteur, province) {
         } else if (st === WORKFLOW_STATUS.EN_ATTENTE) {
           actions = '<span class="text-muted small"><i class="bi bi-hourglass-split me-1"></i>En attente de validation</span>';
         } else if (st === WORKFLOW_STATUS.ACTIVEE) {
-          actions = `<span class="text-success small"><i class="bi bi-lightning-charge-fill me-1"></i>Mission en cours · Litige ${esc(formatCurrencyDisplay(litige))} USD</span>`;
+          actions = `<span class="text-success small"><i class="bi bi-lightning-charge-fill me-1"></i>Mission en cours · Litige ${escapeHtml(formatCurrencyDisplay(litige))} USD</span>`;
         } else if (st === WORKFLOW_STATUS.REALISEE) {
           actions = '<span class="text-muted small"><i class="bi bi-check2-all me-1"></i>Mission terminée</span>';
         } else {
           actions = `<span class="text-muted small">Statut inconnu</span>`;
         }
       } else {
-        // Vue comptable
         if (st === WORKFLOW_STATUS.EN_ATTENTE) {
           actions = '<span class="text-muted small">À analyser</span>';
         } else if (st === WORKFLOW_STATUS.RETOURNEE) {
@@ -2188,7 +2192,7 @@ async function loadUserArchive(rapporteur, province) {
           actions = `
             <button class="btn btn-outline-primary btn-sm me-1" onclick="printLiquidationBordereau('${rid}')"><i class="bi bi-printer me-1"></i>Bordereau</button>
             <button class="btn btn-outline-success btn-sm" onclick="signalerMissionRealisee('${rid}')"><i class="bi bi-check2-circle me-1"></i>Clôturer</button>
-            <div class="small text-muted mt-1">Litige ${esc(formatCurrencyDisplay(litige))} USD</div>`;
+            <div class="small text-muted mt-1">Litige ${escapeHtml(formatCurrencyDisplay(litige))} USD</div>`;
         } else if (st === WORKFLOW_STATUS.REALISEE) {
           actions = `
             <button class="btn btn-outline-primary btn-sm me-1" onclick="printLiquidationBordereau('${rid}')"><i class="bi bi-printer me-1"></i>Bordereau</button>
@@ -2197,11 +2201,11 @@ async function loadUserArchive(rapporteur, province) {
       }
       
       return `<tr>
-        <td>${esc(r.seq_number ? '#'+r.seq_number : '—')}</td>
-        <td>${esc(new Date(r.saved_at).toLocaleDateString('fr-FR'))}</td>
-        <td>${esc(periode || '—')}</td>
+        <td>${escapeHtml(r.seq_number ? '#'+r.seq_number : '—')}</td>
+        <td>${new Date(r.saved_at).toLocaleDateString('fr-FR')}</td>
+        <td>${periode || '—'}</td>
         <td><span class="badge bg-secondary">${nb}</span></td>
-        <td class="text-end">${esc(formatCurrencyDisplay(Number(tot)))} USD</td>
+        <td class="text-end">${escapeHtml(formatCurrencyDisplay(Number(tot)))} USD</td>
         <td>${badge}</td>
         <td>${actions}</td>
       </tr>`;
@@ -2406,7 +2410,6 @@ async function loadActiveMissions(province) {
       .limit(100);
     
     if (error) {
-      // Si la colonne statut n'existe pas encore
       if (error.message && error.message.includes('statut')) {
         console.warn('Colonne statut manquante, utilisation du fallback');
         const { data: fallbackData } = await db.from('reports')
@@ -2432,14 +2435,28 @@ async function loadActiveMissions(province) {
       if (activeSection) activeSection.style.display = '';
       
       tbody.innerHTML = ACTIVE_REPORTS_CACHE.map((report) => {
-        const rid = esc(report.id);
+        const rid = String(report.id || '').replace(/[&<>"']/g, function(m) {
+          const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+          return escapeMap[m];
+        });
         const litige = calculateReportLitige(report);
+        const rapporteur = String(report.rapporteur || report.meta?.rapporteur || '—').replace(/[&<>"']/g, function(m) {
+          const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+          return escapeMap[m];
+        });
+        const periode = String(`${report.trimestre||report.meta?.trimestre||''} ${report.annee||report.meta?.annee||''}`.trim()).replace(/[&<>"']/g, function(m) {
+          const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+          return escapeMap[m];
+        });
+        const nbMissions = String(report.missions?.length || 0);
+        const litigeFormatted = formatCurrencyDisplay(litige);
+        
         return `<tr>
-          <td>${esc(new Date(report.saved_at).toLocaleDateString('fr-FR'))}</td>
-          <td>${esc(report.rapporteur || report.meta?.rapporteur || '—')}</td>
-          <td>${esc(`${report.trimestre||report.meta?.trimestre||''} ${report.annee||report.meta?.annee||''}`.trim())}</td>
-          <td><span class="badge bg-secondary">${esc(String(report.missions?.length || 0))}</span></td>
-          <td><span class="badge ${litige > 0 ? 'bg-warning text-dark' : 'bg-success'}">${esc(formatCurrencyDisplay(litige))}</span></td>
+          <td>${new Date(report.saved_at).toLocaleDateString('fr-FR')}</td>
+          <td>${rapporteur}</td>
+          <td>${periode}</td>
+          <td><span class="badge bg-secondary">${nbMissions}</span></td>
+          <td><span class="badge ${litige > 0 ? 'bg-warning text-dark' : 'bg-success'}">${litigeFormatted}</span></td>
           <td class="text-nowrap">
             <button class="btn btn-outline-primary btn-sm me-1" onclick="printLiquidationBordereau('${rid}')"><i class="bi bi-printer me-1"></i>Bordereau</button>
             <button class="btn btn-outline-success btn-sm" onclick="signalerMissionRealisee('${rid}')"><i class="bi bi-check2-circle me-1"></i>Clôturer</button>
