@@ -2009,55 +2009,164 @@ function collectCompletionMissions(report) {
   });
 }
 
+function getParticipantIdentityKey(participant, fallbackIndex = 0) {
+  const name = String(participant?.nom || '').trim().toLowerCase();
+  const role = String(participant?.role || '').trim().toLowerCase();
+  const chef = participant?.est_chef ? '1' : '0';
+  return `${name}|${role}|${chef}|${fallbackIndex}`;
+}
+
+function getReportParticipants(report, missionsOverride = null) {
+  if (Array.isArray(report?.participants) && report.participants.length) {
+    return report.participants;
+  }
+
+  const missions = missionsOverride || report?.missions || [];
+  if (!missions.length) return [];
+
+  const participantsMap = new Map();
+
+  missions.forEach((mission) => {
+    const missionParticipants = Array.isArray(mission?.participants) ? mission.participants : [];
+    missionParticipants.forEach((participant, index) => {
+      const isChef = participant.est_chef
+        || participant.role === 'chef_mission'
+        || participant.nom === mission.chef_mission
+        || participant.nom === report?.chef_mission
+        || index === 0;
+      const key = getParticipantIdentityKey({ ...participant, est_chef: isChef }, index);
+      const montant = Number(participant.montant_usd || 0);
+      const autresFrais = isChef ? Number(participant.autres_frais_usd || 0) : 0;
+      const avance = Number(participant.avance_usd || +(montant * 0.8 + autresFrais).toFixed(2));
+      const solde = Number(participant.solde_usd || +(montant * 0.2).toFixed(2));
+
+      if (!participantsMap.has(key)) {
+        participantsMap.set(key, {
+          ...participant,
+          est_chef: isChef,
+          montant_usd: 0,
+          autres_frais_usd: 0,
+          total_usd: 0,
+          avance_usd: 0,
+          solde_usd: 0,
+          nuitees: 0,
+          _participant_key: key
+        });
+      }
+
+      const aggregate = participantsMap.get(key);
+      aggregate.nuitees += Number(participant.nuitees || 0);
+      aggregate.montant_usd += montant;
+      aggregate.autres_frais_usd += autresFrais;
+      aggregate.total_usd += montant + autresFrais;
+      aggregate.avance_usd += avance;
+      aggregate.solde_usd += solde;
+      if (!aggregate.taux_per_diem && participant.taux_per_diem) {
+        aggregate.taux_per_diem = participant.taux_per_diem;
+      }
+    });
+  });
+
+  return Array.from(participantsMap.values());
+}
+
+function getParticipantMissions(report, participant, participantIndex = 0, missionsOverride = null) {
+  const missions = missionsOverride || report?.missions || [];
+  if (!missions.length) return [];
+
+  const participantKey = participant?._participant_key || getParticipantIdentityKey(participant, participantIndex);
+  const participantMissions = [];
+
+  missions.forEach((mission) => {
+    const missionParticipants = Array.isArray(mission?.participants) ? mission.participants : [];
+    const matchedIndex = missionParticipants.findIndex((entry, index) => {
+      const isChef = entry.est_chef
+        || entry.role === 'chef_mission'
+        || entry.nom === mission.chef_mission
+        || entry.nom === report?.chef_mission
+        || index === 0;
+      return getParticipantIdentityKey({ ...entry, est_chef: isChef }, index) === participantKey;
+    });
+
+    if (matchedIndex === -1) return;
+
+    const matchedParticipant = missionParticipants[matchedIndex];
+    const isChef = matchedParticipant.est_chef
+      || matchedParticipant.role === 'chef_mission'
+      || matchedParticipant.nom === mission.chef_mission
+      || matchedParticipant.nom === report?.chef_mission
+      || matchedIndex === 0;
+    const montant = Number(matchedParticipant.montant_usd || 0);
+    const autresFrais = isChef ? Number(matchedParticipant.autres_frais_usd || 0) : 0;
+    const totalMission = montant + autresFrais;
+
+    participantMissions.push({
+      nature: mission.nature || report.nature,
+      objectif: mission.objectif || report.objectif,
+      date_debut: mission.date_debut || report.date_debut || report.meta?.date_debut,
+      date_fin: mission.date_fin || report.date_fin || report.meta?.date_fin,
+      destination_province_label: mission.destination_province_label || report.destination_province_label || report.meta?.destination_province_label,
+      nuitees: Number(matchedParticipant.nuitees || 0),
+      taux_per_diem: Number(matchedParticipant.taux_per_diem || 0),
+      montant_usd: montant,
+      autres_frais_usd: autresFrais,
+      total_usd: totalMission,
+      avance_usd: Number(matchedParticipant.avance_usd || +(montant * 0.8 + autresFrais).toFixed(2)),
+      solde_usd: Number(matchedParticipant.solde_usd || +(montant * 0.2).toFixed(2)),
+      participants: 1,
+      is_chef: isChef
+    });
+  });
+
+  return participantMissions;
+}
+
 function buildLiquidationSnapshot(report, missionsOverride, participant = null, participantIndex = 0) {
   // Si un participant spécifique est fourni
   if (participant) {
-    const isChef = participant.est_chef
+    const participantMissions = getParticipantMissions(report, participant, participantIndex, missionsOverride);
+    const fallbackIsChef = participant.est_chef
       || participant.role === 'chef_mission'
       || participant.nom === report.chef_mission
       || participantIndex === 0;
-    
-    // Seul le chef de mission a des "autres frais"
-    const autresFrais = isChef ? Number(participant.autres_frais_usd || 0) : 0;
-    
-    const totalPerDiem = Number(participant.montant_usd || 0);
-    const totalJustificatifs = autresFrais;
-    const totalMission = totalPerDiem + autresFrais;
-    
-    const dateDebut = report.date_debut || report.meta?.date_debut;
-    const dateFin = report.date_fin || report.meta?.date_fin;
-    const totalTravelDays = getMissionTravelDays({ date_debut: dateDebut, date_fin: dateFin });
-    const totalNights = participant.nuitees || 0;
-    
+    const effectiveMissions = participantMissions.length ? participantMissions : [{
+      nature: report.nature,
+      objectif: report.objectif,
+      date_debut: report.date_debut || report.meta?.date_debut,
+      date_fin: report.date_fin || report.meta?.date_fin,
+      destination_province_label: report.destination_province_label || report.meta?.destination_province_label,
+      nuitees: Number(participant.nuitees || 0),
+      taux_per_diem: Number(participant.taux_per_diem || 0),
+      montant_usd: Number(participant.montant_usd || 0),
+      autres_frais_usd: fallbackIsChef ? Number(participant.autres_frais_usd || 0) : 0,
+      total_usd: Number(participant.montant_usd || 0) + (fallbackIsChef ? Number(participant.autres_frais_usd || 0) : 0),
+      avance_usd: Number(participant.avance_usd || +(Number(participant.montant_usd || 0) * 0.8 + (fallbackIsChef ? Number(participant.autres_frais_usd || 0) : 0)).toFixed(2)),
+      solde_usd: Number(participant.solde_usd || +(Number(participant.montant_usd || 0) * 0.2).toFixed(2)),
+      participants: 1,
+      is_chef: fallbackIsChef
+    }];
+
+    const isChef = effectiveMissions.some((mission) => mission.is_chef);
+    const totalPerDiem = effectiveMissions.reduce((sum, mission) => sum + Number(mission.montant_usd || 0), 0);
+    const totalJustificatifs = effectiveMissions.reduce((sum, mission) => sum + Number(mission.autres_frais_usd || 0), 0);
+    const totalMission = effectiveMissions.reduce((sum, mission) => sum + Number(mission.total_usd || 0), 0);
+    const totalTravelDays = effectiveMissions.reduce((sum, mission) => sum + getMissionTravelDays(mission), 0);
+    const totalNights = effectiveMissions.reduce((sum, mission) => sum + Number(mission.nuitees || 0), 0);
     const aPayer = +(totalPerDiem * 0.8 + totalJustificatifs).toFixed(2);
     const soldeRetour = +(totalPerDiem * 0.2).toFixed(2);
-    
-    // Créer une mission virtuelle pour ce participant
+
     const participantMission = {
       ...report,
       participant: participant,
       participant_index: participantIndex,
       is_chef: isChef,
-      missions: [{
-        nature: report.nature,
-        objectif: report.objectif,
-        date_debut: dateDebut,
-        date_fin: dateFin,
-        destination_province_label: report.destination_province_label || report.meta?.destination_province_label,
-        nuitees: participant.nuitees,
-        taux_per_diem: participant.taux_per_diem,
-        montant_usd: participant.montant_usd,
-        autres_frais_usd: autresFrais,
-        total_usd: totalMission,
-        avance_usd: +(totalPerDiem * 0.8 + autresFrais).toFixed(2),
-        solde_usd: +(totalPerDiem * 0.2).toFixed(2),
-        participants: 1
-      }]
+      participants: [participant],
+      missions: effectiveMissions
     };
     
     return {
       report: participantMission,
-      missions: participantMission.missions,
+      missions: effectiveMissions,
       totalPerDiem,
       totalJustificatifs,
       totalMission,
@@ -2345,10 +2454,8 @@ async function printLiquidationBordereau(reportId) {
   
   report = await ensureLiquidationIdentity(report);
   
-  // Récupérer les participants
-  const participants = report.participants || [];
+  const participants = getReportParticipants(report);
   
-  // Si un seul participant ou pas de tableau participants
   if (participants.length <= 1) {
     const participant = participants[0] || null;
     const snapshot = buildLiquidationSnapshot(report, null, participant, 0);
