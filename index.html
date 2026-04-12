@@ -334,6 +334,10 @@
   overflow-y: auto;
   padding-right: 4px;
 }
+.participant-select-modal-header {
+  background: linear-gradient(135deg, var(--pnda-green) 0%, var(--pnda-green-md) 100%);
+  color: #fff;
+}
 </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -377,6 +381,28 @@
     </div>
   </div>
 </div>
+
+    <!-- ░░ MODALE DE SÉLECTION DES PARTICIPANTS ░░ -->
+    <div class="modal fade" id="participantSelectModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header participant-select-modal-header">
+            <h6 class="modal-title"><i class="bi bi-people-fill me-2"></i>Sélectionner le participant pour le bordereau</h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p class="small text-muted mb-3">
+              <i class="bi bi-info-circle me-1"></i>
+              Cette mission comprend plusieurs participants. Sélectionnez celui pour lequel vous souhaitez imprimer un bordereau.
+            </p>
+            <div id="participant-select-list" class="list-group"></div>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
 <!-- ══════════════ LOGOS BAR ══════════════ -->
 <div class="logos-bar">
@@ -694,6 +720,7 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── BOOTSTRAP COMPONENTS ─────────────────────────────────────────────────────
 const _authModal = new bootstrap.Modal(document.getElementById('authModal'));
+let _participantSelectModal = null;
 const _toastEl   = document.getElementById('toast');
 const _bsToast   = new bootstrap.Toast(_toastEl, { delay: 3500 });
 
@@ -2006,7 +2033,156 @@ function collectCompletionMissions(report) {
   });
 }
 
-function buildLiquidationSnapshot(report, missionsOverride) {
+function getRoleLabel(role) {
+  const labels = {
+    chef_mission: 'Chef de mission',
+    expert: 'Expert',
+    chauffeur: 'Chauffeur',
+    assistant: 'Assistant',
+    autre: 'Autre'
+  };
+  return labels[role] || role || 'Participant';
+}
+
+function findLiquidationReport(reportId) {
+  return ACTIVE_REPORTS_CACHE.find((entry) => entry.id === reportId)
+    || PENDING_REPORTS_CACHE.find((entry) => entry.id === reportId)
+    || USER_MISSIONS_CACHE.find((entry) => entry.id === reportId)
+    || null;
+}
+
+function getLiquidationParticipants(report) {
+  if (Array.isArray(report?.participants) && report.participants.length) {
+    return report.participants;
+  }
+
+  const rapporteur = report?.rapporteur || report?.meta?.rapporteur || '—';
+  return [{
+    nom: rapporteur,
+    role: 'chef_mission',
+    est_chef: true,
+    nuitees: report?.nuitees || report?.meta?.nuitees || 0,
+    taux_per_diem: report?.taux_per_diem || report?.meta?.taux_per_diem || 0,
+    montant_usd: report?.montant_usd || report?.meta?.total_montant_usd || 0,
+    autres_frais_usd: report?.autres_frais_usd || report?.meta?.total_autres_frais_usd || 0,
+    total_usd: report?.total_usd || report?.meta?.total_general_usd || 0,
+    avance_usd: report?.avance_usd || report?.meta?.total_avance_usd || 0,
+    solde_usd: report?.solde_usd || report?.meta?.total_solde_usd || 0
+  }];
+}
+
+function showParticipantSelectionModal(report, participants) {
+  if (!_participantSelectModal) {
+    _participantSelectModal = new bootstrap.Modal(document.getElementById('participantSelectModal'));
+  }
+
+  const listContainer = document.getElementById('participant-select-list');
+  if (!listContainer) return;
+
+  const missionInfo = report.meta || {};
+  const safeReportId = JSON.stringify(String(report.id || ''));
+  const headerHtml = `
+    <div class="alert alert-light border small mb-3">
+      <strong>${escapeHtml(missionInfo.province_label || report.province || '—')}</strong><br>
+      ${escapeHtml(report.trimestre || missionInfo.trimestre || '')} ${escapeHtml(String(report.annee || missionInfo.annee || ''))}<br>
+      Chef de mission : <strong>${escapeHtml(report.chef_mission || participants.find((p) => p.est_chef)?.nom || '—')}</strong>
+    </div>
+  `;
+
+  const participantsHtml = participants.map((participant, index) => {
+    const isChef = participant.est_chef || participant.role === 'chef_mission' || index === 0;
+    const roleLabel = getRoleLabel(participant.role);
+    const autresFrais = Number(participant.autres_frais_usd || 0);
+
+    return `
+      <a href="#" class="list-group-item list-group-item-action" onclick="printBordereauForParticipant(${safeReportId}, ${index}); return false;">
+        <div class="d-flex w-100 justify-content-between align-items-center">
+          <div>
+            <i class="bi ${isChef ? 'bi-star-fill text-warning' : 'bi-person'} me-2"></i>
+            <strong>${escapeHtml(participant.nom || '—')}</strong>
+            ${isChef ? '<span class="badge bg-warning text-dark ms-2">Chef de mission</span>' : ''}
+            <span class="badge bg-secondary ms-2">${escapeHtml(roleLabel)}</span>
+          </div>
+          <div class="text-end">
+            <div class="small">Total: <strong>${escapeHtml(formatCurrencyDisplay(participant.total_usd || 0))} USD</strong></div>
+            <div class="small text-muted">Avance: ${escapeHtml(formatCurrencyDisplay(participant.avance_usd || 0))} USD</div>
+          </div>
+        </div>
+        <div class="small text-muted mt-1">
+          <i class="bi bi-calendar me-1"></i>${participant.nuitees || 0} nuitées × ${escapeHtml(formatCurrencyDisplay(participant.taux_per_diem || 0))} USD
+          ${autresFrais > 0 ? ` · Autres frais: ${escapeHtml(formatCurrencyDisplay(autresFrais))} USD` : ''}
+        </div>
+      </a>
+    `;
+  }).join('');
+
+  const allOptionHtml = `
+    <a href="#" class="list-group-item list-group-item-action list-group-item-success mt-2" onclick="printAllBordereaux(${safeReportId}); return false;">
+      <div class="d-flex w-100 justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-files me-2"></i>
+          <strong>Imprimer tous les bordereaux</strong>
+        </div>
+        <span class="badge bg-success">${participants.length} bordereaux</span>
+      </div>
+    </a>
+  `;
+
+  listContainer.innerHTML = headerHtml + participantsHtml + allOptionHtml;
+  _participantSelectModal.show();
+}
+
+function buildLiquidationSnapshot(report, missionsOverride, participant = null, participantIndex = 0) {
+  if (participant) {
+    const totalPerDiem = Number(participant.montant_usd || 0);
+    const totalJustificatifs = Number(participant.autres_frais_usd || 0);
+    const totalMission = Number(participant.total_usd || 0);
+    const totalTravelDays = getMissionTravelDays({
+      date_debut: report.date_debut || report.meta?.date_debut,
+      date_fin: report.date_fin || report.meta?.date_fin
+    });
+    const totalNights = Number(participant.nuitees || 0);
+    const totalParticipants = 1;
+    const aPayer = +(totalPerDiem * 0.8 + totalJustificatifs).toFixed(2);
+    const soldeRetour = +(totalPerDiem * 0.2).toFixed(2);
+
+    const participantMission = {
+      ...report,
+      participant,
+      participant_index: participantIndex,
+      missions: [{
+        nature: report.nature,
+        objectif: report.objectif,
+        date_debut: report.date_debut || report.meta?.date_debut,
+        date_fin: report.date_fin || report.meta?.date_fin,
+        destination_province_label: report.destination_province_label || report.meta?.destination_province_label,
+        nuitees: participant.nuitees,
+        taux_per_diem: participant.taux_per_diem,
+        montant_usd: participant.montant_usd,
+        autres_frais_usd: participant.autres_frais_usd,
+        total_usd: participant.total_usd,
+        avance_usd: participant.avance_usd,
+        solde_usd: participant.solde_usd,
+        participants: 1
+      }]
+    };
+
+    return {
+      report: participantMission,
+      missions: participantMission.missions,
+      totalPerDiem,
+      totalJustificatifs,
+      totalMission,
+      totalTravelDays,
+      totalNights,
+      totalParticipants,
+      aPayer,
+      soldeRetour,
+      participant,
+      participantIndex
+    };
+  }
+
   const missions = missionsOverride || report?.missions || [];
   const totalPerDiem = missions.reduce((sum, mission) => sum + Number(mission.montant_usd || 0), 0);
   const totalJustificatifs = missions.reduce((sum, mission) => sum + Number(mission.autres_frais_usd || 0), 0);
@@ -2030,36 +2206,11 @@ function buildLiquidationSnapshot(report, missionsOverride) {
   };
 }
 
-function buildLiquidationPrintHtml(snapshot) {
-  const session = getSession();
-  const report = snapshot.report;
-  const meta = report.meta || {};
-  const provinceLabel = meta.province_label || report.province || '—';
-  const liquidationNumber = getLiquidationNumber(report);
-  const printedAt = new Date();
-  const missionRows = snapshot.missions.map((mission, index) => `
-    <tr>
-      <td>${index + 1}</td>
-      <td>${escapeHtml(mission.nature || '—')}</td>
-      <td>${escapeHtml(mission.objectif || '—')}</td>
-      <td>${escapeHtml(formatDateDisplay(mission.date_debut))} - ${escapeHtml(formatDateDisplay(mission.date_fin))}</td>
-      <td class="num">${getMissionTravelDays(mission)}</td>
-      <td class="num">${Number(mission.nuitees || 0)}</td>
-      <td class="num">${escapeHtml(formatCurrencyDisplay(mission.taux_per_diem || 0))}</td>
-      <td class="num">${escapeHtml(formatCurrencyDisplay(mission.montant_usd || 0))}</td>
-      <td class="num">${escapeHtml(formatCurrencyDisplay(mission.autres_frais_usd || 0))}</td>
-    </tr>
-  `).join('');
-
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Bordereau de liquidation de mission</title>
-  <style>
+function getLiquidationPrintStyles() {
+  return `
     @page { size: A4 portrait; margin: 11mm 10mm; }
     * { box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; color: #14251b; margin: 0; font-size: 11px; line-height: 1.25; }
+    body { font-family: Arial, sans-serif; color: #14251b; margin: 0; font-size: 11px; line-height: 1.25; background: #fff; }
     .sheet { width: 100%; min-height: 271mm; display: flex; flex-direction: column; }
     .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #123524; padding-bottom: 6px; margin-bottom: 8px; }
     .brand { display: flex; align-items: center; gap: 10px; }
@@ -2104,9 +2255,42 @@ function buildLiquidationPrintHtml(snapshot) {
     .signature-box h4 { margin: 0 0 6px; font-size: 10px; text-transform: uppercase; color: #123524; }
     .signature-line { margin-top: auto; border-top: 1px solid #8ea293; padding-top: 6px; font-size: 9.5px; color: #5b6e61; }
     .note { font-size: 9px; color: #495b50; }
-  </style>
-</head>
-<body>
+    .page-break { page-break-before: always; break-before: page; }
+  `;
+}
+
+function buildLiquidationPrintSheetHtml(snapshot) {
+  const session = getSession();
+  const report = snapshot.report;
+  const meta = report.meta || {};
+  const provinceLabel = meta.province_label || report.province || '—';
+  const liquidationNumber = getLiquidationNumber(report);
+  const printedAt = new Date();
+  const participant = snapshot.participant || {};
+  const isMultiParticipant = !!participant.nom;
+  const participantDisplayName = isMultiParticipant
+    ? participant.nom
+    : (report.rapporteur || meta.rapporteur || '—');
+  const participantRole = isMultiParticipant
+    ? getRoleLabel(participant.role)
+    : (meta.role || report.rapporteur_role || '—');
+  const reportParticipants = Array.isArray(report.participants) ? report.participants : [];
+  const chefMission = report.chef_mission || reportParticipants.find((p) => p.est_chef)?.nom || '—';
+  const missionRows = snapshot.missions.map((mission, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${escapeHtml(mission.nature || '—')}</td>
+      <td>${escapeHtml(mission.objectif || '—')}</td>
+      <td>${escapeHtml(formatDateDisplay(mission.date_debut))} - ${escapeHtml(formatDateDisplay(mission.date_fin))}</td>
+      <td class="num">${getMissionTravelDays(mission)}</td>
+      <td class="num">${Number(mission.nuitees || 0)}</td>
+      <td class="num">${escapeHtml(formatCurrencyDisplay(mission.taux_per_diem || 0))}</td>
+      <td class="num">${escapeHtml(formatCurrencyDisplay(mission.montant_usd || 0))}</td>
+      <td class="num">${escapeHtml(formatCurrencyDisplay(mission.autres_frais_usd || 0))}</td>
+    </tr>
+  `).join('');
+
+  return `
   <div class="sheet">
     <div class="header">
       <div class="brand">
@@ -2135,12 +2319,12 @@ function buildLiquidationPrintHtml(snapshot) {
     <div class="section">
       <div class="section-title">1. Identité</div>
       <div class="section-body grid-3">
-        <div class="field"><strong>Missionnaire</strong><span>${escapeHtml(report.rapporteur || meta.rapporteur || '—')}</span></div>
+        <div class="field"><strong>Participant</strong><span>${escapeHtml(participantDisplayName)}</span></div>
+        <div class="field"><strong>Rôle</strong><span>${escapeHtml(participantRole)}</span></div>
+        ${isMultiParticipant && chefMission !== participantDisplayName ? `<div class="field"><strong>Chef de mission</strong><span>${escapeHtml(chefMission)}</span></div>` : ''}
         <div class="field"><strong>Province / Entité</strong><span>${escapeHtml(provinceLabel)}</span></div>
         <div class="field"><strong>Période</strong><span>${escapeHtml(`${report.trimestre || meta.trimestre || ''} ${report.annee || meta.annee || ''}`.trim() || '—')}</span></div>
-        <div class="field"><strong>Rôle</strong><span>${escapeHtml(meta.role || report.rapporteur_role || '—')}</span></div>
-        <div class="field"><strong>Participants</strong><span>${snapshot.totalParticipants}</span></div>
-        <div class="field"><strong>Référence rapport</strong><span>${escapeHtml((report.seq_number || meta.seq_number) ? `#${report.seq_number || meta.seq_number}` : '—')}</span></div>
+        <div class="field"><strong>Référence mission</strong><span>${escapeHtml((report.seq_number || meta.seq_number) ? `#${report.seq_number || meta.seq_number}` : '—')}</span></div>
       </div>
     </div>
 
@@ -2238,7 +2422,19 @@ function buildLiquidationPrintHtml(snapshot) {
         <div class="signature-line">Nom, fonction et cachet</div>
       </div>
     </div>
-  </div>
+  </div>`;
+}
+
+function buildLiquidationPrintHtml(snapshot) {
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Bordereau de liquidation de mission</title>
+  <style>${getLiquidationPrintStyles()}</style>
+</head>
+<body>
+  ${buildLiquidationPrintSheetHtml(snapshot)}
   <script>
     window.onload = function () { window.print(); };
   <\/script>
@@ -2257,6 +2453,38 @@ function openLiquidationPrintWindow(snapshot) {
   printWindow.document.close();
 }
 
+function openMultiLiquidationPrintWindow(snapshots, report) {
+  const printWindow = window.open('', '_blank', 'width=900,height=1200');
+  if (!printWindow) {
+    showToast('Autorisez les fenêtres pop-up pour imprimer les bordereaux.');
+    return;
+  }
+
+  const allHtml = snapshots.map((snapshot, index) => {
+    const pageBreak = index > 0 ? '<div class="page-break"></div>' : '';
+    return pageBreak + buildLiquidationPrintSheetHtml(snapshot);
+  }).join('');
+
+  const fullHtml = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Bordereaux de liquidation - ${escapeHtml(report.chef_mission || 'Mission')}</title>
+  <style>${getLiquidationPrintStyles()}</style>
+</head>
+<body>
+  ${allHtml}
+  <script>
+    window.onload = function () { window.print(); };
+  <\/script>
+</body>
+</html>`;
+
+  printWindow.document.open();
+  printWindow.document.write(fullHtml);
+  printWindow.document.close();
+}
+
 async function printCurrentLiquidationBordereau() {
   if (!CURRENT_COMPLETION_REPORT_ID) { showToast('Ouvrez d\'abord une mission à compléter.'); return; }
   let report = PENDING_REPORTS_CACHE.find((entry) => entry.id === CURRENT_COMPLETION_REPORT_ID);
@@ -2267,12 +2495,67 @@ async function printCurrentLiquidationBordereau() {
 }
 
 async function printLiquidationBordereau(reportId) {
-  let report = ACTIVE_REPORTS_CACHE.find((entry) => entry.id === reportId)
-    || PENDING_REPORTS_CACHE.find((entry) => entry.id === reportId)
-    || USER_MISSIONS_CACHE.find((entry) => entry.id === reportId);
-  if (!report) { showToast('Bordereau introuvable pour ce rapport.'); return; }
+  let report = findLiquidationReport(reportId);
+  
+  if (!report) { 
+    showToast('Bordereau introuvable pour ce rapport.'); 
+    return; 
+  }
+  
   report = await ensureLiquidationIdentity(report);
-  openLiquidationPrintWindow(buildLiquidationSnapshot(report));
+  const participants = getLiquidationParticipants(report);
+  
+  if (participants.length === 1) {
+    openLiquidationPrintWindow(buildLiquidationSnapshot(report, null, participants[0], 0));
+    return;
+  }
+  
+  showParticipantSelectionModal(report, participants);
+}
+
+async function printBordereauForParticipant(reportId, participantIndex) {
+  _participantSelectModal?.hide();
+
+  let report = findLiquidationReport(reportId);
+  if (!report) {
+    showToast('Rapport introuvable.');
+    return;
+  }
+
+  report = await ensureLiquidationIdentity(report);
+  const participants = getLiquidationParticipants(report);
+  const participant = participants[participantIndex];
+
+  if (!participant) {
+    showToast('Participant introuvable.');
+    return;
+  }
+
+  openLiquidationPrintWindow(buildLiquidationSnapshot(report, null, participant, participantIndex));
+}
+
+async function printAllBordereaux(reportId) {
+  _participantSelectModal?.hide();
+
+  let report = findLiquidationReport(reportId);
+  if (!report) {
+    showToast('Rapport introuvable.');
+    return;
+  }
+
+  report = await ensureLiquidationIdentity(report);
+  const participants = getLiquidationParticipants(report);
+
+  if (!participants.length) {
+    showToast('Aucun participant trouvé.');
+    return;
+  }
+
+  const allSnapshots = participants.map((participant, index) =>
+    buildLiquidationSnapshot(report, null, participant, index)
+  );
+
+  openMultiLiquidationPrintWindow(allSnapshots, report);
 }
 
 function renderSelectedMissionsTable() {
