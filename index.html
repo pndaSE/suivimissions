@@ -2637,21 +2637,54 @@ function buildSelectedMissionsWorkbookXml(data) {
   ].join('');
 }
 
-async function exportSelectedMissionsExcel() {
-  const data = buildData();
-  const pk = (data.meta.province||'province').replace(/\s/g,'_');
-  const content = buildSelectedMissionsWorkbookXml(data);
-  const fname = `PNDA_budget_missions_${data.meta.trimestre}_${data.meta.annee}_${pk}.xls`;
-  if (window.PNDA_DESKTOP?.saveFile) {
-    const r = await window.PNDA_DESKTOP.saveFile({ title:'Enregistrer Excel', defaultPath:fname, filters:[{name:'Excel',extensions:['xls']}], content });
-    if (!r.canceled) showToast(`✓ Excel enregistré : ${r.filePath}`);
-    return;
+function exportSelectedMissionsExcel() {
+  const table = document.querySelector("#selected-missions-body");
+  const rows = [];
+
+  // En-têtes
+  rows.push([
+    "N°","Province","Mission","Objectif","Province destination",
+    "Territoire","Secteur","Début","Fin prévue","Participants",
+    "Nuitées","Taux/nuit","Section","Hors projet","Projet",
+    "Montant USD","Autres frais","Total USD","Avance USD","Solde USD","Observation"
+  ]);
+
+  // Récupération des données du tableau
+  const trs = table.querySelectorAll("tr");
+
+  trs.forEach(tr => {
+    const tds = tr.querySelectorAll("td");
+    if (tds.length > 1) {
+      const row = [];
+      tds.forEach(td => {
+        row.push(td.innerText.trim());
+      });
+      rows.push(row);
+    }
+  });
+
+  // Création feuille Excel
+  const range = XLSX.utils.decode_range(worksheet['!ref']);
+
+for (let C = range.s.c; C <= range.e.c; ++C) {
+  const cell = worksheet[XLSX.utils.encode_cell({ r: 0, c: C })];
+  if (cell) {
+    cell.s = {
+      font: { bold: true },
+      fill: { fgColor: { rgb: "D3A52C" } } // or PNDA gold
+    };
   }
-  const blob = new Blob([content], { type:'application/vnd.ms-excel;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = fname; a.click();
-  URL.revokeObjectURL(url);
-  showToast('✓ Tableau Excel téléchargé.');
+}
+
+  // Ajustement largeur colonnes auto
+  worksheet['!cols'] = rows[0].map(() => ({ wch: 18 }));
+
+  // Création classeur
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Missions");
+
+  // Export fichier
+  XLSX.writeFile(workbook, "PNDA_Missions.xlsx");
 }
 
 function printSelectedMissions() { renderSelectedMissionsTable(); window.print(); }
@@ -3398,5 +3431,6 @@ function refreshComptableView() {
 }
 renderSelectedMissionsTable();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </body>
 </html>

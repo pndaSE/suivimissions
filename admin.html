@@ -1927,7 +1927,12 @@ function sheetNameForProvince(label) { return label.replace(/[\\/*?:\[\]]/g, '_'
 function sheetName(value) { return String(value || 'Sheet1').replace(/[\\/*?:\[\]]/g, '_').slice(0, 31); }
 
 function xmlEscape(value) {
-  return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&apos;');
+  return String(value ?? '')
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&apos;');
 }
 
 // ─── UTILITIES ────────────────────────────────────────────────────────────────
