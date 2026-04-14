@@ -650,21 +650,39 @@
         <div class="card-body">
           <p class="text-muted small mb-3">Retrouvez, consultez et gérez vos rapports enregistrés.</p>
           <div class="row g-2 mb-3">
-            <div class="col-md-3">
+
+            <div class="col-md-2">
               <input type="text" id="filter-chef" class="form-control form-control-sm" placeholder="Chef de mission">
             </div>
-            <div class="col-md-3">
+
+            <div class="col-md-2">
               <input type="text" id="filter-mission" class="form-control form-control-sm" placeholder="Mission">
             </div>
-            <div class="col-md-3">
+
+            <div class="col-md-2">
               <select id="filter-statut" class="form-select form-select-sm">
-                <option value="">Tous statuts</option>
+                <option value="">Statut</option>
                 <option value="en_attente">En attente</option>
                 <option value="retournee">Retournée</option>
                 <option value="activee">Activée</option>
                 <option value="realisee">Réalisée</option>
               </select>
             </div>
+
+            <div class="col-md-2">
+              <input type="date" id="filter-date" class="form-control form-control-sm">
+            </div>
+
+            <div class="col-md-2">
+              <input type="number" id="filter-montant" class="form-control form-control-sm" placeholder="Montant min">
+            </div>
+
+            <div class="col-md-2">
+              <button class="btn btn-outline-secondary btn-sm w-100" onclick="resetFilters()">
+                <i class="bi bi-x-circle"></i> Reset
+              </button>
+            </div>
+
           </div>
           <div class="table-responsive">
             <table class="table table-hover table-sm summary-table mb-0">
@@ -2875,7 +2893,7 @@ async function loadUserArchive(rapporteur, province) {
       realisee:   '<span class="badge bg-secondary"><i class="bi bi-check2-all me-1"></i>Réalisée</span>'
     };
 
-    const filteredData = applyFilters(data);
+    const filtered = applyFiltersLocal(data);
 
     tbody.innerHTML = filteredData.map((r) => {
       const nb = r.missions?.length || r.meta?.total_missions || 0;
@@ -3181,6 +3199,55 @@ async function loadActiveMissions(province) {
   }
 }
 
+function applyFiltersLocal(data) {
+  const chef = document.getElementById('filter-chef')?.value.toLowerCase() || '';
+  const mission = document.getElementById('filter-mission')?.value.toLowerCase() || '';
+  const statut = document.getElementById('filter-statut')?.value || '';
+  const date = document.getElementById('filter-date')?.value || '';
+  const montant = parseFloat(document.getElementById('filter-montant')?.value) || 0;
+
+  return data.filter(r => {
+    const chefMission = (r.chef_mission || r.meta?.rapporteur || '').toLowerCase();
+    const missionLabel = (r.missions || []).map(m => m.nature).join(' ').toLowerCase();
+    const st = r.statut || '';
+    const savedDate = r.saved_at ? r.saved_at.split('T')[0] : '';
+    const total = parseFloat(r.meta?.total_general_usd || 0);
+
+    return (
+      (!chef || chefMission.includes(chef)) &&
+      (!mission || missionLabel.includes(mission)) &&
+      (!statut || st === statut) &&
+      (!date || savedDate === date) &&
+      (!montant || total >= montant)
+    );
+  });
+}
+
+function renderArchiveTable(data) {
+  const tbody = document.getElementById('archive-tbody');
+
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Aucune donnée</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map((r) => {
+    const chef = r.chef_mission || r.meta?.rapporteur || '—';
+    const mission = (r.missions || []).map(m => m.nature).join(', ');
+    const total = r.meta?.total_general_usd || 0;
+
+    return `
+      <tr>
+        <td>${new Date(r.saved_at).toLocaleDateString('fr-FR')}</td>
+        <td>${chef}</td>
+        <td>${mission}</td>
+        <td>${r.trimestre} ${r.annee}</td>
+        <td>${r.statut || ''}</td>
+        <td>${total}</td>
+      </tr>
+    `;
+  }).join('');
+}
 // ─── COMPTABLE — COMPLÉTION FINANCIÈRE ───────────────────────────────────────
 function openFinancialCompletion(reportId) {
   const report = PENDING_REPORTS_CACHE.find((r) => r.id === reportId);
