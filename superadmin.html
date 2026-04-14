@@ -642,11 +642,41 @@
         <div class="card-header py-3">
           <h5><i class="bi bi-clock-history me-2"></i>Derniers rapports soumis</h5>
         </div>
+        <div class="card-body border-bottom bg-light">
+          <div class="row g-2">
+            <div class="col-md-3">
+              <select class="form-select form-select-sm" id="dash-filter-province" title="Filtrer par province" aria-label="Filtrer par province" onchange="renderRecentReports()">
+                <option value="">Toutes provinces</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <input class="form-control form-control-sm" id="dash-filter-rapporteur" type="text" placeholder="Rapporteur…" oninput="renderRecentReports()">
+            </div>
+            <div class="col-md-3">
+              <input class="form-control form-control-sm" id="dash-filter-mission" type="text" placeholder="Objet de mission…" oninput="renderRecentReports()">
+            </div>
+            <div class="col-md-2">
+              <input class="form-control form-control-sm" id="dash-filter-periode" type="text" placeholder="Période (ex. T1 2026)" oninput="renderRecentReports()">
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+              <select class="form-select form-select-sm" id="dash-filter-statut" title="Filtrer par statut" aria-label="Filtrer par statut" onchange="renderRecentReports()">
+                <option value="">Tous statuts</option>
+                <option value="en_attente">En attente</option>
+                <option value="retournee">Retournée</option>
+                <option value="activee">Activée</option>
+                <option value="realisee">Réalisée</option>
+              </select>
+              <button class="btn btn-outline-secondary btn-sm" type="button" onclick="resetRecentReportFilters()" title="Réinitialiser les filtres">
+                <i class="bi bi-x-circle"></i>
+              </button>
+            </div>
+          </div>
+        </div>
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="table table-hover table-sm mb-0">
               <thead>
-                <tr><th>N°</th><th>Date</th><th>Province</th><th>Rapporteur</th><th>Missions</th><th>Montant USD</th><th>Statut</th></tr>
+                <tr><th>N°</th><th>Date</th><th>Province</th><th>Rapporteur</th><th>Objet de mission</th><th>Montant USD</th><th>Statut</th></tr>
               </thead>
               <tbody id="tbl-recent-reports">
                 <tr><td colspan="7" class="text-center text-muted py-4">Chargement…</td></tr>
@@ -1120,6 +1150,7 @@ let PROVINCES_CACHE    = [];
 let TERRITOIRES_CACHE  = [];
 let SECTEURS_CACHE     = [];
 let ALL_REPORTS_CACHE  = [];
+let DASHBOARD_REPORTS_CACHE = [];
 let MR_CACHE           = [];
 let currentReportStatusFilter = '';
 const REPORT_SYNC_KEY = 'PNDA_REPORTS_SYNC';
@@ -1182,6 +1213,84 @@ function calculateReportTotal(report) {
     return missions.reduce((sum, mission) => sum + Number(mission.total_usd || 0), 0);
   }
   return Number(report?.meta?.total_general_usd || report?.meta?.total_montant_usd || 0);
+}
+
+function getReportPeriod(report) {
+  return `${report?.trimestre || report?.meta?.trimestre || ''} ${report?.annee || report?.meta?.annee || ''}`.trim();
+}
+
+function getReportMissionSummary(report) {
+  const missions = Array.isArray(report?.missions) ? report.missions : [];
+  const labels = missions
+    .map((mission) => (mission?.objectif || mission?.nature || '').trim())
+    .filter(Boolean);
+
+  if (!labels.length) {
+    return '—';
+  }
+
+  return [...new Set(labels)].join(' ; ');
+}
+
+function getRecentReportFilters() {
+  return {
+    province: document.getElementById('dash-filter-province')?.value || '',
+    rapporteur: document.getElementById('dash-filter-rapporteur')?.value.trim().toLowerCase() || '',
+    mission: document.getElementById('dash-filter-mission')?.value.trim().toLowerCase() || '',
+    periode: document.getElementById('dash-filter-periode')?.value.trim().toLowerCase() || '',
+    statut: document.getElementById('dash-filter-statut')?.value || ''
+  };
+}
+
+function applyRecentReportFilters(reports) {
+  const filters = getRecentReportFilters();
+
+  return (reports || []).filter((report) => {
+    const province = (report.province_label || report.province || '').toLowerCase();
+    const rapporteur = (report.rapporteur || '').toLowerCase();
+    const mission = getReportMissionSummary(report).toLowerCase();
+    const periode = getReportPeriod(report).toLowerCase();
+    const statut = report.statut || 'activee';
+
+    return (
+      (!filters.province || report.province === filters.province) &&
+      (!filters.rapporteur || rapporteur.includes(filters.rapporteur)) &&
+      (!filters.mission || mission.includes(filters.mission)) &&
+      (!filters.periode || periode.includes(filters.periode)) &&
+      (!filters.statut || statut === filters.statut)
+    );
+  });
+}
+
+function renderRecentReports() {
+  const tbody = document.getElementById('tbl-recent-reports');
+  if (!tbody) return;
+
+  const reports = applyRecentReportFilters(DASHBOARD_REPORTS_CACHE);
+  tbody.innerHTML = reports.map((report) => {
+    const status = report.statut || 'activee';
+    const total = calculateReportTotal(report);
+    const missionSummary = getReportMissionSummary(report);
+    return `
+      <tr>
+        <td>${esc(report.seq_number ? '#'+report.seq_number : '—')}</td>
+        <td>${esc(new Date(report.saved_at).toLocaleDateString('fr-FR'))}</td>
+        <td>${esc(report.province_label || report.province || '—')}</td>
+        <td>${esc(report.rapporteur || '—')}</td>
+        <td class="small">${esc(missionSummary)}</td>
+        <td>${esc(fmtCur(total))}</td>
+        <td>${getStatusBadge(status)}</td>
+      </tr>
+    `;
+  }).join('') || '<tr><td colspan="7" class="text-center text-muted py-4">Aucun rapport.</td></tr>';
+}
+
+function resetRecentReportFilters() {
+  ['dash-filter-province', 'dash-filter-rapporteur', 'dash-filter-mission', 'dash-filter-periode', 'dash-filter-statut'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  renderRecentReports();
 }
 
 function scheduleVisibleDataRefresh() {
@@ -1383,7 +1492,7 @@ async function loadDashboard() {
     ] = await Promise.all([
       db.from('users').select('*',    { count: 'exact', head: true }),
       db.from('provinces').select('*',{ count: 'exact', head: true }),
-      db.from('reports').select('id,saved_at,province_label,rapporteur,seq_number,statut,meta,missions').order('saved_at',{ascending:false}).limit(10),
+      db.from('reports').select('id,saved_at,province_label,province,rapporteur,trimestre,annee,seq_number,statut,meta,missions').order('saved_at',{ascending:false}).limit(50),
       db.from('reports').select('*',  { count: 'exact', head: true })
     ]);
     
@@ -1391,25 +1500,12 @@ async function loadDashboard() {
     document.getElementById('stat-users').textContent     = nbUsers     ?? '—';
     document.getElementById('stat-provinces').textContent = nbProvs     ?? '—';
     document.getElementById('stat-reports').textContent   = nbReports   ?? '—';
+    DASHBOARD_REPORTS_CACHE = reports || [];
     
     // Charger les stats du workflow
     await loadWorkflowStats();
     
-    // Tableau des derniers rapports avec statut
-    document.getElementById('tbl-recent-reports').innerHTML = (reports || []).map((r) => {
-      const status = r.statut || 'activee';
-      const total = calculateReportTotal(r);
-      return `
-      <tr>
-        <td>${esc(r.seq_number ? '#'+r.seq_number : '—')}</td>
-        <td>${esc(new Date(r.saved_at).toLocaleDateString('fr-FR'))}</td>
-        <td>${esc(r.province_label || '—')}</td>
-        <td>${esc(r.rapporteur || '—')}</td>
-        <td><span class="badge bg-secondary">${esc(String(r.missions?.length||0))}</span></td>
-        <td>${esc(fmtCur(total))}</td>
-        <td>${getStatusBadge(status)}</td>
-      </tr>
-    `}).join('') || '<tr><td colspan="7" class="text-center text-muted py-4">Aucun rapport.</td></tr>';
+    renderRecentReports();
     
   } catch (e) {
     console.error(e);
@@ -1564,7 +1660,7 @@ async function loadProvinces() {
   if (error) { showToast('Erreur chargement provinces.'); return; }
   PROVINCES_CACHE = data || [];
   
-  ['mr-filter-province','mr-province','rp-filter-province',
+  ['mr-filter-province','mr-province','rp-filter-province','dash-filter-province',
    'terr-filter-province','terr-province','sect-filter-province','sect-province'].forEach((selId) => {
     const sel = document.getElementById(selId);
     if (!sel) return;
