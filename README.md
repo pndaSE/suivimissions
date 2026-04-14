@@ -1,9 +1,9 @@
 # Suivi des missions
 
-[![Version](https://img.shields.io/badge/version-1.0.0-1d4c34)](https://github.com/KISUNGU/suivi-missions/releases/tag/v1.0.0)
-[![Windows](https://img.shields.io/badge/platform-Windows-0f6cbd)](https://github.com/KISUNGU/suivi-missions/releases)
+[![Version](https://img.shields.io/badge/version-1.0.0-1d4c34)](https://github.com/pndaSE/suivi-missions/releases/tag/v1.0.0)
+[![Windows](https://img.shields.io/badge/platform-Windows-0f6cbd)](https://github.com/pndaSE/suivi-missions/releases)
 [![Electron](https://img.shields.io/badge/Electron-37.2.0-47848f)](https://www.electronjs.org/)
-[![Release](https://img.shields.io/badge/download-releases-d3a52c)](https://github.com/KISUNGU/suivi-missions/releases)
+[![Release](https://img.shields.io/badge/download-releases-d3a52c)](https://github.com/pndaSE/suivi-missions/releases)
 
 Application desktop Electron pour le suivi des missions du PNDA-SE.
 
@@ -19,8 +19,8 @@ Le projet fournit une application Windows autonome avec :
 
 ## Telechargement
 
-- Page des releases : https://github.com/KISUNGU/suivi-missions/releases
-- Version `v1.0.0` : https://github.com/KISUNGU/suivi-missions/releases/tag/v1.0.0
+- Page des releases : https://github.com/pndaSE/suivi-missions/releases
+- Version `v1.0.0` : https://github.com/pndaSE/suivi-missions/releases/tag/v1.0.0
 
 Quand un executable est publie dans une release, il peut etre telecharge directement depuis cette page.
 
@@ -90,7 +90,7 @@ Le build genere un executable Windows portable dans le dossier `dist/` avec un n
 
 Le depot distant associe est :
 
-https://github.com/KISUNGU/suivi-missions.git
+https://github.com/pndaSE/suivi-missions.git
 
 ## Licence
 
