@@ -2895,7 +2895,7 @@ async function loadUserArchive(rapporteur, province) {
 
     const filtered = applyFiltersLocal(data);
 
-    tbody.innerHTML = filteredData.map((r) => {
+      tbody.innerHTML = filtered.map((r) => {
       const nb = r.missions?.length || r.meta?.total_missions || 0;
       const tot = r.meta?.total_general_usd || r.meta?.total_montant_usd || '0.00';
       const st = r.statut || WORKFLOW_STATUS.ACTIVEE;
