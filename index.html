@@ -649,6 +649,23 @@
         </div>
         <div class="card-body">
           <p class="text-muted small mb-3">Retrouvez, consultez et gérez vos rapports enregistrés.</p>
+          <div class="row g-2 mb-3">
+            <div class="col-md-3">
+              <input type="text" id="filter-chef" class="form-control form-control-sm" placeholder="Chef de mission">
+            </div>
+            <div class="col-md-3">
+              <input type="text" id="filter-mission" class="form-control form-control-sm" placeholder="Mission">
+            </div>
+            <div class="col-md-3">
+              <select id="filter-statut" class="form-select form-select-sm">
+                <option value="">Tous statuts</option>
+                <option value="en_attente">En attente</option>
+                <option value="retournee">Retournée</option>
+                <option value="activee">Activée</option>
+                <option value="realisee">Réalisée</option>
+              </select>
+            </div>
+          </div>
           <div class="table-responsive">
             <table class="table table-hover table-sm summary-table mb-0">
               <thead>
@@ -2858,7 +2875,9 @@ async function loadUserArchive(rapporteur, province) {
       realisee:   '<span class="badge bg-secondary"><i class="bi bi-check2-all me-1"></i>Réalisée</span>'
     };
 
-    tbody.innerHTML = data.map((r) => {
+    const filteredData = applyFilters(data);
+
+    tbody.innerHTML = filteredData.map((r) => {
       const nb = r.missions?.length || r.meta?.total_missions || 0;
       const tot = r.meta?.total_general_usd || r.meta?.total_montant_usd || '0.00';
       const st = r.statut || WORKFLOW_STATUS.ACTIVEE;
@@ -3420,6 +3439,13 @@ function refreshComptableView() {
   }
 }
 renderSelectedMissionsTable();
+
+['filter-chef','filter-mission','filter-statut'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', () => {
+    const session = getSession();
+    loadUserArchive(session?.user, session?.province);
+  });
+});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </body>
