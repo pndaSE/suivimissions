@@ -1463,19 +1463,39 @@ function buildGeneralPanel(reports = getFilteredReports()) {
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="table table-hover table-sm mb-0">
-              <thead><tr><th>Date</th><th>Province</th><th>Rapporteur</th><th>Missions</th><th>Total USD</th><th>Litige USD</th><th>Statut</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Province</th><th>Chef de mission</th>
+                  <th>Intitulé mission</th>
+                  <th>Rapporteur</th>
+                  <th>Missions</th>
+                  <th>Total USD</th>
+                  <th>Litige USD</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
               <tbody>${reports.length ? reports.slice(0, 10).map((report) => {
+                const chefMission = r.chef_mission || r.meta?.rapporteur || '—';
+                const missionLabel = (r.missions && r.missions.length)
+                  ? r.missions.map(m => m.nature).join(', ')
+                  : '—';
                 const rm = report.missions || [];
                 const rTotal = rm.reduce((s,m) => s + Number(m.total_usd||0), 0);
                 const litige = calculateReportLitige(report);
                 const st = report.statut || 'activee';
                 return `
-                <tr><td>${formatDate(report.savedAt)}</td><td>${escapeHtml(getReportProvinceLabel(report) || '—')}</td>
-                <td>${escapeHtml(report.meta?.rapporteur || '—')}</td>
-                <td><span class="badge bg-secondary">${rm.length}</span></td>
-                <td class="text-end fw-bold">${formatCurrency(rTotal)}</td>
-                <td class="text-end ${litige > 0 ? 'text-warning fw-bold' : 'text-success'}">${formatCurrency(litige)}</td>
-                <td>${getStatusBadge(st)}</td></tr>`;
+                <tr>
+                  <td>${formatDate(report.savedAt)}</td>
+                  <td>${escapeHtml(getReportProvinceLabel(report) || '—')}</td>
+                  <td>${escapeHtml(chefMission)}</td>
+                  <td>${escapeHtml(missionLabel)}</td>
+                  <td>${escapeHtml(report.meta?.rapporteur || '—')}</td>
+                  <td><span class="badge bg-secondary">${rm.length}</span></td>
+                  <td class="text-end fw-bold">${formatCurrency(rTotal)}</td>
+                  <td class="text-end ${litige > 0 ? 'text-warning fw-bold' : 'text-success'}">${formatCurrency(litige)}</td>
+                  <td>${getStatusBadge(st)}</td>
+                </tr>`;
               }).join('') : '<tr><td colspan="7" class="text-center text-muted py-4">Aucun rapport.</td></tr>'}</tbody>
             </table>
           </div>
